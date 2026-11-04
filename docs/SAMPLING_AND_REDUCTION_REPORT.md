@@ -1,79 +1,168 @@
 # Sampling and Reduction Report
 
-## 1. Purpose
+## 1. Original Source
 
-This report documents the source-data review, sampling decision, reduction approach, and reproducibility of the POC-21 canonical data package.
-
-The objective is to retain a controlled, traceable dataset for the Phase 3 Canonical Data Foundation while preserving the supplied source records.
-
-## 2. Source Dataset
-
-| Item | Result |
+| Item | Details |
 |---|---|
-| Source file | `data/synthetic/downtime_incidents.csv` |
-| Source records | 10 |
-| Source columns | 11 |
-| Source size | 1,212 bytes |
-| Source classification | Synthetic |
+| Source name | Synthetic Downtime Incident Dataset |
+| Source type | Synthetic CSV |
+| Source path | `data/synthetic/downtime_incidents.csv` |
+| Original record count | 10 |
+| Original column count | 11 |
+| Original file size | 1,212 bytes |
+| Data classification | Synthetic |
 | Personal data observed | No personal data observed in the supplied synthetic source |
 | Restricted data observed | No restricted data observed in the supplied synthetic source |
 
-Manual reviewer confirmation of the data classification remains required.
+Manual reviewer confirmation of data classification remains required.
 
-## 3. Sampling Decision
+## 2. Original Size
 
-The complete source dataset was retained. No source records were removed.
+The original source CSV is 1,212 bytes.
 
-| Item | Result |
-|---|---|
-| Original source records | 10 |
-| Records retained | 10 |
-| Records removed | 0 |
-| Sampling applied | No |
-| Sampling seed | 42 (documented; not used because no sampling was required) |
+The complete source dataset was small enough to retain without reducing its record count.
 
-The source dataset is small enough to retain in full. Retaining all records preserves traceability and avoids losing potentially useful examples.
+## 3. Original Record Count
 
-## 4. Reduction and Standardization
+- Original records: 10
+- Records retained: 10
+- Records removed: 0
 
-The canonical dataset standardizes the source incidents into measurement records.
+The complete source dataset was retained.
 
-Each source incident produces two canonical measurement records:
+## 4. Original Column Count
 
-- `downtime_minutes`
-- `failure_frequency`
+The original source contains 11 columns.
 
-The resulting canonical dataset contains 20 records and 22 columns.
+The source sample retains all 11 source columns.
 
-The first 20 columns follow the required canonical column order. The additional domain-specific columns are `shift` and `severity`.
+## 5. Selected Sampling Method
 
-The canonical CSV remains the source of truth. The published JSON file is generated from the canonical CSV by the pipeline.
+**Full-source retention (no sampling required).**
 
-## 5. Coverage and Limitations
+The supplied source contains only 10 records. All records were retained to preserve the available operational examples and avoid unnecessary information loss.
 
-All 10 supplied source incidents were retained.
+No random or stratified record selection was performed.
 
-The source data provides examples across the categories represented in the supplied dataset. However, the dataset is synthetic and small.
+## 6. Random Seed
 
-Known limitations:
+- Documented seed: 42
+- Seed usage: Not applicable
+- Reason: The complete source dataset was retained without random sampling.
 
-- The dataset contains only 10 source incidents.
-- All supplied incidents have a Closed status.
-- The observations cover only the dates present in the synthetic source.
-- Geographic coordinates are not available in the source data.
-- The dataset does not establish real-world operational coverage or representativeness.
+## 7. Stratification Fields
 
-These limitations must be considered during reviewer assessment.
+No stratified sampling was performed.
 
-## 6. Data Classification Review
+The retained source records preserve the categories and examples available in the original synthetic dataset.
+
+## 8. Date-Coverage Method
+
+All source records were retained.
+
+The source contains observations across the dates represented in the original dataset. No date-based filtering or record reduction was applied.
+
+## 9. Rare-Record Preservation
+
+All 10 source records were retained.
+
+This preserves the available examples, including less frequent examples in the supplied source.
+
+No rare-record exclusion was performed.
+
+## 10. Removed Fields
+
+No source columns were removed from `source_sample.csv`.
+
+The canonical standardization process maps source information into the approved canonical fields and documented domain-specific fields.
+
+See `docs/CANONICAL_DATA_MAPPING.md` for the field-level transformations.
+
+## 11. Removed Records
+
+- Records removed during sampling: 0
+- Records retained: 10
+- Sampling reduction: None
+
+## 12. Text Truncation
+
+The source sample retains the original source records.
+
+Canonical free-text values are subject to the Phase 3 maximum of 500 characters per value.
+
+Any transformation applied during canonical standardization is documented in the canonical mapping.
+
+## 13. Sensitive-Data Removal
 
 No personal or restricted data was observed in the supplied synthetic source dataset.
 
-This is an initial technical review, not a substitute for formal reviewer confirmation. The reviewer must confirm that the dataset is suitable for the intended project use before subsequent analysis work proceeds.
+No separate sensitive-record removal was required based on the initial technical review.
 
-## 7. Reproduction Commands
+Manual reviewer confirmation remains required before formal approval.
 
-Run these commands from the repository root in the documented pipeline order:
+## 14. Final Source Sample
+
+| Item | Result |
+|---|---|
+| Path | `data/source-sample/source_sample.csv` |
+| Size | 1,212 bytes |
+| Record count | 10 |
+| Column count | 11 |
+| Encoding | UTF-8 |
+| Sampling | Full-source retention |
+
+## 15. Representativeness Checks
+
+The following checks were performed:
+
+- All 10 original records are retained.
+- The source sample preserves all 11 original columns.
+- Available source categories are retained.
+- The available date coverage is preserved.
+- Rare examples present in the original source are retained.
+- No records were removed through sampling.
+
+The dataset is synthetic and contains only 10 source incidents. It should not be interpreted as representative of real-world operational activity.
+
+## 16. Canonical Standardization Result
+
+Each source incident produces two canonical measurement records:
+
+1. `downtime_minutes`
+2. `failure_frequency`
+
+The resulting canonical dataset contains:
+
+| Item | Result |
+|---|---:|
+| Canonical records | 20 |
+| Canonical columns | 22 |
+| Canonical CSV size | 4,982 bytes |
+| Published JSON records | 20 |
+| Published JSON size | 11,520 bytes |
+
+The first 20 columns follow the mandatory Phase 3 canonical column order.
+
+The additional domain-specific columns are `shift` and `severity`.
+
+The canonical CSV is the source of truth. The published JSON is generated from the canonical CSV.
+
+## 17. Known Sampling Limitations
+
+The following limitations apply:
+
+- The source dataset contains only 10 synthetic incidents.
+- All supplied incidents have a Closed status.
+- The observations cover only the dates represented in the supplied source.
+- Geographic coordinates are not available in the source data.
+- The dataset does not establish real-world operational representativeness.
+- No random sampling was necessary because the complete source was retained.
+
+These limitations must be considered during reviewer assessment.
+
+## 18. Reproduction Command
+
+Run the following commands from the repository root in the documented pipeline order:
 
 ```powershell
 py scripts/data_pipeline/extract_data.py
@@ -83,18 +172,22 @@ py scripts/data_pipeline/validate_data.py
 py scripts/data_pipeline/publish_data.py
 ```
 
-After publishing, run validation again:
+After publishing, validate the package again:
 
 ```powershell
 py scripts/data_pipeline/validate_data.py
 ```
 
-## 8. Outcome
+## 19. Final Result
 
 The complete supplied synthetic source dataset has been retained and standardized into the canonical data structure.
 
-The canonical CSV is the source of truth, and the published JSON is generated from it.
+The canonical CSV contains 20 measurement records and 22 columns.
 
-The package has passed the automated validation checks. Manual reviewer confirmation of the data classification and formal approval of the canonical data package are still required.
+The published JSON is generated from the canonical CSV.
 
-No Phase 3 Post #2 analysis or Data Intelligence functionality should proceed until the reviewer approves the canonical data foundation.
+Automated canonical package validation has passed.
+
+Manual reviewer confirmation of data classification and formal approval of the Canonical Data Foundation remain outstanding.
+
+No Phase 3 Post #2 analytical work or Data Intelligence functionality should proceed until formal reviewer approval.
