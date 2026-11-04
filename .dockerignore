@@ -1,88 +1,15 @@
-
-def check_project_information_signature():
-    # Scroll to the top so the header button is in view.
-    driver.execute_script(
-        "window.scrollTo({top: 0, left: 0, behavior: 'instant'});"
-    )
-
-    wait_for(
-        lambda d: d.execute_script("return window.scrollY === 0"),
-        "page scroll to top"
-    )
-
-    info_locator = (
-        By.CSS_SELECTOR,
-        "button[aria-label='Open project information']"
-    )
-
-    # Wait until the project information button exists.
-    info_button = wait_for(
-        EC.presence_of_element_located(info_locator),
-        "project information button"
-    )
-
-    # Bring the button into the visible viewport.
-    driver.execute_script(
-        "arguments[0].scrollIntoView({block: 'center', inline: 'center'});",
-        info_button
-    )
-
-    info_button = wait_for(
-        EC.visibility_of_element_located(info_locator),
-        "visible project information button"
-    )
-
-    # Use a normal click first, then JavaScript if another element intercepts it.
-    try:
-        info_button.click()
-    except ElementClickInterceptedException:
-        driver.execute_script("arguments[0].click();", info_button)
-
-    # Verify that the project information modal opens.
-    modal_locator = (
-        By.CSS_SELECTOR,
-        "[role='dialog'][aria-labelledby='project-information-title']"
-    )
-
-    modal = wait_for(
-        EC.visibility_of_element_located(modal_locator),
-        "Project Information modal"
-    )
-
-    modal_text = modal.text.lower()
-
-    # Verify developer and project information.
-    assert "niranjana" in modal_text, (
-        "Developer name was not found in the project information modal"
-    )
-
-    assert "21" in modal_text, (
-        "PoC ID 21 was not found in the project information modal"
-    )
-
-    assert "niranjanats07" in modal_text, (
-        "GitHub username was not found in the project information modal"
-    )
-
-    # Close the modal.
-    close_locator = (
-        By.CSS_SELECTOR,
-        "button[aria-label='Close project information']"
-    )
-
-    close_button = wait_for(
-        EC.element_to_be_clickable(close_locator),
-        "Close project information button"
-    )
-
-    close_button.click()
-
-    wait_for(
-        EC.invisibility_of_element_located(modal_locator),
-        "Project Information modal to close"
-    )
-
-    return (
-        "Project Information modal opened successfully and displayed "
-        "developer name, PoC ID 21, and GitHub username"
-    )
+﻿.git
+.gitignore
+**/node_modules
+**/.next
+**/__pycache__
+**/.pytest_cache
+**/.venv
+**/venv
+**/.mypy_cache
+*.pyc
+*.pyo
+.env
+.env.*
+!.env.example
+repomix-output.xml
