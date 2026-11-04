@@ -6,6 +6,16 @@ The canonical CSV begins with the 20 mandatory universal fields in the exact
 required order. The two documented case-specific columns, `shift` and
 `severity`, follow those fields. Total columns: 22 (within the 50-column cap).
 
+The package limits are:
+
+- Total `/data` directory size: maximum 10 MB.
+- Source sample CSV: maximum 5 MB.
+- Canonical CSV: maximum 5 MB.
+- Published JSON: maximum 5 MB.
+- Canonical rows: maximum 10,000.
+- Canonical columns: maximum 50.
+- Text values: maximum 500 characters.
+
 ## Automated Validation
 
 Run from the repository root:
@@ -33,18 +43,38 @@ The validator checks:
 
 The machine validator cannot certify legal ownership or detect every possible
 sensitive-data issue. The source inventory therefore records a separate
-human review of the supplied synthetic CSV.
+human review of the supplied synthetic CSV. Manual reviewer confirmation
+remains necessary.
 
-## Preservation
+## Preservation and Backend Compatibility
 
-No Phase 2 dashboard, API, backend loader, frontend page, chart, test or
-deployment configuration is intentionally redesigned by this Post #1 change.
-The existing Phase 2 source file remains in place and remains the backend
-loader's source.
+The existing Phase 2 dashboard, API, frontend pages, charts, tests and
+deployment configuration are intended to retain their existing behavior.
+No visualization redesign is part of this Post #1 change.
+
+The backend data-loading implementation now reads the Phase 3 canonical CSV
+and reconstructs legacy-compatible incident rows for the existing API and
+dashboard. The original Phase 2 source file remains in the repository as
+historical project data; it is not the active backend loader source.
+
+Local regression checks previously covered the dashboard's KPI, Pareto,
+machine downtime, heatmap and root-cause views, along with filtering and
+CSV/JSON exports. These checks support compatibility but do not replace
+clean-clone or deployment verification.
 
 ## Build and Deployment Readiness
 
-The data package is local and does not require a live API for Phase 3 data
-preparation. A fresh Repomix, clean-clone validation, Docker build and target
-platform build still need to be executed in the actual Phase 3 Git repository
-before deployment readiness can be claimed.
+The data package is prepared and validated locally. A passing canonical
+package validation does not by itself establish deployment readiness.
+
+Before deployment readiness can be claimed, complete and record:
+
+- Fresh Repomix generation after the final documentation changes.
+- Clean-clone validation in the Phase 3 Git repository.
+- Backend tests and frontend production build.
+- Docker build, if Docker is part of the target deployment process.
+- Target-platform build and deployment verification.
+- Live frontend and backend endpoint checks.
+
+Do not begin Phase 3 Post #2 until the Post #1 canonical data package has
+received formal reviewer approval.
