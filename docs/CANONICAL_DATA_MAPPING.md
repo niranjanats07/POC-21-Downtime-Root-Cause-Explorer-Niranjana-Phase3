@@ -18,8 +18,8 @@ and do not duplicate a mandatory field.
 
 | Source Field | Canonical Field | Transformation | Required | Example | Notes |
 |---|---|---|---|---|---|
-| `incident_id` | `source_record_id` | Preserve source ID | Yes | `INC001` | Original incident key |
-| `incident_id` | `record_id` | `POC21-{incident_id}-DOWNTIME` or `...-FREQUENCY` | Yes | `POC21-INC001-DOWNTIME` | Stable unique ID per metric row |
+| `incident_id` | `source_record_id` | Preserve source ID | No | `INC001` | Original incident key |
+| `incident_id` | `record_id` | `POC21-{incident_id}-DOWNTIME` or `POC21-{incident_id}-FREQUENCY` | Yes | `POC21-INC001-DOWNTIME` | Stable unique ID per metric row |
 | Fixed value | `record_type` | Set to `measurement` | Yes | `measurement` | One row per numeric measurement |
 | `incident_date` | `observed_at` | Convert date-only value to ISO 8601 midnight UTC | No | `2026-01-05T00:00:00Z` | Midnight is normalization, not source event time |
 | `machine_id` | `entity_id` | Preserve machine identifier | No | `MCH-01` | Machine associated with incident |
@@ -32,7 +32,7 @@ and do not duplicate a mandatory field.
 | `description` | `text_value` | Trim and cap at 500 characters | No | `Bearing wear caused machine stoppage` | Retained as short context |
 | `shift` | `shift` (domain-specific) | Trim and lowercase | No | `morning` | No universal field has equivalent meaning |
 | `severity` | `severity` (domain-specific) | Trim and lowercase | No | `high` | No universal field has equivalent meaning |
-| Fixed value | `source_name` | `synthetic_downtime_incidents_csv` | Yes | same | Source provenance |
+| Fixed value | `source_name` | `synthetic_downtime_incidents_csv` | Yes | `synthetic_downtime_incidents_csv` | Source provenance |
 | Fixed value | `is_synthetic` | Boolean `true` | Yes | `true` | All supplied records are synthetic |
 | Fixed value | `data_version` | `1.0.0` | Yes | `1.0.0` | Package version |
 
