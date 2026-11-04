@@ -22,7 +22,7 @@ from it after the package is reviewed and approved.
 ## Source and sampling decision
 
 The Phase 2 application uses `data/synthetic/downtime_incidents.csv`.
-The supplied source contains 10 records and 11 columns (1,202 bytes).
+The supplied source contains 10 records and 11 columns (1,212 bytes).
 It is already far below the 10,000-row and 5 MB limits, so all records are
 retained; no rows are dropped and no random sample is necessary. Seed 42 is
 recorded for reproducibility policy, but is not applied because no random
