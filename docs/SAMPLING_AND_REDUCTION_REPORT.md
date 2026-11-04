@@ -1,96 +1,100 @@
 # Sampling and Reduction Report
 
-## Original Source
+## 1. Purpose
 
-`data/synthetic/downtime_incidents.csv` — synthetic local CSV used by the
-existing Phase 2 backend loader.
+This report documents the source-data review, sampling decision, reduction approach, and reproducibility of the POC-21 canonical data package.
 
-## Original Size
+The objective is to retain a controlled, traceable dataset for the Phase 3 Canonical Data Foundation while preserving the supplied source records.
 
-1,202 bytes.
+## 2. Source Dataset
 
-## Original Record Count
+| Item | Result |
+|---|---|
+| Source file | `data/synthetic/downtime_incidents.csv` |
+| Source records | 10 |
+| Source columns | 11 |
+| Source size | 1,212 bytes |
+| Source classification | Synthetic |
+| Personal data observed | No personal data observed in the supplied synthetic source |
+| Restricted data observed | No restricted data observed in the supplied synthetic source |
 
-10 records.
+Manual reviewer confirmation of the data classification remains required.
 
-## Original Column Count
+## 3. Sampling Decision
 
-11 columns.
+The complete source dataset was retained. No source records were removed.
 
-## Selected Sampling Method
+| Item | Result |
+|---|---|
+| Original source records | 10 |
+| Records retained | 10 |
+| Records removed | 0 |
+| Sampling applied | No |
+| Sampling seed | 42 (documented; not used because no sampling was required) |
 
-Full-source retention with coverage review. The complete source contains only
-10 records, so it is already below the program's default 10,000-row limit.
-No record reduction is needed or performed.
+The source dataset is small enough to retain in full. Retaining all records preserves traceability and avoids losing potentially useful examples.
 
-## Random Seed
+## 4. Reduction and Standardization
 
-42 is the configured program seed. It is not applied because the source is
-retained in full and no random selection takes place.
+The canonical dataset standardizes the source incidents into measurement records.
 
-## Stratification Fields
+Each source incident produces two canonical measurement records:
 
-Coverage was reviewed across `root_cause`, `sub_cause`, `severity`, `status`,
-`shift`, `machine_id` and `incident_date`. All source records are retained.
+- `downtime_minutes`
+- `failure_frequency`
 
-## Date-Coverage Method
+The resulting canonical dataset contains 20 records and 22 columns.
 
-All 10 consecutive dates from 2026-01-05 through 2026-01-14 are retained.
+The first 20 columns follow the required canonical column order. The additional domain-specific columns are `shift` and `severity`.
 
-## Rare-Record Preservation
+The canonical CSV remains the source of truth. The published JSON file is generated from the canonical CSV by the pipeline.
 
-All records are retained, including the single Maintenance root-cause record,
-the single Low-severity/Operational examples where present, and all machine,
-shift and sub-cause combinations.
+## 5. Coverage and Limitations
 
-## Removed Fields
+All 10 supplied source incidents were retained.
 
-No source columns are removed from `source_sample.csv`. In the canonical
-representation, source attributes not in the universal schema are retained
-as documented domain-specific columns (`shift`, `severity`). The original
-source remains available in the source sample.
+The source data provides examples across the categories represented in the supplied dataset. However, the dataset is synthetic and small.
 
-## Removed Records
+Known limitations:
 
-0.
+- The dataset contains only 10 source incidents.
+- All supplied incidents have a Closed status.
+- The observations cover only the dates present in the synthetic source.
+- Geographic coordinates are not available in the source data.
+- The dataset does not establish real-world operational coverage or representativeness.
 
-## Text Truncation
+These limitations must be considered during reviewer assessment.
 
-No description exceeds 500 characters. The standardization script enforces
-the 500-character maximum.
+## 6. Data Classification Review
 
-## Sensitive-Data Removal
+No personal or restricted data was observed in the supplied synthetic source dataset.
 
-No personal or restricted data was identified in the supplied synthetic
-source. No rows or fields were removed for sensitivity.
+This is an initial technical review, not a substitute for formal reviewer confirmation. The reviewer must confirm that the dataset is suitable for the intended project use before subsequent analysis work proceeds.
 
-## Final Source Sample
+## 7. Reproduction Commands
 
-- **Path:** `data/source-sample/source_sample.csv`
-- **Size:** 1,202 bytes
-- **Record count:** 10
-- **Column count:** 11
-
-## Representativeness Checks
-
-- Root-cause categories retained: Electrical, Maintenance, Mechanical,
-  Operational.
-- Severity values retained: High, Low, Medium.
-- Shift values retained: Evening, Morning, Night.
-- Status values retained: Closed.
-- Machines retained: MCH-01, MCH-02, MCH-03, MCH-04.
-- Full date range retained: 2026-01-05 to 2026-01-14.
-- All 10 source incidents retained.
-
-## Known Sampling Limitations
-
-This is a small synthetic demonstration dataset. It does not establish
-statistical representativeness of real manufacturing operations. Status is
-constant, the time range is short, and no geographic attributes exist.
-
-## Reproduction Command
+Run these commands from the repository root in the documented pipeline order:
 
 ```powershell
 py scripts/data_pipeline/extract_data.py
 py scripts/data_pipeline/sample_data.py
+py scripts/data_pipeline/standardize_data.py
+py scripts/data_pipeline/validate_data.py
+py scripts/data_pipeline/publish_data.py
 ```
+
+After publishing, run validation again:
+
+```powershell
+py scripts/data_pipeline/validate_data.py
+```
+
+## 8. Outcome
+
+The complete supplied synthetic source dataset has been retained and standardized into the canonical data structure.
+
+The canonical CSV is the source of truth, and the published JSON is generated from it.
+
+The package has passed the automated validation checks. Manual reviewer confirmation of the data classification and formal approval of the canonical data package are still required.
+
+No Phase 3 Post #2 analysis or Data Intelligence functionality should proceed until the reviewer approves the canonical data foundation.

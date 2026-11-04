@@ -2,8 +2,8 @@
 
 ## Project
 
-- **Project:** POC-21 — Downtime Root Cause Explorer
-- **Phase:** Phase 3 — Post #1, Canonical Data Foundation
+- **Project:** POC-21 - Downtime Root Cause Explorer
+- **Phase:** Phase 3 - Post #1, Canonical Data Foundation
 - **Base application:** Existing Phase 2 Downtime Root Cause Explorer
 - **Existing Phase 2 repository:** https://github.com/niranjanats07/POC-21-Downtime-Root-Cause-Explorer-Niranjana-Phase2
 - **Live frontend:** https://downtime-frontend.onrender.com/
@@ -12,17 +12,23 @@
 ## Existing Application Data Flow
 
 The FastAPI backend imports `load_downtime_data()` from
-`backend/app/data/loader.py`. That loader reads
-`data/synthetic/downtime_incidents.csv` using a repository-relative path.
-The API exposes incident data, KPI and chart endpoints from this loaded
-dataset. The Next.js frontend consumes the backend API. Phase 3 Post #1 does
-not change this application data flow or its operational visualizations.
+`backend/app/data/loader.py`. The current loader reads
+`data/canonical/intelligence_data.csv` using a repository-relative path.
+
+The loader selects measurement records, reconstructs incident-level
+records from the canonical measurements, and exposes the incident data
+through the existing API endpoints. The Next.js frontend consumes the
+backend API.
+
+The backend data-loading implementation now uses the canonical dataset.
+The existing dashboard and visualization behavior is intended to remain
+compatible with the Phase 2 application and must be regression-tested.
 
 ## Source Inventory
 
 | Source | Type | Access Method | Current Usage | Raw Size | Record Count | Sensitivity | Phase 3 Decision |
 |---|---|---|---|---:|---:|---|---|
-| `data/synthetic/downtime_incidents.csv` | Synthetic CSV | Local repository file; loaded by `backend/app/data/loader.py` | Backend incident, KPI, chart, filter and export endpoints | 1,202 bytes | 10 rows × 11 columns | Synthetic demonstration data; no personal data observed | Use as the sole Post #1 source |
+| `data/synthetic/downtime_incidents.csv` | Synthetic CSV | Local repository file | Selected input for canonical data pipeline | 1,212 bytes | 10 rows x 11 columns | Synthetic demonstration data; no personal data observed | Sole Post #1 source |
 
 ## Source Fields
 
@@ -30,11 +36,24 @@ not change this application data flow or its operational visualizations.
 `sub_cause`, `downtime_minutes`, `failure_frequency`, `severity`, `status`,
 `description`.
 
+## Canonical Representation
+
+The canonical dataset is stored at
+`data/canonical/intelligence_data.csv`.
+
+It contains 20 measurement records representing the 10 source incidents.
+The first 20 columns follow the required universal schema. The additional
+domain-specific columns are `shift` and `severity`.
+
+The published JSON is generated from the canonical CSV at
+`data/published/intelligence_data.json`.
+
 ## Excluded Sources
 
-No additional source file, public API, database, user-uploaded data source or
-simulation output was identified in the supplied project snapshot for this
-Post #1 package. The live API is not used as a Phase 3 extraction dependency.
+No additional source file, public API, database, user-uploaded data source
+or simulation output was identified in the supplied project snapshot for
+this Post #1 package. The live API is not used as a Phase 3 extraction
+dependency.
 
 ## Licensing or Access Notes
 
@@ -51,9 +70,12 @@ snapshot; confirm any later source additions before using them.
 - No location fields are supplied.
 - `incident_date` is date-only; no event time or timezone is supplied.
 - No personal or restricted fields were observed in the source.
+- Manual reviewer confirmation of the personal-data assessment remains
+  required.
 
 ## Selected Phase 3 Source
 
-Use only `data/synthetic/downtime_incidents.csv`, copied without row loss to
-`data/source-sample/source_sample.csv`. The canonical file is generated from
-that source sample through the documented pipeline.
+The selected source is
+`data/synthetic/downtime_incidents.csv`. The complete source is retained
+in `data/source-sample/source_sample.csv`. The canonical file is generated
+from that source sample through the documented pipeline.
