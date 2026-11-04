@@ -15,7 +15,7 @@
   "sample_record_count": 10,
   "canonical_record_count": 20,
   "canonical_column_count": 22,
-  "source_sample_size_mb": 0.001156,
+  "source_sample_size_mb": 0.001147,
   "canonical_file_size_mb": 0.004751,
   "published_file_size_mb": 0.010986,
   "original_source_size_bytes": 1212,
