@@ -1,0 +1,46 @@
+{
+  "status": "PASS",
+  "project_id": "POC-21",
+  "data_version": "1.0.0",
+  "errors": [],
+  "evidence": {
+    "data_directory_size_bytes_including_report": 29764,
+    "data_directory_size_mb_including_report": 0.028385,
+    "main_file_sizes_bytes": {
+      "data\\source-sample\\source_sample.csv": 1202,
+      "data\\canonical\\intelligence_data.csv": 4982,
+      "data\\published\\intelligence_data.json": 11520
+    },
+    "canonical_row_count": 20,
+    "canonical_column_count": 22,
+    "canonical_columns": [
+      "record_id",
+      "record_type",
+      "observed_at",
+      "entity_id",
+      "related_entity_id",
+      "entity_name",
+      "category",
+      "subcategory",
+      "status",
+      "stage",
+      "metric_name",
+      "metric_value",
+      "metric_unit",
+      "text_value",
+      "latitude",
+      "longitude",
+      "source_name",
+      "source_record_id",
+      "is_synthetic",
+      "data_version",
+      "shift",
+      "severity"
+    ],
+    "source_sample_row_count": 10,
+    "source_sample_column_count": 11,
+    "synthetic_data": true,
+    "personal_data_review": "No personal data observed in supplied synthetic source; manual reviewer confirmation remains required.",
+    "phase2_visualization_changes": "No dashboard/API visualization files intentionally modified by this package build."
+  }
+}

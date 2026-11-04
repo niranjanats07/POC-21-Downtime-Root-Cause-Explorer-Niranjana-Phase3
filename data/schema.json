@@ -1,0 +1,181 @@
+{
+  "record_id": {
+    "type": "string",
+    "required": true,
+    "nullable": false,
+    "description": "Stable unique identifier for each canonical measurement row.",
+    "source_or_derived": "derived",
+    "unique": true
+  },
+  "record_type": {
+    "type": "string",
+    "required": true,
+    "nullable": false,
+    "description": "Canonical record kind; this package uses measurement.",
+    "source_or_derived": "derived",
+    "allowed_values": [
+      "measurement"
+    ]
+  },
+  "observed_at": {
+    "type": "datetime",
+    "required": false,
+    "nullable": true,
+    "description": "Source incident date normalized to ISO 8601 midnight UTC.",
+    "source_or_derived": "derived"
+  },
+  "entity_id": {
+    "type": "string",
+    "required": false,
+    "nullable": true,
+    "description": "Machine identifier associated with the incident.",
+    "source_or_derived": "source_or_blank"
+  },
+  "related_entity_id": {
+    "type": "string",
+    "required": false,
+    "nullable": true,
+    "description": "Linked entity identifier; not supplied by source.",
+    "source_or_derived": "source_or_blank"
+  },
+  "entity_name": {
+    "type": "string",
+    "required": false,
+    "nullable": true,
+    "description": "Readable machine label derived from machine_id.",
+    "source_or_derived": "derived"
+  },
+  "category": {
+    "type": "string",
+    "required": false,
+    "nullable": true,
+    "description": "Normalized primary root-cause category.",
+    "source_or_derived": "source_or_blank"
+  },
+  "subcategory": {
+    "type": "string",
+    "required": false,
+    "nullable": true,
+    "description": "Normalized secondary root-cause category.",
+    "source_or_derived": "source_or_blank"
+  },
+  "status": {
+    "type": "string",
+    "required": false,
+    "nullable": true,
+    "description": "Normalized incident status.",
+    "source_or_derived": "source_or_blank"
+  },
+  "stage": {
+    "type": "string",
+    "required": false,
+    "nullable": true,
+    "description": "Process lifecycle stage; not supplied by source.",
+    "source_or_derived": "source_or_blank"
+  },
+  "metric_name": {
+    "type": "string",
+    "required": false,
+    "nullable": true,
+    "description": "Numeric measure represented by this row.",
+    "source_or_derived": "derived",
+    "allowed_values": [
+      "downtime_minutes",
+      "failure_frequency"
+    ]
+  },
+  "metric_value": {
+    "type": "number",
+    "required": false,
+    "nullable": true,
+    "description": "Numeric value for metric_name.",
+    "source_or_derived": "source_or_blank"
+  },
+  "metric_unit": {
+    "type": "string",
+    "required": false,
+    "nullable": true,
+    "description": "Unit for metric_value.",
+    "source_or_derived": "derived",
+    "allowed_values": [
+      "minutes",
+      "count"
+    ]
+  },
+  "text_value": {
+    "type": "string",
+    "required": false,
+    "nullable": true,
+    "description": "Short source description, maximum 500 characters.",
+    "source_or_derived": "source_or_blank"
+  },
+  "latitude": {
+    "type": "number",
+    "required": false,
+    "nullable": true,
+    "description": "Latitude; not supplied by source.",
+    "source_or_derived": "source_or_blank"
+  },
+  "longitude": {
+    "type": "number",
+    "required": false,
+    "nullable": true,
+    "description": "Longitude; not supplied by source.",
+    "source_or_derived": "source_or_blank"
+  },
+  "source_name": {
+    "type": "string",
+    "required": true,
+    "nullable": false,
+    "description": "Identifier for the synthetic CSV source.",
+    "source_or_derived": "derived"
+  },
+  "source_record_id": {
+    "type": "string",
+    "required": false,
+    "nullable": true,
+    "description": "Original incident_id.",
+    "source_or_derived": "source_or_blank"
+  },
+  "is_synthetic": {
+    "type": "boolean",
+    "required": true,
+    "nullable": false,
+    "description": "Whether the source record is synthetic.",
+    "source_or_derived": "derived",
+    "allowed_values": [
+      true
+    ]
+  },
+  "data_version": {
+    "type": "string",
+    "required": true,
+    "nullable": false,
+    "description": "Canonical package version.",
+    "source_or_derived": "derived"
+  },
+  "shift": {
+    "type": "string",
+    "required": false,
+    "nullable": true,
+    "description": "Case-specific machine shift; retained from source.",
+    "source_or_derived": "source_or_blank",
+    "allowed_values": [
+      "morning",
+      "evening",
+      "night"
+    ]
+  },
+  "severity": {
+    "type": "string",
+    "required": false,
+    "nullable": true,
+    "description": "Case-specific incident severity; retained from source.",
+    "source_or_derived": "source_or_blank",
+    "allowed_values": [
+      "high",
+      "medium",
+      "low"
+    ]
+  }
+}

@@ -113,6 +113,7 @@ export default function Home() {
         ) / closedIncidents.length
       : 0;
 
+  // Pareto analysis
   const causes = useMemo(() => {
     const totals: Record<string, number> = {};
 
@@ -129,10 +130,14 @@ export default function Home() {
       }))
       .sort((a, b) => b.downtime_minutes - a.downtime_minutes);
 
-    let cumulative = 0;
-
-    return sorted.map((item) => {
-      cumulative += item.downtime_minutes;
+    // Calculate cumulative downtime without mutating a variable.
+    return sorted.map((item, index) => {
+      const cumulative = sorted
+        .slice(0, index + 1)
+        .reduce(
+          (sum, current) => sum + current.downtime_minutes,
+          0
+        );
 
       return {
         ...item,
@@ -147,6 +152,7 @@ export default function Home() {
     });
   }, [filteredIncidents, totalDowntime]);
 
+  // Downtime by machine
   const machines = useMemo(() => {
     const totals: Record<string, number> = {};
 
@@ -164,8 +170,12 @@ export default function Home() {
       .sort((a, b) => b.downtime_minutes - a.downtime_minutes);
   }, [filteredIncidents]);
 
+  // Machine and shift heatmap
   const heatmap = useMemo(() => {
-    const result: Record<string, Record<string, number>> = {};
+    const result: Record<
+      string,
+      { Morning: number; Evening: number; Night: number }
+    > = {};
 
     filteredIncidents.forEach((item) => {
       if (!result[item.machine_id]) {
@@ -176,7 +186,11 @@ export default function Home() {
         };
       }
 
-      if (item.shift in result[item.machine_id]) {
+      if (
+        item.shift === "Morning" ||
+        item.shift === "Evening" ||
+        item.shift === "Night"
+      ) {
         result[item.machine_id][item.shift] +=
           Number(item.downtime_minutes || 0);
       }
@@ -190,11 +204,13 @@ export default function Home() {
     }));
   }, [filteredIncidents]);
 
+  // Root cause and sub-cause analysis
   const rootCauses = useMemo(() => {
     const totals: Record<string, number> = {};
 
     filteredIncidents.forEach((item) => {
       const key = `${item.root_cause}|||${item.sub_cause}`;
+
       totals[key] =
         (totals[key] || 0) +
         Number(item.downtime_minutes || 0);
@@ -203,7 +219,11 @@ export default function Home() {
     return Object.entries(totals).map(([key, downtime_minutes]) => {
       const [root_cause, sub_cause] = key.split("|||");
 
-      return { root_cause, sub_cause, downtime_minutes };
+      return {
+        root_cause,
+        sub_cause,
+        downtime_minutes,
+      };
     });
   }, [filteredIncidents]);
 
@@ -239,10 +259,13 @@ export default function Home() {
     const params = new URLSearchParams();
 
     Object.entries(filters).forEach(([key, value]) => {
-      if (value) params.set(key, value);
+      if (value) {
+        params.set(key, value);
+      }
     });
 
     const query = params.toString();
+
     const url =
       `${API}/api/incidents/export/${format}` +
       (query ? `?${query}` : "");
@@ -267,6 +290,7 @@ export default function Home() {
   return (
     <main className="min-h-screen w-full min-w-0 overflow-x-hidden bg-[#070d18] p-4 text-white md:p-8">
       <div className="mx-auto w-full min-w-0 max-w-7xl">
+
         {/* Dashboard Header */}
         <header className="mb-8 flex min-w-0 flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
@@ -411,6 +435,7 @@ export default function Home() {
                   <h2 className="text-lg font-semibold">
                     Incident Filters
                   </h2>
+
                   <p className="mt-1 text-xs text-slate-400">
                     Filters update the KPIs, charts and incident list.
                   </p>
@@ -434,8 +459,12 @@ export default function Home() {
                     ["status", "Status"],
                   ] as const
                 ).map(([key, label]) => (
-                  <label key={key} className="min-w-0 text-sm text-slate-300">
+                  <label
+                    key={key}
+                    className="min-w-0 text-sm text-slate-300"
+                  >
                     {label}
+
                     <select
                       value={filters[key]}
                       onChange={(event) =>
@@ -444,6 +473,7 @@ export default function Home() {
                       className="mt-2 w-full min-w-0 rounded-lg border border-slate-700 bg-slate-950 p-3 text-white"
                     >
                       <option value="">All</option>
+
                       {filterOptions[key].map((value) => (
                         <option key={value} value={value}>
                           {value}
@@ -496,10 +526,14 @@ export default function Home() {
                   className="min-w-0 rounded-xl border border-slate-800 bg-slate-900 p-5"
                 >
                   <p className="text-sm text-slate-400">{label}</p>
+
                   <p className="mt-3 text-3xl font-bold text-cyan-300">
                     {value}
                   </p>
-                  <p className="mt-1 text-xs text-slate-500">{unit}</p>
+
+                  <p className="mt-1 text-xs text-slate-500">
+                    {unit}
+                  </p>
                 </div>
               ))}
             </section>
@@ -517,9 +551,11 @@ export default function Home() {
                     <h2 className="mb-2 text-lg font-semibold">
                       Downtime Pareto Analysis
                     </h2>
+
                     <p className="mb-4 text-sm text-slate-400">
                       Downtime contribution by root cause.
                     </p>
+
                     <ParetoChart data={causes} />
                   </div>
 
@@ -530,7 +566,8 @@ export default function Home() {
                     </h2>
 
                     <p className="mb-5 text-xs text-slate-400">
-                      Click any machine bar to investigate its highest-downtime incident.
+                      Click any machine bar to investigate its
+                      highest-downtime incident.
                     </p>
 
                     <div className="space-y-5">
@@ -579,9 +616,11 @@ export default function Home() {
                   <h2 className="mb-2 text-lg font-semibold">
                     Failure Frequency vs Downtime Duration
                   </h2>
+
                   <p className="mb-4 text-sm text-slate-400">
                     Compare recorded failure frequency with downtime.
                   </p>
+
                   <ScatterChart data={filteredIncidents} />
                 </section>
 
@@ -590,9 +629,11 @@ export default function Home() {
                   <h2 className="mb-2 text-lg font-semibold">
                     Root Cause Tree
                   </h2>
+
                   <p className="mb-4 text-sm text-slate-400">
                     Main causes and their contributing sub-causes.
                   </p>
+
                   <RootCauseTree data={rootCauses} />
                 </section>
 
@@ -601,6 +642,7 @@ export default function Home() {
                   <h2 className="mb-2 text-lg font-semibold">
                     Machine / Shift Downtime Heatmap
                   </h2>
+
                   <p className="mb-4 text-sm text-slate-400">
                     Downtime minutes by machine and shift.
                   </p>
@@ -625,6 +667,7 @@ export default function Home() {
                             <td className="p-3 font-medium">
                               {row.machine_id}
                             </td>
+
                             {[row.Morning, row.Evening, row.Night].map(
                               (value, index) => (
                                 <td className="p-3" key={index}>
@@ -648,6 +691,7 @@ export default function Home() {
               <h2 className="text-lg font-semibold">
                 Incident Investigation
               </h2>
+
               <p className="mb-4 mt-2 text-sm text-slate-400">
                 Select an incident to view its details.
               </p>
@@ -673,16 +717,30 @@ export default function Home() {
                         key={incident.incident_id}
                         className="border-b border-slate-800 hover:bg-slate-800/50"
                       >
-                        <td className="p-3">{incident.incident_id}</td>
-                        <td className="p-3">{incident.machine_id}</td>
-                        <td className="p-3">{incident.shift}</td>
-                        <td className="p-3">{incident.severity}</td>
+                        <td className="p-3">
+                          {incident.incident_id}
+                        </td>
+
+                        <td className="p-3">
+                          {incident.machine_id}
+                        </td>
+
+                        <td className="p-3">
+                          {incident.shift}
+                        </td>
+
+                        <td className="p-3">
+                          {incident.severity}
+                        </td>
+
                         <td className="p-3">
                           {incident.failure_frequency}
                         </td>
+
                         <td className="p-3">
                           {incident.downtime_minutes} min
                         </td>
+
                         <td className="p-3">
                           <button
                             onClick={() => setSelectedIncident(incident)}
@@ -718,6 +776,7 @@ export default function Home() {
           <p>Batch: Batch8/MA College</p>
           <p>GitHub: @niranjanats07</p>
           <p>Infocreon Internship</p>
+
           <p className="mt-2">
             Downtime Root Cause Explorer · Synthetic demonstration data
           </p>

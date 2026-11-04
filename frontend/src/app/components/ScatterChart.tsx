@@ -1,4 +1,3 @@
-
 "use client";
 
 import ReactECharts from "echarts-for-react";
@@ -10,6 +9,10 @@ type Incident = {
   downtime_minutes: number;
 };
 
+type ScatterTooltipParams = {
+  data: unknown;
+};
+
 type Props = {
   data: Incident[];
 };
@@ -18,8 +21,18 @@ export default function ScatterChart({ data }: Props) {
   const option = {
     tooltip: {
       trigger: "item",
-      formatter: (params: any) => {
-        const item = params.data;
+      formatter: (params: ScatterTooltipParams) => {
+        if (!Array.isArray(params.data)) {
+          return "";
+        }
+
+        const item = params.data as [
+          number,
+          number,
+          string,
+          string
+        ];
+
         return `
           <b>${item[2]}</b><br/>
           Machine: ${item[3]}<br/>
