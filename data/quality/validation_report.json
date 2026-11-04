@@ -4,8 +4,8 @@
   "data_version": "1.0.0",
   "errors": [],
   "evidence": {
-    "data_directory_size_bytes_including_report": 29774,
-    "data_directory_size_mb_including_report": 0.028395,
+    "data_directory_size_bytes_including_report": 31905,
+    "data_directory_size_mb_including_report": 0.030427,
     "main_file_sizes_bytes": {
       "data\\source-sample\\source_sample.csv": 1212,
       "data\\canonical\\intelligence_data.csv": 4982,
