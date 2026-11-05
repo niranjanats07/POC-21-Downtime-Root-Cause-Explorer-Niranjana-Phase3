@@ -1,12 +1,12 @@
 POC 21 — DOWNTIME ROOT CAUSE EXPLORER
 SELENIUM LIVE APPLICATION TEST REPORT
 ==========================================================
-Execution time: 2026-11-03 05:40:28 UTC
+Execution time: 2026-11-05 03:45:44 UTC
 Frontend URL: https://downtime-frontend.onrender.com
 Backend URL: https://downtime-backend.onrender.com
 Deployment platform: Render (not Azure Container Apps)
 Browser: Google Chrome via Selenium WebDriver
-Headless: False
+Headless: True
 
 TEST RESULTS
 ----------------------------------------------------------
