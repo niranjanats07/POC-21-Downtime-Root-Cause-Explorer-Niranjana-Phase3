@@ -50,7 +50,7 @@
     "timeliness": {
       "status": "ASSESSED_HISTORICAL_VINTAGE",
       "evidence": {
-        "assessment_timestamp_utc": "2026-11-05T13:51:53.231735+00:00",
+        "assessment_timestamp_utc": "2026-11-05T15:28:17.269203+00:00",
         "latest_observation_timestamp_utc": "2026-02-03T00:00:00+00:00",
         "age_of_latest_observation_days": 275,
         "interpretation": "Observation vintage is historical relative to assessment date; the dataset is synthetic and does not establish current operational conditions."
@@ -192,7 +192,7 @@
       "status": "pass",
       "severity": "warning",
       "detail": {
-        "assessment_timestamp_utc": "2026-11-05T13:51:53.231735+00:00",
+        "assessment_timestamp_utc": "2026-11-05T15:28:17.269203+00:00",
         "latest_observation_timestamp_utc": "2026-02-03T00:00:00+00:00",
         "age_of_latest_observation_days": 275,
         "interpretation": "Observation vintage is historical relative to assessment date; the dataset is synthetic and does not establish current operational conditions."
@@ -216,7 +216,7 @@
     "conclusion": "Structural validity and provenance do not independently prove that recorded values accurately match their original source."
   },
   "timeliness_assessment": {
-    "assessment_timestamp_utc": "2026-11-05T13:51:53.231735+00:00",
+    "assessment_timestamp_utc": "2026-11-05T15:28:17.269203+00:00",
     "latest_observation_timestamp_utc": "2026-02-03T00:00:00+00:00",
     "age_of_latest_observation_days": 275,
     "interpretation": "Observation vintage is historical relative to assessment date; the dataset is synthetic and does not establish current operational conditions."
