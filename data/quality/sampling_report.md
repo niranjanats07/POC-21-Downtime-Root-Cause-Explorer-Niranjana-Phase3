@@ -57,7 +57,14 @@ The canonical dataset contains two measurement records per source incident. This
 - No geographic attributes are present.
 - Manual sensitive-data and source-rights review remains required.
 
-## 9. Reproduction commands
+## 9. Analytical Readiness and Interpretation Limits
+- The dataset contains only 10 synthetic source incidents. It is suitable for demonstrating data validation, standardization, dashboard functionality, and basic descriptive analysis, but it is not sufficient for strong statistical conclusions.
+- Root-cause groups contain very small numbers of incidents. Comparisons between categories should be treated as illustrative observations rather than statistically reliable findings.
+- The dataset does not establish a basis for predictive modelling, reliable anomaly detection, or generalizable causal analysis.
+- Observed downtime and failure-frequency values describe this synthetic sample only and should not be interpreted as representative operational performance.
+- Additional real-world data, broader time coverage, and sufficient observations across categories would be required for stronger analytical conclusions.
+
+## 10. Reproduction commands
 
 Run from the repository root:
 
