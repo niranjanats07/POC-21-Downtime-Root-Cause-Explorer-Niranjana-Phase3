@@ -1,17 +1,19 @@
 {
-  "status": "PASS",
+  "status": "FAIL",
   "project_id": "POC-21",
   "data_version": "1.0.0",
-  "errors": [],
+  "errors": [
+    "Manifest data_version must match package version 1.0.0."
+  ],
   "evidence": {
-    "data_directory_size_bytes_including_report": 33013,
-    "data_directory_size_mb_including_report": 0.031484,
+    "data_directory_size_bytes_including_report": 75132,
+    "data_directory_size_mb_including_report": 0.071651,
     "main_file_sizes_bytes": {
-      "data\\source-sample\\source_sample.csv": 1203,
-      "data\\canonical\\intelligence_data.csv": 4982,
-      "data\\published\\intelligence_data.json": 11520
+      "data\\source-sample\\source_sample.csv": 4217,
+      "data\\canonical\\intelligence_data.csv": 16182,
+      "data\\published\\intelligence_data.json": 36280
     },
-    "canonical_row_count": 20,
+    "canonical_row_count": 60,
     "canonical_column_count": 22,
     "canonical_columns": [
       "record_id",
@@ -37,7 +39,7 @@
       "shift",
       "severity"
     ],
-    "source_sample_row_count": 10,
+    "source_sample_row_count": 30,
     "source_sample_column_count": 11,
     "synthetic_data": true,
     "personal_data_review": "No personal data observed in supplied synthetic source; manual reviewer confirmation remains required.",

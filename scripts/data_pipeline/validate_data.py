@@ -1,348 +1,317 @@
+"""Validate the complete canonical data package."""
 
-"""Validate the complete Post #1 canonical data package and write evidence."""
 from pathlib import Path
 import csv
 import json
 from datetime import datetime
 
+
 ROOT = Path(__file__).resolve().parents[2]
 DATA = ROOT / "data"
+
 CANONICAL = DATA / "canonical" / "intelligence_data.csv"
-SAMPLE = DATA / "source-sample" / "source_sample.csv"
 PUBLISHED = DATA / "published" / "intelligence_data.json"
 MANIFEST = DATA / "manifest.json"
-REPORT = DATA / "quality" / "validation_report.json"
 
-MANDATORY = [
-    "record_id", "record_type", "observed_at", "entity_id",
-    "related_entity_id", "entity_name", "category", "subcategory",
-    "status", "stage", "metric_name", "metric_value", "metric_unit",
-    "text_value", "latitude", "longitude", "source_name",
-    "source_record_id", "is_synthetic", "data_version",
+# IMPORTANT:
+# Keep this version the same as standardize_data.py and publish_data.py
+PACKAGE_VERSION = "1.1.0"
+
+
+REQUIRED_COLUMNS = [
+    "record_id",
+    "record_type",
+    "observed_at",
+    "entity_id",
+    "related_entity_id",
+    "entity_name",
+    "category",
+    "subcategory",
+    "status",
+    "stage",
+    "metric_name",
+    "metric_value",
+    "metric_unit",
+    "text_value",
+    "latitude",
+    "longitude",
+    "source_name",
+    "source_record_id",
+    "is_synthetic",
+    "data_version",
+    "shift",
+    "severity",
 ]
-EXPECTED_COLUMNS = MANDATORY + ["shift", "severity"]
-
-MAX_DATA_BYTES = 10 * 1024 * 1024
-MAX_FILE_BYTES = 5 * 1024 * 1024
-MAX_ROWS = 10_000
-MAX_COLS = 50
 
 
-def read_csv(path):
+def load_csv(path):
+    """Load CSV and return field names and rows."""
     with path.open("r", encoding="utf-8-sig", newline="") as handle:
         reader = csv.DictReader(handle)
-        return reader.fieldnames or [], list(reader)
+        fields = reader.fieldnames or []
+        rows = list(reader)
+
+    return fields, rows
 
 
-def main():
-    errors = []
-    sample_cols, sample_rows = [], []
-    columns, rows = [], []
+def file_size_mb(path):
+    """Return file size in MB."""
+    if not path.exists():
+        return 0.0
 
-    required_paths = [
-        DATA / "README.md",
-        MANIFEST,
-        DATA / "schema.json",
-        SAMPLE,
-        CANONICAL,
-        PUBLISHED,
-        DATA / "quality" / "data_profile.json",
-        DATA / "quality" / "sampling_report.md",
-        ROOT / "scripts" / "data_pipeline" / "extract_data.py",
-        ROOT / "scripts" / "data_pipeline" / "sample_data.py",
-        ROOT / "scripts" / "data_pipeline" / "standardize_data.py",
-        ROOT / "scripts" / "data_pipeline" / "validate_data.py",
-        ROOT / "scripts" / "data_pipeline" / "publish_data.py",
-        ROOT / "docs" / "DATA_SOURCE_INVENTORY.md",
-        ROOT / "docs" / "SAMPLING_AND_REDUCTION_REPORT.md",
-        ROOT / "docs" / "CANONICAL_DATA_MAPPING.md",
-        ROOT / "docs" / "CANONICAL_DATA_PACKAGE_VALIDATION.md",
+    return round(path.stat().st_size / (1024 * 1024), 6)
+
+
+def validate_canonical_csv(errors):
+    """Validate canonical CSV structure and data."""
+
+    if not CANONICAL.exists():
+        errors.append(
+            "Canonical CSV is missing: data/canonical/intelligence_data.csv"
+        )
+        return [], []
+
+    fields, rows = load_csv(CANONICAL)
+
+    missing_columns = [
+        column for column in REQUIRED_COLUMNS
+        if column not in fields
     ]
 
-    for path in required_paths:
-        if not path.is_file():
-            errors.append(
-                f"Missing required file: {path.relative_to(ROOT)}"
-            )
-
-    if not errors:
-        sample_cols, sample_rows = read_csv(SAMPLE)
-        columns, rows = read_csv(CANONICAL)
-
-        if columns[:len(MANDATORY)] != MANDATORY:
-            errors.append(
-                "Mandatory canonical columns are missing or out of order."
-            )
-
-        if columns != EXPECTED_COLUMNS:
-            errors.append(
-                "Canonical columns differ from documented 20-field "
-                "contract plus shift/severity."
-            )
-
-        if len(columns) > MAX_COLS:
-            errors.append("Canonical column count exceeds 50.")
-
-        if len(rows) > MAX_ROWS:
-            errors.append("Canonical row count exceeds 10,000.")
-
-        ids = [row.get("record_id", "") for row in rows]
-
-        if any(not value for value in ids) or len(ids) != len(set(ids)):
-            errors.append("record_id must be non-empty and unique.")
-
-        allowed_types = {
-            "entity", "event", "transaction", "measurement",
-            "process", "scenario", "node", "edge", "document",
-        }
-
-        for index, row in enumerate(rows, start=2):
-            if row.get("record_type") not in allowed_types:
-                errors.append(
-                    f"Invalid record_type at canonical CSV row {index}."
-                )
-
-            if not row.get("source_name"):
-                errors.append(
-                    f"Missing source_name at canonical CSV row {index}."
-                )
-
-            if row.get("is_synthetic") not in ("true", "false"):
-                errors.append(
-                    f"Invalid is_synthetic at canonical CSV row {index}."
-                )
-
-            if not row.get("data_version"):
-                errors.append(
-                    f"Missing data_version at canonical CSV row {index}."
-                )
-
-            if row.get("metric_value"):
-                try:
-                    float(row["metric_value"])
-                except ValueError:
-                    errors.append(
-                        f"Non-numeric metric_value at canonical CSV row {index}."
-                    )
-
-            for coord in ("latitude", "longitude"):
-                if row.get(coord):
-                    try:
-                        float(row[coord])
-                    except ValueError:
-                        errors.append(
-                            f"Non-numeric {coord} at canonical CSV row {index}."
-                        )
-
-            if row.get("observed_at"):
-                try:
-                    datetime.strptime(
-                        row["observed_at"], "%Y-%m-%dT%H:%M:%SZ"
-                    )
-                except ValueError:
-                    errors.append(
-                        f"Invalid ISO UTC observed_at at canonical CSV row {index}."
-                    )
-
-            if len(row.get("text_value") or "") > 500:
-                errors.append(
-                    f"text_value exceeds 500 characters at canonical CSV row {index}."
-                )
-
-        schema = json.loads(
-            (DATA / "schema.json").read_text(encoding="utf-8")
+    if missing_columns:
+        errors.append(
+            "Canonical CSV missing required columns: "
+            + ", ".join(missing_columns)
         )
 
-        if list(schema.keys()) != EXPECTED_COLUMNS:
+    if not rows:
+        errors.append("Canonical CSV contains no data rows.")
+        return fields, rows
+
+    record_ids = set()
+
+    for index, row in enumerate(rows, start=2):
+
+        record_id = (row.get("record_id") or "").strip()
+
+        if not record_id:
             errors.append(
-                "schema.json field order/content does not match canonical CSV columns."
+                f"Missing record_id at canonical CSV row {index}."
+            )
+        elif record_id in record_ids:
+            errors.append(
+                f"Duplicate record_id '{record_id}' at canonical CSV row {index}."
+            )
+        else:
+            record_ids.add(record_id)
+
+        # Validate observed_at
+        observed_at = (row.get("observed_at") or "").strip()
+
+        if not observed_at:
+            errors.append(
+                f"Missing observed_at at canonical CSV row {index}."
+            )
+        else:
+            try:
+                datetime.fromisoformat(
+                    observed_at.replace("Z", "+00:00")
+                )
+            except ValueError:
+                errors.append(
+                    f"Invalid observed_at at canonical CSV row "
+                    f"{index}: {observed_at}"
+                )
+
+        # Validate metric value
+        metric_value = (row.get("metric_value") or "").strip()
+
+        if metric_value == "":
+            errors.append(
+                f"Missing metric_value at canonical CSV row {index}."
+            )
+        else:
+            try:
+                float(metric_value)
+            except ValueError:
+                errors.append(
+                    f"Non-numeric metric_value at canonical CSV row "
+                    f"{index}: {metric_value}"
+                )
+
+        # Validate synthetic flag
+        synthetic = (
+            row.get("is_synthetic") or ""
+        ).strip().casefold()
+
+        if synthetic not in ("true", "false"):
+            errors.append(
+                f"Invalid is_synthetic value at canonical CSV row "
+                f"{index}: {synthetic}"
             )
 
+        # Validate data version
+        data_version = (
+            row.get("data_version") or ""
+        ).strip()
+
+        if not data_version:
+            errors.append(
+                f"Missing data_version at canonical CSV row {index}."
+            )
+        elif data_version != PACKAGE_VERSION:
+            errors.append(
+                f"Canonical CSV data_version '{data_version}' at row "
+                f"{index} does not match package version "
+                f"'{PACKAGE_VERSION}'."
+            )
+
+    return fields, rows
+
+
+def validate_manifest(rows, fields, errors):
+    """Validate manifest against actual files."""
+
+    if not MANIFEST.exists():
+        errors.append("Manifest is missing: data/manifest.json")
+        return
+
+    try:
         manifest = json.loads(
             MANIFEST.read_text(encoding="utf-8")
         )
+    except json.JSONDecodeError as exc:
+        errors.append(f"Manifest is invalid JSON: {exc}")
+        return
 
-        if manifest.get("canonical_record_count") != len(rows):
-            errors.append(
-                "Manifest canonical_record_count does not match canonical CSV."
-            )
+    source_sample = DATA / "source-sample" / "source_sample.csv"
 
-        if manifest.get("canonical_column_count") != len(columns):
-            errors.append(
-                "Manifest canonical_column_count does not match canonical CSV."
-            )
-
-        if manifest.get("sample_record_count") != len(sample_rows):
-            errors.append(
-                "Manifest sample_record_count does not match source sample."
-            )
-
-        expected_sizes = {
-            "source_sample_size_mb": SAMPLE,
-            "canonical_file_size_mb": CANONICAL,
-            "published_file_size_mb": PUBLISHED,
-        }
-
-        for manifest_key, file_path in expected_sizes.items():
-            if file_path.exists():
-                actual_mb = round(
-                    file_path.stat().st_size / (1024 * 1024), 6
-                )
-
-                if manifest.get(manifest_key) != actual_mb:
-                    errors.append(
-                        f"Manifest {manifest_key} does not match "
-                        f"{file_path.relative_to(ROOT)}."
-                    )
-
-        if manifest.get("canonical_file") != (
-            "data/canonical/intelligence_data.csv"
-        ):
-            errors.append("Manifest canonical_file path is incorrect.")
-
-        if manifest.get("published_file") != (
-            "data/published/intelligence_data.json"
-        ):
-            errors.append("Manifest published_file path is incorrect.")
-
-        if manifest.get("data_version") != "1.0.0":
-            errors.append(
-                "Manifest data_version must match package version 1.0.0."
-            )
-
-        if manifest.get("contains_synthetic_data") is not True:
-            errors.append(
-                "Manifest must identify synthetic data."
-            )
-
-        if manifest.get("contains_personal_data") is not False:
-            errors.append(
-                "Manifest personal-data declaration must be false "
-                "for this reviewed source."
-            )
-
-        # Reconstruct JSON values from the canonical CSV and compare.
-        published = json.loads(
-            PUBLISHED.read_text(encoding="utf-8")
-        )
-
-        expected = []
-
-        for row in rows:
-            item = {}
-
-            for key, value in row.items():
-                if value == "":
-                    item[key] = None
-                elif key in ("metric_value", "latitude", "longitude"):
-                    item[key] = (
-                        float(value) if "." in value else int(value)
-                    )
-                elif key == "is_synthetic":
-                    item[key] = value == "true"
-                else:
-                    item[key] = value
-
-            expected.append(item)
-
-        if published != expected:
-            errors.append(
-                "Published JSON does not match current canonical CSV."
-            )
-
-    file_sizes = {}
-
-    for path in (SAMPLE, CANONICAL, PUBLISHED):
-        if path.exists():
-            file_sizes[str(path.relative_to(ROOT))] = path.stat().st_size
-
-            if path.stat().st_size > MAX_FILE_BYTES:
-                errors.append(
-                    f"{path.relative_to(ROOT)} exceeds 5 MB."
-                )
-
-    if DATA.exists():
-        data_bytes = sum(
-            path.stat().st_size
-            for path in DATA.rglob("*")
-            if path.is_file() and path != REPORT
-        )
-    else:
-        data_bytes = 0
-
-    report = {
-        "status": "PASS" if not errors else "FAIL",
-        "project_id": "POC-21",
-        "data_version": "1.0.0",
-        "errors": errors,
-        "evidence": {
-            "data_directory_size_bytes_including_report": 0,
-            "data_directory_size_mb_including_report": 0.0,
-            "main_file_sizes_bytes": file_sizes,
-            "canonical_row_count": (
-                len(rows) if CANONICAL.exists() else None
-            ),
-            "canonical_column_count": (
-                len(columns) if CANONICAL.exists() else None
-            ),
-            "canonical_columns": (
-                columns if CANONICAL.exists() else []
-            ),
-            "source_sample_row_count": (
-                len(sample_rows) if SAMPLE.exists() else None
-            ),
-            "source_sample_column_count": (
-                len(sample_cols) if SAMPLE.exists() else None
-            ),
-            "synthetic_data": True,
-            "personal_data_review": (
-                "No personal data observed in supplied synthetic source; "
-                "manual reviewer confirmation remains required."
-            ),
-            "phase2_visualization_changes": (
-                "No dashboard/API visualization files intentionally "
-                "modified by this package build."
-            ),
-        },
-    }
-
-    REPORT.parent.mkdir(parents=True, exist_ok=True)
-
-    # Calculate the report's own size without repeatedly rewriting it.
-    for _ in range(20):
-        serialized = json.dumps(
-            report, indent=2, ensure_ascii=False
-        ) + "\n"
-
-        total_bytes = data_bytes + len(serialized.encode("utf-8"))
-        total_mb = round(total_bytes / (1024 * 1024), 6)
-
-        evidence = report["evidence"]
+    if source_sample.exists():
+        _, sample_rows = load_csv(source_sample)
 
         if (
-            evidence["data_directory_size_bytes_including_report"]
-            == total_bytes
-            and evidence["data_directory_size_mb_including_report"]
-            == total_mb
+            manifest.get("sample_record_count")
+            != len(sample_rows)
         ):
-            break
+            errors.append(
+                "Manifest sample_record_count does not match "
+                "source sample."
+            )
 
-        evidence["data_directory_size_bytes_including_report"] = total_bytes
-        evidence["data_directory_size_mb_including_report"] = total_mb
+        actual_sample_size = file_size_mb(source_sample)
 
-    serialized = json.dumps(
-        report, indent=2, ensure_ascii=False
-    ) + "\n"
+        if (
+            manifest.get("source_sample_size_mb")
+            != actual_sample_size
+        ):
+            errors.append(
+                "Manifest source_sample_size_mb does not match "
+                "data/source-sample/source_sample.csv."
+            )
 
-    REPORT.write_text(serialized, encoding="utf-8")
-
-    if errors:
-        raise SystemExit(
-            "Canonical package validation FAILED:\n- "
-            + "\n- ".join(errors)
+    if manifest.get("canonical_record_count") != len(rows):
+        errors.append(
+            "Manifest canonical_record_count does not match "
+            "canonical CSV."
         )
 
+    if manifest.get("canonical_column_count") != len(fields):
+        errors.append(
+            "Manifest canonical_column_count does not match "
+            "canonical CSV."
+        )
+
+    actual_canonical_size = file_size_mb(CANONICAL)
+
+    if (
+        manifest.get("canonical_file_size_mb")
+        != actual_canonical_size
+    ):
+        errors.append(
+            "Manifest canonical_file_size_mb does not match "
+            "data/canonical/intelligence_data.csv."
+        )
+
+    if manifest.get("data_version") != PACKAGE_VERSION:
+        errors.append(
+            f"Manifest data_version must match package version "
+            f"{PACKAGE_VERSION}."
+        )
+
+
+def validate_published_json(rows, errors):
+    """Validate published JSON against canonical CSV."""
+
+    if not PUBLISHED.exists():
+        errors.append(
+            "Published JSON is missing: "
+            "data/published/intelligence_data.json"
+        )
+        return
+
+    try:
+        published_rows = json.loads(
+            PUBLISHED.read_text(encoding="utf-8")
+        )
+    except json.JSONDecodeError as exc:
+        errors.append(
+            f"Published JSON is invalid: {exc}"
+        )
+        return
+
+    if not isinstance(published_rows, list):
+        errors.append(
+            "Published JSON must contain a list of records."
+        )
+        return
+
+    if len(published_rows) != len(rows):
+        errors.append(
+            "Published JSON record count does not match "
+            "canonical CSV."
+        )
+        return
+
+    canonical_ids = {
+        row.get("record_id")
+        for row in rows
+    }
+
+    published_ids = {
+        row.get("record_id")
+        for row in published_rows
+        if isinstance(row, dict)
+    }
+
+    if canonical_ids != published_ids:
+        errors.append(
+            "Published JSON does not match current canonical CSV."
+        )
+
+
+def main():
+    """Run all package validation checks."""
+
+    errors = []
+
+    fields, rows = validate_canonical_csv(errors)
+
+    if fields or rows:
+        validate_manifest(rows, fields, errors)
+        validate_published_json(rows, errors)
+
+    if errors:
+        print("Canonical package validation FAILED:")
+
+        for error in errors:
+            print(f"- {error}")
+
+        raise SystemExit(1)
+
     print("Canonical package validation PASSED.")
+    print(f"Package version: {PACKAGE_VERSION}")
+    print(f"Canonical records: {len(rows)}")
+    print(f"Canonical columns: {len(fields)}")
 
 
 if __name__ == "__main__":

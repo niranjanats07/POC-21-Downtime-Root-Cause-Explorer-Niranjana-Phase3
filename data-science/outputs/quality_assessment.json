@@ -1,0 +1,235 @@
+{
+  "source_file": "data/canonical/intelligence_data.csv",
+  "row_count": 60,
+  "column_count": 22,
+  "canonical_sha256": "966f1e94f26abc8efe1fae04244f2fd86546bb98fef6a77f9c929201ed2de824",
+  "dataset_structure": {
+    "measurement_rows": 60,
+    "distinct_source_incidents": 30,
+    "synthetic_incidents": 30,
+    "real_incidents": 0,
+    "distinct_machines": 4,
+    "repeated_source_incident_measurement_rows": 30
+  },
+  "quality_dimensions": {
+    "completeness": {
+      "status": "ASSESSED",
+      "evidence": "Required-field completeness and field-specific checks."
+    },
+    "uniqueness": {
+      "status": "ASSESSED",
+      "evidence": "Canonical record ID duplicate check."
+    },
+    "validity": {
+      "status": "ASSESSED",
+      "evidence": "Numeric, timestamp and coordinate validity checks."
+    },
+    "consistency": {
+      "status": "ASSESSED",
+      "evidence": "Metric-unit and timestamp timezone consistency checks."
+    },
+    "provenance": {
+      "status": "ASSESSED",
+      "evidence": "Source, source-record and data-version completeness."
+    },
+    "safety": {
+      "status": "NO_PATTERN_MATCHES",
+      "evidence": "Pattern-based scan for possible email, phone and IP values.",
+      "limitation": "Not a complete privacy or security audit."
+    },
+    "reproducibility": {
+      "status": "INPUT_FINGERPRINT_STABLE",
+      "evidence": {
+        "canonical_source": "data/canonical/intelligence_data.csv",
+        "canonical_sha256": "966f1e94f26abc8efe1fae04244f2fd86546bb98fef6a77f9c929201ed2de824",
+        "assessment_uses_deterministic_checks": true,
+        "input_fingerprint_stable_during_assessment": true,
+        "independent_repeat_run_comparison": "Not established by this script; compare fingerprints and generated outputs across separate runs."
+      }
+    },
+    "timeliness": {
+      "status": "ASSESSED_HISTORICAL_VINTAGE",
+      "evidence": {
+        "assessment_timestamp_utc": "2026-11-05T13:51:53.231735+00:00",
+        "latest_observation_timestamp_utc": "2026-02-03T00:00:00+00:00",
+        "age_of_latest_observation_days": 275,
+        "interpretation": "Observation vintage is historical relative to assessment date; the dataset is synthetic and does not establish current operational conditions."
+      }
+    },
+    "source_accuracy": {
+      "status": "NOT_INDEPENDENTLY_VERIFIABLE",
+      "evidence": {
+        "status": "NOT_INDEPENDENTLY_VERIFIABLE",
+        "evidence_available": "Canonical source identifiers and provenance fields are present.",
+        "evidence_missing": "No authoritative original-source sample or independent source reconciliation evidence is available to this script.",
+        "conclusion": "Structural validity and provenance do not independently prove that recorded values accurately match their original source."
+      }
+    },
+    "representativeness": {
+      "status": "LIMITED_SYNTHETIC_SAMPLE",
+      "evidence": "30 distinct synthetic incidents represented by 60 measurement rows."
+    }
+  },
+  "checks": [
+    {
+      "check": "required_columns",
+      "status": "pass",
+      "severity": "blocking",
+      "detail": "Missing columns: []"
+    },
+    {
+      "check": "required_field_completeness",
+      "status": "pass",
+      "severity": "blocking",
+      "detail": "Empty required-field counts: {}"
+    },
+    {
+      "check": "record_id_uniqueness",
+      "status": "pass",
+      "severity": "blocking",
+      "detail": "Duplicate IDs: []"
+    },
+    {
+      "check": "metric_numeric_validity",
+      "status": "pass",
+      "severity": "blocking",
+      "detail": "Invalid or negative metric values at CSV rows: []"
+    },
+    {
+      "check": "observed_at_validity",
+      "status": "pass",
+      "severity": "blocking",
+      "detail": "Invalid timestamps at CSV rows: []"
+    },
+    {
+      "check": "timestamp_timezone_consistency",
+      "status": "pass",
+      "severity": "warning",
+      "detail": "Timezone type distribution: {'timezone-aware': 60}"
+    },
+    {
+      "check": "coordinate_validity",
+      "status": "pass",
+      "severity": "warning",
+      "detail": "Coordinate issues: []"
+    },
+    {
+      "check": "status_completeness",
+      "status": "pass",
+      "severity": "warning",
+      "detail": "Blank values: 0"
+    },
+    {
+      "check": "category_completeness",
+      "status": "pass",
+      "severity": "warning",
+      "detail": "Blank values: 0"
+    },
+    {
+      "check": "shift_completeness",
+      "status": "pass",
+      "severity": "warning",
+      "detail": "Blank values: 0"
+    },
+    {
+      "check": "severity_completeness",
+      "status": "pass",
+      "severity": "warning",
+      "detail": "Blank values: 0"
+    },
+    {
+      "check": "metric_unit_completeness",
+      "status": "pass",
+      "severity": "warning",
+      "detail": "Blank values: 0"
+    },
+    {
+      "check": "metric_unit_consistency",
+      "status": "pass",
+      "severity": "blocking",
+      "detail": "Metrics with multiple units: {}"
+    },
+    {
+      "check": "provenance_completeness",
+      "status": "pass",
+      "severity": "blocking",
+      "detail": "Each row must identify its source, source record and data version."
+    },
+    {
+      "check": "synthetic_data_disclosure",
+      "status": "pass",
+      "severity": "warning",
+      "detail": "Synthetic flag distribution: {'true': 60}"
+    },
+    {
+      "check": "manifest_row_and_column_counts",
+      "status": "pass",
+      "severity": "blocking",
+      "detail": "Manifest mismatches: {}"
+    },
+    {
+      "check": "sensitive_content_screening",
+      "status": "pass",
+      "severity": "warning",
+      "detail": {
+        "possible_matches": [],
+        "method": "Pattern-based screening of canonical CSV field values",
+        "limitation": "This automated screening is not a complete privacy, security or legal review."
+      }
+    },
+    {
+      "check": "canonical_input_fingerprint_stability",
+      "status": "pass",
+      "severity": "blocking",
+      "detail": {
+        "sha256_before": "966f1e94f26abc8efe1fae04244f2fd86546bb98fef6a77f9c929201ed2de824",
+        "sha256_after": "966f1e94f26abc8efe1fae04244f2fd86546bb98fef6a77f9c929201ed2de824",
+        "stable_during_assessment": true
+      }
+    },
+    {
+      "check": "observation_timeliness_assessment",
+      "status": "pass",
+      "severity": "warning",
+      "detail": {
+        "assessment_timestamp_utc": "2026-11-05T13:51:53.231735+00:00",
+        "latest_observation_timestamp_utc": "2026-02-03T00:00:00+00:00",
+        "age_of_latest_observation_days": 275,
+        "interpretation": "Observation vintage is historical relative to assessment date; the dataset is synthetic and does not establish current operational conditions."
+      }
+    }
+  ],
+  "warnings": [
+    "related_entity_id is empty for every row; confirm whether it is optional.",
+    "stage is empty for every row; confirm whether it is optional.",
+    "latitude is empty for every row; confirm whether it is optional.",
+    "longitude is empty for every row; confirm whether it is optional.",
+    "Only closed records are present; status comparison is unavailable.",
+    "All records are synthetic; operational conclusions cannot be generalized.",
+    "Source accuracy is not independently verified against an authoritative sample.",
+    "Reproducibility fingerprint stability is checked within this run; a separate repeat-run comparison is still required."
+  ],
+  "source_accuracy_assessment": {
+    "status": "NOT_INDEPENDENTLY_VERIFIABLE",
+    "evidence_available": "Canonical source identifiers and provenance fields are present.",
+    "evidence_missing": "No authoritative original-source sample or independent source reconciliation evidence is available to this script.",
+    "conclusion": "Structural validity and provenance do not independently prove that recorded values accurately match their original source."
+  },
+  "timeliness_assessment": {
+    "assessment_timestamp_utc": "2026-11-05T13:51:53.231735+00:00",
+    "latest_observation_timestamp_utc": "2026-02-03T00:00:00+00:00",
+    "age_of_latest_observation_days": 275,
+    "interpretation": "Observation vintage is historical relative to assessment date; the dataset is synthetic and does not establish current operational conditions."
+  },
+  "reproducibility_assessment": {
+    "canonical_source": "data/canonical/intelligence_data.csv",
+    "canonical_sha256": "966f1e94f26abc8efe1fae04244f2fd86546bb98fef6a77f9c929201ed2de824",
+    "assessment_uses_deterministic_checks": true,
+    "input_fingerprint_stable_during_assessment": true,
+    "independent_repeat_run_comparison": "Not established by this script; compare fingerprints and generated outputs across separate runs."
+  },
+  "blocking_failure_count": 0,
+  "blocking_failures": [],
+  "assessment_status": "NO_BLOCKING_FAILURES_DETECTED",
+  "scope_note": "Automated checks assess structural and selected content quality. They do not independently establish source accuracy, privacy compliance, operational representativeness or current operational conditions. Independent repeat-run comparison is still required to establish end-to-end reproducibility."
+}

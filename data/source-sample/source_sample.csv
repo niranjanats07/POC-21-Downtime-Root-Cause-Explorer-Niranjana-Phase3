@@ -9,3 +9,23 @@ INC007,MCH-03,2026-01-11,Morning,Maintenance,Delayed Maintenance,60,1,Medium,Clo
 INC008,MCH-04,2026-01-12,Evening,Operational,Material Jam,30,1,Low,Closed,Material blockage stopped production
 INC009,MCH-01,2026-01-13,Night,Electrical,Sensor Failure,100,2,Medium,Closed,Faulty sensor triggered shutdown
 INC010,MCH-02,2026-01-14,Morning,Mechanical,Bearing Failure,140,3,High,Closed,Repeated bearing damage
+INC011,MCH-03,2026-01-15,Evening,Mechanical,Coupling Misalignment,85,2,Medium,Closed,Synthetic scenario: coupling misalignment caused vibration and machine stoppage
+INC012,MCH-04,2026-01-16,Morning,Electrical,Control Panel Fault,110,3,High,Closed,Synthetic scenario: control panel fault interrupted machine operation
+INC013,MCH-01,2026-01-17,Night,Operational,Incorrect Material Feed,40,1,Low,Closed,Synthetic scenario: incorrect material feeding briefly stopped production
+INC014,MCH-02,2026-01-18,Evening,Maintenance,Lubrication Delay,70,2,Medium,Closed,Synthetic scenario: delayed lubrication led to machine stoppage
+INC015,MCH-03,2026-01-19,Morning,Electrical,Wiring Fault,135,3,High,Closed,Synthetic scenario: damaged wiring caused electrical interruption
+INC016,MCH-04,2026-01-20,Night,Mechanical,Gear Wear,160,4,High,Closed,Synthetic scenario: worn gears required inspection and replacement
+INC017,MCH-01,2026-01-21,Evening,Operational,Setup Error,35,1,Low,Closed,Synthetic scenario: incorrect setup delayed the production run
+INC018,MCH-02,2026-01-22,Morning,Electrical,Sensor Calibration,55,2,Medium,Closed,Synthetic scenario: sensor calibration issue triggered a shutdown
+INC019,MCH-03,2026-01-23,Night,Mechanical,Belt Tension,95,2,Medium,Closed,Synthetic scenario: incorrect belt tension caused machine stoppage
+INC020,MCH-04,2026-01-24,Evening,Maintenance,Inspection Delay,65,1,Medium,Closed,Synthetic scenario: delayed inspection allowed a fault to interrupt production
+INC021,MCH-01,2026-01-25,Morning,Electrical,Fuse Failure,125,3,High,Closed,Synthetic scenario: failed fuse stopped the machine until replacement
+INC022,MCH-02,2026-01-26,Night,Operational,Operator Adjustment,25,1,Low,Closed,Synthetic scenario: incorrect operator adjustment caused a short interruption
+INC023,MCH-03,2026-01-27,Evening,Mechanical,Bearing Lubrication,145,3,High,Closed,Synthetic scenario: insufficient bearing lubrication caused overheating and stoppage
+INC024,MCH-04,2026-01-28,Morning,Electrical,Power Supply Fluctuation,80,2,Medium,Closed,Synthetic scenario: unstable power supply interrupted machine operation
+INC025,MCH-01,2026-01-29,Night,Maintenance,Preventive Service Delay,50,1,Low,Closed,Synthetic scenario: delayed preventive service resulted in brief downtime
+INC026,MCH-02,2026-01-30,Evening,Mechanical,Shaft Wear,175,4,High,Closed,Synthetic scenario: shaft wear required extended repair
+INC027,MCH-03,2026-01-31,Morning,Operational,Material Loading Error,45,1,Low,Closed,Synthetic scenario: material loading error interrupted the production cycle
+INC028,MCH-04,2026-02-01,Night,Electrical,Relay Failure,105,2,Medium,Closed,Synthetic scenario: relay failure interrupted the control circuit
+INC029,MCH-01,2026-02-02,Evening,Mechanical,Motor Mount Loosening,90,2,Medium,Closed,Synthetic scenario: loose motor mount caused vibration and downtime
+INC030,MCH-02,2026-02-03,Morning,Maintenance,Scheduled Maintenance Overrun,115,3,High,Closed,Synthetic scenario: maintenance work exceeded its planned duration

@@ -1,37 +1,37 @@
 {
   "project_id": "POC-21",
-  "data_version": "1.0.0",
+  "data_version": "1.1.0",
   "source_sample": {
-    "record_count": 10,
+    "record_count": 30,
     "column_count": 11,
     "date_min": "2026-01-05",
-    "date_max": "2026-01-14",
+    "date_max": "2026-02-03",
     "root_cause_counts": {
-      "Electrical": 3,
-      "Maintenance": 1,
-      "Mechanical": 4,
-      "Operational": 2
+      "Electrical": 9,
+      "Maintenance": 5,
+      "Mechanical": 10,
+      "Operational": 6
     },
     "severity_counts": {
-      "High": 4,
-      "Low": 2,
-      "Medium": 4
+      "High": 11,
+      "Low": 7,
+      "Medium": 12
     },
     "shift_counts": {
-      "Evening": 3,
-      "Morning": 4,
-      "Night": 3
+      "Evening": 10,
+      "Morning": 11,
+      "Night": 9
     },
     "status_counts": {
-      "Closed": 10
+      "Closed": 30
     }
   },
   "canonical": {
-    "record_count": 20,
+    "record_count": 60,
     "column_count": 22,
     "metric_name_counts": {
-      "downtime_minutes": 10,
-      "failure_frequency": 10
+      "downtime_minutes": 30,
+      "failure_frequency": 30
     },
     "is_synthetic_values": [
       "true"
@@ -39,9 +39,8 @@
   },
   "limitations": [
     "Synthetic demonstration data only.",
-    "Only 10 source incidents are available.",
-    "All source incidents have Closed status.",
-    "The date range covers 10 consecutive days.",
+    "The dataset is generated for demonstration and analytical development.",
+    "Findings depend on the synthetic data distribution and may not represent real production operations.",
     "No geographic coordinates or event times are supplied."
   ]
 }

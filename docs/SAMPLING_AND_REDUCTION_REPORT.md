@@ -7,9 +7,9 @@
 | Source name | Synthetic Downtime Incident Dataset |
 | Source type | Synthetic CSV |
 | Source path | `data/synthetic/downtime_incidents.csv` |
-| Original record count | 10 |
+| Original record count | 30 |
 | Original column count | 11 |
-| Original file size | 1,212 bytes |
+| Original file size | 4,246 bytes |
 | Data classification | Synthetic |
 | Personal data observed | No personal data observed in the supplied synthetic source |
 | Restricted data observed | No restricted data observed in the supplied synthetic source |
@@ -18,14 +18,14 @@ Manual reviewer confirmation of data classification remains required.
 
 ## 2. Original Size
 
-The original source CSV is 1,212 bytes.
+The original source CSV is 4,246 bytes.
 
 The complete source dataset was small enough to retain without reducing its record count.
 
 ## 3. Original Record Count
 
-- Original records: 10
-- Records retained: 10
+- Original records: 30
+- Records retained: 30
 - Records removed: 0
 
 The complete source dataset was retained.
@@ -40,7 +40,7 @@ The source sample retains all 11 source columns.
 
 **Full-source retention (no sampling required).**
 
-The supplied source contains only 10 records. All records were retained to preserve the available operational examples and avoid unnecessary information loss.
+The supplied source contains only 30 records. All records were retained to preserve the available operational examples and avoid unnecessary information loss.
 
 No random or stratified record selection was performed.
 
@@ -64,7 +64,7 @@ The source contains observations across the dates represented in the original da
 
 ## 9. Rare-Record Preservation
 
-All 10 source records were retained.
+All 30 source records were retained.
 
 This preserves the available examples, including less frequent examples in the supplied source.
 
@@ -81,7 +81,7 @@ See `docs/CANONICAL_DATA_MAPPING.md` for the field-level transformations.
 ## 11. Removed Records
 
 - Records removed during sampling: 0
-- Records retained: 10
+- Records retained: 30
 - Sampling reduction: None
 
 ## 12. Text Truncation
@@ -105,8 +105,8 @@ Manual reviewer confirmation remains required before formal approval.
 | Item | Result |
 |---|---|
 | Path | `data/source-sample/source_sample.csv` |
-| Size | 1,212 bytes |
-| Record count | 10 |
+| Size | 4,217 bytes |
+| Record count | 30 |
 | Column count | 11 |
 | Encoding | UTF-8 |
 | Sampling | Full-source retention |
@@ -115,14 +115,14 @@ Manual reviewer confirmation remains required before formal approval.
 
 The following checks were performed:
 
-- All 10 original records are retained.
+- All 30 original records are retained.
 - The source sample preserves all 11 original columns.
 - Available source categories are retained.
 - The available date coverage is preserved.
 - Rare examples present in the original source are retained.
 - No records were removed through sampling.
 
-The dataset is synthetic and contains only 10 source incidents. It should not be interpreted as representative of real-world operational activity.
+The dataset is synthetic and contains only 30 source incidents. It should not be interpreted as representative of real-world operational activity.
 
 ## 16. Canonical Standardization Result
 
@@ -135,11 +135,11 @@ The resulting canonical dataset contains:
 
 | Item | Result |
 |---|---:|
-| Canonical records | 20 |
+| Canonical records | 60 |
 | Canonical columns | 22 |
-| Canonical CSV size | 4,982 bytes |
-| Published JSON records | 20 |
-| Published JSON size | 11,520 bytes |
+| Canonical CSV size | 16,182 bytes |
+| Published JSON records | 60 |
+| Published JSON size | 36,280 bytes |
 
 The first 20 columns follow the mandatory Phase 3 canonical column order.
 
@@ -151,8 +151,7 @@ The canonical CSV is the source of truth. The published JSON is generated from t
 
 The following limitations apply:
 
-- The source dataset contains only 10 synthetic incidents.
-- All supplied incidents have a Closed status.
+- The source dataset contains only 30 synthetic incidents.
 - The observations cover only the dates represented in the supplied source.
 - Geographic coordinates are not available in the source data.
 - The dataset does not establish real-world operational representativeness.
@@ -182,12 +181,11 @@ py scripts/data_pipeline/validate_data.py
 
 The complete supplied synthetic source dataset has been retained and standardized into the canonical data structure.
 
-The canonical CSV contains 20 measurement records and 22 columns.
+The canonical CSV contains 60 measurement records and 22 columns.
 
-The published JSON is generated from the canonical CSV.
+The published JSON contains 60 records and is generated from the canonical CSV.
 
 Automated canonical package validation has passed.
 
 Manual reviewer confirmation of data classification and formal approval of the Canonical Data Foundation remain outstanding.
 
-No Phase 3 Post #2 analytical work or Data Intelligence functionality should proceed until formal reviewer approval.

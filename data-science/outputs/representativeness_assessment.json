@@ -1,0 +1,311 @@
+{
+  "source_file": "data/canonical/intelligence_data.csv",
+  "canonical_measurement_rows": 60,
+  "distinct_source_incidents": 30,
+  "distinct_machines": 4,
+  "date_range": {
+    "start": "2026-01-05T00:00:00+00:00",
+    "end": "2026-02-03T00:00:00+00:00",
+    "distinct_observation_dates": 30,
+    "observation_dates": [
+      "2026-01-05",
+      "2026-01-06",
+      "2026-01-07",
+      "2026-01-08",
+      "2026-01-09",
+      "2026-01-10",
+      "2026-01-11",
+      "2026-01-12",
+      "2026-01-13",
+      "2026-01-14",
+      "2026-01-15",
+      "2026-01-16",
+      "2026-01-17",
+      "2026-01-18",
+      "2026-01-19",
+      "2026-01-20",
+      "2026-01-21",
+      "2026-01-22",
+      "2026-01-23",
+      "2026-01-24",
+      "2026-01-25",
+      "2026-01-26",
+      "2026-01-27",
+      "2026-01-28",
+      "2026-01-29",
+      "2026-01-30",
+      "2026-01-31",
+      "2026-02-01",
+      "2026-02-02",
+      "2026-02-03"
+    ]
+  },
+  "incident_distributions": {
+    "machine": {
+      "MCH-01": 8,
+      "MCH-02": 8,
+      "MCH-03": 7,
+      "MCH-04": 7
+    },
+    "category": {
+      "mechanical": 10,
+      "electrical": 9,
+      "operational": 6,
+      "maintenance": 5
+    },
+    "shift": {
+      "morning": 11,
+      "evening": 10,
+      "night": 9
+    },
+    "severity": {
+      "high": 11,
+      "medium": 12,
+      "low": 7
+    },
+    "status": {
+      "closed": 30
+    }
+  },
+  "synthetic_incidents": 30,
+  "real_incidents": 0,
+  "sampling_assessment": {
+    "sampling_method": "NOT_DOCUMENTED",
+    "sampling_frame": "NOT_ESTABLISHED",
+    "selection_procedure": "NOT_ESTABLISHED",
+    "inclusion_probabilities": "NOT_AVAILABLE",
+    "evidence": "Canonical CSV and provenance fields identify source records but do not document a probability-sampling procedure or the method used to construct/select the synthetic incidents."
+  },
+  "source_population_assessment": {
+    "source_population_size": "UNKNOWN",
+    "eligible_machine_population": "UNKNOWN",
+    "excluded_incident_count": "UNKNOWN",
+    "population_coverage": "NOT_ESTABLISHED",
+    "evidence": "The available canonical dataset does not define the complete operational incident population or its sampling frame."
+  },
+  "coverage_assessment": {
+    "machine": {
+      "observed_distribution": {
+        "MCH-01": 8,
+        "MCH-02": 8,
+        "MCH-03": 7,
+        "MCH-04": 7
+      },
+      "observed_machine_count": 4,
+      "assessment": "LIMITED_SAMPLE_COVERAGE"
+    },
+    "category": {
+      "observed_distribution": {
+        "mechanical": 10,
+        "electrical": 9,
+        "operational": 6,
+        "maintenance": 5
+      },
+      "assessment": "SAMPLE_DISTRIBUTION_ONLY"
+    },
+    "shift": {
+      "observed_distribution": {
+        "morning": 11,
+        "evening": 10,
+        "night": 9
+      },
+      "assessment": "SAMPLE_DISTRIBUTION_ONLY"
+    },
+    "severity": {
+      "observed_distribution": {
+        "high": 11,
+        "medium": 12,
+        "low": 7
+      },
+      "assessment": "SAMPLE_DISTRIBUTION_ONLY"
+    },
+    "status": {
+      "observed_distribution": {
+        "closed": 30
+      },
+      "all_incidents_closed": true,
+      "assessment": "CLOSED_ONLY"
+    },
+    "temporal": {
+      "date_range": {
+        "start": "2026-01-05T00:00:00+00:00",
+        "end": "2026-02-03T00:00:00+00:00",
+        "distinct_observation_dates": 30,
+        "observation_dates": [
+          "2026-01-05",
+          "2026-01-06",
+          "2026-01-07",
+          "2026-01-08",
+          "2026-01-09",
+          "2026-01-10",
+          "2026-01-11",
+          "2026-01-12",
+          "2026-01-13",
+          "2026-01-14",
+          "2026-01-15",
+          "2026-01-16",
+          "2026-01-17",
+          "2026-01-18",
+          "2026-01-19",
+          "2026-01-20",
+          "2026-01-21",
+          "2026-01-22",
+          "2026-01-23",
+          "2026-01-24",
+          "2026-01-25",
+          "2026-01-26",
+          "2026-01-27",
+          "2026-01-28",
+          "2026-01-29",
+          "2026-01-30",
+          "2026-01-31",
+          "2026-02-01",
+          "2026-02-02",
+          "2026-02-03"
+        ]
+      },
+      "assessment": "SHORT_SYNTHETIC_OBSERVATION_PERIOD"
+    },
+    "geographic": {
+      "valid_coordinate_pair_count": 0,
+      "assessment": "NOT_ASSESSABLE"
+    },
+    "lifecycle_stage": {
+      "blank_incident_count": 30,
+      "assessment": "NOT_ASSESSABLE"
+    },
+    "related_entity": {
+      "blank_incident_count": 30,
+      "assessment": "NOT_ASSESSABLE"
+    },
+    "text": {
+      "non_empty_text_incident_count": 30,
+      "assessment": "LIMITED_SYNTHETIC_TEXT_COVERAGE"
+    }
+  },
+  "underrepresented_areas": [
+    {
+      "area": "Real operational incidents",
+      "evidence": "0 non-synthetic incidents.",
+      "impact": "No real operational behaviour can be generalized."
+    },
+    {
+      "area": "Source-population coverage",
+      "evidence": "Population frame and sampling method are not established.",
+      "impact": "Population representativeness cannot be measured."
+    },
+    {
+      "area": "Machine population",
+      "evidence": "Only 4 observed machine identifiers.",
+      "impact": "Coverage of the wider machine population is unknown."
+    },
+    {
+      "area": "Geographic coverage",
+      "evidence": "0 valid coordinate pairs.",
+      "impact": "Geographic comparisons are unavailable."
+    },
+    {
+      "area": "Incident lifecycle",
+      "evidence": "30 incidents have no lifecycle stage; 30 have no related entity.",
+      "impact": "Lifecycle and related-incident analysis are unsupported."
+    },
+    {
+      "area": "Status coverage",
+      "evidence": "Only closed incidents are present.",
+      "impact": "Open and in-progress status comparisons are unsupported."
+    },
+    {
+      "area": "Long-term temporal behaviour",
+      "evidence": "30 distinct observed dates.",
+      "impact": "Long-term trends and seasonality are unsupported."
+    },
+    {
+      "area": "Rare and exceptional failures",
+      "evidence": "Ten synthetic incidents; rare-event population coverage is unknown.",
+      "impact": "Rare-event and anomaly conclusions are unreliable."
+    },
+    {
+      "area": "Operational text diversity",
+      "evidence": "Only the supplied synthetic incident descriptions are available.",
+      "impact": "Text coverage of the wider operational vocabulary is unknown."
+    }
+  ],
+  "sampling_bias_assessment": {
+    "status": "POTENTIAL_BIAS_RISKS_IDENTIFIED",
+    "risks": [
+      {
+        "risk": "Synthetic construction bias",
+        "evidence": "All supplied incidents are synthetic.",
+        "impact": "Synthetic distributions may not reflect real operations."
+      },
+      {
+        "risk": "Selection bias",
+        "evidence": "Sampling frame and selection method are not documented.",
+        "impact": "Inclusion and exclusion effects cannot be evaluated."
+      },
+      {
+        "risk": "Category and machine coverage imbalance",
+        "evidence": "Only ten incidents and four observed machines.",
+        "impact": "Observed distributions may not represent the wider population."
+      },
+      {
+        "risk": "Temporal concentration",
+        "evidence": "Observations cover a short January 2026 period.",
+        "impact": "Seasonal and long-term behaviour may be missed."
+      },
+      {
+        "risk": "Status restriction",
+        "evidence": "All observed incidents are closed.",
+        "impact": "Open and unresolved behaviour is absent."
+      }
+    ],
+    "magnitude_and_direction": "NOT_ESTABLISHED"
+  },
+  "impact_on_analytical_use": [
+    "Comparisons describe the supplied synthetic incidents only.",
+    "Operational prevalence and performance estimates are unsupported.",
+    "Trend and seasonality conclusions are unsupported.",
+    "Geographic and lifecycle comparisons are unavailable.",
+    "Predictive performance and causal conclusions are unsupported."
+  ],
+  "mitigation_and_required_improvements": [
+    "Obtain an authoritative source-population definition and sampling frame.",
+    "Document the incident selection and synthetic-data construction method.",
+    "Obtain authorized real operational records where available.",
+    "Document machine-population and incident-category coverage.",
+    "Extend temporal coverage across relevant operational cycles.",
+    "Include relevant incident statuses and lifecycle stages.",
+    "Collect valid geographic and relationship fields where meaningful and available.",
+    "Assess rare and exceptional operating conditions.",
+    "Reconcile canonical values against authoritative source samples.",
+    "Do not fabricate missing canonical fields."
+  ],
+  "limitations": [
+    "All available incidents are synthetic.",
+    "Only ten distinct source incidents are available.",
+    "Two metric rows per incident are measurements, not independent incidents.",
+    "Only four machine identifiers are represented.",
+    "The sampling method and source population are not established.",
+    "The dataset covers a short observation period.",
+    "Only closed incidents are represented.",
+    "No valid geographic coordinate pairs are available.",
+    "Lifecycle-stage and related-entity coverage is absent.",
+    "Category, shift and severity distributions describe this sample only.",
+    "Source accuracy is not independently verified."
+  ],
+  "representativeness_status": "INSUFFICIENT_FOR_OPERATIONAL_GENERALIZATION",
+  "recommended_use": [
+    "Pipeline and schema validation",
+    "Synthetic-data analytical workflow testing",
+    "Descriptive demonstration of recorded incident metrics"
+  ],
+  "not_supported": [
+    "Claims about actual plant-wide incident prevalence",
+    "Generalization to real machine failure patterns",
+    "Seasonal or long-term trend conclusions",
+    "Operational risk estimates",
+    "Predictive modelling",
+    "Causal root-cause conclusions",
+    "Geographic intelligence"
+  ]
+}

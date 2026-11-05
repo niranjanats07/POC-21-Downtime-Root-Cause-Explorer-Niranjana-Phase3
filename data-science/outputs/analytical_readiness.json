@@ -1,0 +1,188 @@
+{
+  "source_file": "data/canonical/intelligence_data.csv",
+  "data_version": "1.1.0",
+  "measurement_rows": 60,
+  "distinct_incidents": 30,
+  "incidents_with_both_metrics": 30,
+  "distinct_machines": 4,
+  "synthetic_incidents": 30,
+  "all_incidents_closed": true,
+  "incident_distributions": {
+    "machine": {
+      "MCH-01": 8,
+      "MCH-02": 8,
+      "MCH-03": 7,
+      "MCH-04": 7
+    },
+    "category": {
+      "mechanical": 10,
+      "electrical": 9,
+      "operational": 6,
+      "maintenance": 5
+    },
+    "shift": {
+      "morning": 11,
+      "evening": 10,
+      "night": 9
+    },
+    "severity": {
+      "high": 11,
+      "medium": 12,
+      "low": 7
+    }
+  },
+  "confirmed_data_archetype": "Incident-centric structured event records with repeated metric measurements per source incident. Suitable for limited descriptive comparative analysis; not an established representative time-series or predictive dataset.",
+  "tracks": [
+    {
+      "track": "A",
+      "name": "Comparative Intelligence",
+      "status": "SUPPORTED",
+      "supporting_evidence": [
+        "30 distinct synthetic incidents are available.",
+        "30 incidents contain both downtime_minutes and failure_frequency measurements.",
+        "4 machines, 4 root-cause categories and 3 shifts are represented.",
+        "The canonical dataset supports deterministic group totals, averages, rankings, percentage contributions and performance-gap calculations.",
+        "A simple descriptive baseline can be calculated directly from the canonical dataset."
+      ],
+      "missing_requirements": [
+        "All 30 available incidents are synthetic and do not establish real-world operational representativeness.",
+        "The dataset does not establish an independently verified real operational population.",
+        "Small groups may produce unstable rankings and must be reviewed using minimum group-size and sensitivity checks.",
+        "Results must not be generalized as actual operational performance without representative real-world data."
+      ],
+      "recommendation": "Approve Comparative Intelligence only for a clearly labelled synthetic-data analytical demonstration. Use deterministic incident-level aggregation, define minimum group sizes, validate selected calculations independently, review ranking stability and document all limitations."
+    },
+    {
+      "track": "B",
+      "name": "Trend Intelligence",
+      "status": "NOT_SUPPORTED",
+      "supporting_evidence": [
+        "30 incidents are available, but the observation window is limited."
+      ],
+      "missing_requirements": [
+        "A sufficiently long and meaningful longitudinal observation period.",
+        "Repeated observations across operational cycles.",
+        "A validated time-series baseline.",
+        "Evidence supporting trend or seasonality interpretation."
+      ],
+      "recommendation": "Reject trend and seasonality conclusions for the current dataset. Do not infer long-term trends from the available synthetic incident period."
+    },
+    {
+      "track": "C",
+      "name": "Risk and Priority Intelligence",
+      "status": "CONDITIONAL",
+      "supporting_evidence": [
+        "Severity, shift, machine and root-cause attributes are available.",
+        "Downtime and failure-frequency measurements could support a transparent deterministic demonstration score."
+      ],
+      "missing_requirements": [
+        "Approved business priority rules.",
+        "Validated operational thresholds.",
+        "Documented stakeholder-approved factor weights.",
+        "Evidence that the selected factors represent real urgency."
+      ],
+      "recommendation": "Do not use Risk and Priority Intelligence as the primary track unless Post #2 explicitly approves a deterministic priority method with documented factors, thresholds and weights."
+    },
+    {
+      "track": "D",
+      "name": "Anomaly Intelligence",
+      "status": "NOT_SUPPORTED",
+      "supporting_evidence": [
+        "Numerical downtime and failure-frequency values are available."
+      ],
+      "missing_requirements": [
+        "A representative normal-operation baseline.",
+        "Adequate historical observations to characterize variation.",
+        "Validated anomaly definitions.",
+        "Evidence distinguishing genuine anomalies from sample sparsity."
+      ],
+      "recommendation": "Reject anomaly detection. The available synthetic sample does not establish a sufficiently defensible normal baseline."
+    },
+    {
+      "track": "E",
+      "name": "Segmentation Intelligence",
+      "status": "NOT_SUPPORTED",
+      "supporting_evidence": [
+        "30 incidents and 4 machines are represented.",
+        "Descriptive grouping fields are available."
+      ],
+      "missing_requirements": [
+        "Sufficient records for stable and meaningful segments.",
+        "Evidence supporting segment stability.",
+        "A validated segmentation objective.",
+        "Business evidence supporting interpretation of generated groups."
+      ],
+      "recommendation": "Do not create or claim stable operational segments from the current synthetic dataset."
+    },
+    {
+      "track": "F",
+      "name": "Predictive Intelligence",
+      "status": "NOT_SUPPORTED",
+      "supporting_evidence": [
+        "Numerical measurements are available for each source incident."
+      ],
+      "missing_requirements": [
+        "A genuine prediction target.",
+        "Sufficient historical examples.",
+        "Decision-time feature availability.",
+        "A documented leakage assessment.",
+        "A defensible train-validation strategy.",
+        "Appropriate performance metrics and error analysis."
+      ],
+      "recommendation": "Reject predictive modelling. The current dataset is not approved for predictive intelligence."
+    },
+    {
+      "track": "G",
+      "name": "Simulation and Scenario Intelligence",
+      "status": "NOT_SUPPORTED",
+      "supporting_evidence": [
+        "Recorded measurements provide descriptive context only."
+      ],
+      "missing_requirements": [
+        "Validated scenario parameters.",
+        "Calibrated operational assumptions.",
+        "A defined decision model.",
+        "Evidence supporting interpretation of simulated outputs."
+      ],
+      "recommendation": "Reject operational simulation. Do not invent calibrated scenario parameters from the synthetic sample."
+    },
+    {
+      "track": "H",
+      "name": "Text and Theme Intelligence",
+      "status": "CONDITIONAL",
+      "supporting_evidence": [
+        "30 incident records contain non-empty descriptions.",
+        "Text can be manually reviewed with record-level evidence."
+      ],
+      "missing_requirements": [
+        "A larger and more diverse operational text corpus.",
+        "Representative real-world incident language.",
+        "A validated taxonomy or theme-classification approach."
+      ],
+      "recommendation": "Allow only controlled exploratory text review as an optional supporting activity. Do not claim generalized theme prevalence."
+    }
+  ],
+  "recommended_primary_track": "A - Comparative Intelligence",
+  "optional_supporting_track": "H - Text and Theme Intelligence, limited to controlled exploratory review.",
+  "supported_tracks": [
+    "A"
+  ],
+  "conditionally_supported_tracks": [
+    "C",
+    "H"
+  ],
+  "rejected_tracks": [
+    "B",
+    "D",
+    "E",
+    "F",
+    "G"
+  ],
+  "predictive_intelligence_status": "REJECTED",
+  "primary_analytical_question": "Which recorded root-cause categories, machines and shifts have the highest observed downtime totals and failure-frequency values within the approved synthetic incident dataset?",
+  "decision_supported": "Identify the highest-observed groups for closer descriptive review within the synthetic downtime investigation demonstration.",
+  "scope_boundary": "Track A is approved only for reproducible descriptive comparison of the approved canonical synthetic dataset. Results must be labelled synthetic demonstration outputs and must not be presented as representative of real-world operations.",
+  "overall_readiness": "DATA READY FOR ANALYTICAL TRACK DEVELOPMENT",
+  "readiness_explanation": "The approved canonical synthetic dataset supports Track A (Comparative Intelligence) for a limited, reproducible and clearly labelled synthetic-data demonstration. The approval does not establish real-world operational representativeness and does not support predictive, anomaly, trend, segmentation or simulation claims.",
+  "post_3_approval_gate": "Proceed to Post #3 only if the Post #2 reviewer accepts this limited Track A scope and approves the readiness evidence."
+}
