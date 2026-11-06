@@ -1,0 +1,49 @@
+{
+  "project_id": "POC-21",
+  "analytical_track": "TRACK A - COMPARATIVE INTELLIGENCE",
+  "data_version": "1.1.0",
+  "method_version": "1.0.0",
+  "overall_result": "Comparative Intelligence completed using deterministic descriptive calculations on the approved synthetic canonical dataset.",
+  "top_observed_root_cause_category": {
+    "group": "mechanical",
+    "incident_count": 10,
+    "downtime_measurement_count": 10,
+    "failure_frequency_measurement_count": 10,
+    "total_downtime_minutes": 1265.0,
+    "average_downtime_minutes": 126.5,
+    "total_failure_frequency": 28.0,
+    "average_failure_frequency": 2.8,
+    "meets_minimum_group_size": true,
+    "rank_by_total_downtime": 1
+  },
+  "top_observed_machine": {
+    "group": "MCH-02",
+    "incident_count": 8,
+    "downtime_measurement_count": 8,
+    "failure_frequency_measurement_count": 8,
+    "total_downtime_minutes": 850.0,
+    "average_downtime_minutes": 106.25,
+    "total_failure_frequency": 20.0,
+    "average_failure_frequency": 2.5,
+    "meets_minimum_group_size": true,
+    "rank_by_total_downtime": 1
+  },
+  "top_observed_shift": {
+    "group": "morning",
+    "incident_count": 11,
+    "downtime_measurement_count": 11,
+    "failure_frequency_measurement_count": 11,
+    "total_downtime_minutes": 1060.0,
+    "average_downtime_minutes": 96.36363636363636,
+    "total_failure_frequency": 26.0,
+    "average_failure_frequency": 2.3636363636363638,
+    "meets_minimum_group_size": true,
+    "rank_by_total_downtime": 1
+  },
+  "limitations": [
+    "All records are synthetic and results are not representative of real-world industrial operations.",
+    "The analysis is descriptive and does not establish causality.",
+    "The dataset contains only the approved observation period and represented machines.",
+    "Small group sizes may affect ranking stability and must be interpreted with caution."
+  ]
+}

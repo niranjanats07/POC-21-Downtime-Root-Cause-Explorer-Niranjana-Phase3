@@ -1,0 +1,392 @@
+{
+  "project_id": "POC-21",
+  "analytical_track": "TRACK A — COMPARATIVE INTELLIGENCE",
+  "data_version": "1.1.0",
+  "generated_method_version": "1.0.0",
+  "validation_method_version": "1.0.0",
+  "source_measurement_rows": 60,
+  "independently_reconstructed_incidents": 30,
+  "validation_status": "PASS",
+  "overall_metric_checks": {
+    "incident_count": {
+      "generated": 30,
+      "independent": 30,
+      "matches": true
+    },
+    "total_downtime_minutes": {
+      "generated": 2795.0,
+      "independent": 2795.0,
+      "matches": true
+    },
+    "average_downtime_minutes": {
+      "generated": 93.16666666666667,
+      "independent": 93.16666666666667,
+      "matches": true
+    },
+    "total_failure_frequency": {
+      "generated": 65.0,
+      "independent": 65.0,
+      "matches": true
+    },
+    "average_failure_frequency": {
+      "generated": 2.1666666666666665,
+      "independent": 2.1666666666666665,
+      "matches": true
+    }
+  },
+  "group_validation": {
+    "root_cause_category": [
+      {
+        "group": "electrical",
+        "status": "PASS",
+        "metrics": {
+          "incident_count": {
+            "generated": 9,
+            "independent": 9,
+            "matches": true
+          },
+          "total_downtime_minutes": {
+            "generated": 950.0,
+            "independent": 950.0,
+            "matches": true
+          },
+          "average_downtime_minutes": {
+            "generated": 105.55555555555556,
+            "independent": 105.55555555555556,
+            "matches": true
+          },
+          "total_failure_frequency": {
+            "generated": 23.0,
+            "independent": 23.0,
+            "matches": true
+          },
+          "average_failure_frequency": {
+            "generated": 2.5555555555555554,
+            "independent": 2.5555555555555554,
+            "matches": true
+          }
+        }
+      },
+      {
+        "group": "maintenance",
+        "status": "PASS",
+        "metrics": {
+          "incident_count": {
+            "generated": 5,
+            "independent": 5,
+            "matches": true
+          },
+          "total_downtime_minutes": {
+            "generated": 360.0,
+            "independent": 360.0,
+            "matches": true
+          },
+          "average_downtime_minutes": {
+            "generated": 72.0,
+            "independent": 72.0,
+            "matches": true
+          },
+          "total_failure_frequency": {
+            "generated": 8.0,
+            "independent": 8.0,
+            "matches": true
+          },
+          "average_failure_frequency": {
+            "generated": 1.6,
+            "independent": 1.6,
+            "matches": true
+          }
+        }
+      },
+      {
+        "group": "mechanical",
+        "status": "PASS",
+        "metrics": {
+          "incident_count": {
+            "generated": 10,
+            "independent": 10,
+            "matches": true
+          },
+          "total_downtime_minutes": {
+            "generated": 1265.0,
+            "independent": 1265.0,
+            "matches": true
+          },
+          "average_downtime_minutes": {
+            "generated": 126.5,
+            "independent": 126.5,
+            "matches": true
+          },
+          "total_failure_frequency": {
+            "generated": 28.0,
+            "independent": 28.0,
+            "matches": true
+          },
+          "average_failure_frequency": {
+            "generated": 2.8,
+            "independent": 2.8,
+            "matches": true
+          }
+        }
+      },
+      {
+        "group": "operational",
+        "status": "PASS",
+        "metrics": {
+          "incident_count": {
+            "generated": 6,
+            "independent": 6,
+            "matches": true
+          },
+          "total_downtime_minutes": {
+            "generated": 220.0,
+            "independent": 220.0,
+            "matches": true
+          },
+          "average_downtime_minutes": {
+            "generated": 36.666666666666664,
+            "independent": 36.666666666666664,
+            "matches": true
+          },
+          "total_failure_frequency": {
+            "generated": 6.0,
+            "independent": 6.0,
+            "matches": true
+          },
+          "average_failure_frequency": {
+            "generated": 1.0,
+            "independent": 1.0,
+            "matches": true
+          }
+        }
+      }
+    ],
+    "machine": [
+      {
+        "group": "MCH-01",
+        "status": "PASS",
+        "metrics": {
+          "incident_count": {
+            "generated": 8,
+            "independent": 8,
+            "matches": true
+          },
+          "total_downtime_minutes": {
+            "generated": 635.0,
+            "independent": 635.0,
+            "matches": true
+          },
+          "average_downtime_minutes": {
+            "generated": 79.375,
+            "independent": 79.375,
+            "matches": true
+          },
+          "total_failure_frequency": {
+            "generated": 15.0,
+            "independent": 15.0,
+            "matches": true
+          },
+          "average_failure_frequency": {
+            "generated": 1.875,
+            "independent": 1.875,
+            "matches": true
+          }
+        }
+      },
+      {
+        "group": "MCH-02",
+        "status": "PASS",
+        "metrics": {
+          "incident_count": {
+            "generated": 8,
+            "independent": 8,
+            "matches": true
+          },
+          "total_downtime_minutes": {
+            "generated": 850.0,
+            "independent": 850.0,
+            "matches": true
+          },
+          "average_downtime_minutes": {
+            "generated": 106.25,
+            "independent": 106.25,
+            "matches": true
+          },
+          "total_failure_frequency": {
+            "generated": 20.0,
+            "independent": 20.0,
+            "matches": true
+          },
+          "average_failure_frequency": {
+            "generated": 2.5,
+            "independent": 2.5,
+            "matches": true
+          }
+        }
+      },
+      {
+        "group": "MCH-03",
+        "status": "PASS",
+        "metrics": {
+          "incident_count": {
+            "generated": 7,
+            "independent": 7,
+            "matches": true
+          },
+          "total_downtime_minutes": {
+            "generated": 610.0,
+            "independent": 610.0,
+            "matches": true
+          },
+          "average_downtime_minutes": {
+            "generated": 87.14285714285714,
+            "independent": 87.14285714285714,
+            "matches": true
+          },
+          "total_failure_frequency": {
+            "generated": 13.0,
+            "independent": 13.0,
+            "matches": true
+          },
+          "average_failure_frequency": {
+            "generated": 1.8571428571428572,
+            "independent": 1.8571428571428572,
+            "matches": true
+          }
+        }
+      },
+      {
+        "group": "MCH-04",
+        "status": "PASS",
+        "metrics": {
+          "incident_count": {
+            "generated": 7,
+            "independent": 7,
+            "matches": true
+          },
+          "total_downtime_minutes": {
+            "generated": 700.0,
+            "independent": 700.0,
+            "matches": true
+          },
+          "average_downtime_minutes": {
+            "generated": 100.0,
+            "independent": 100.0,
+            "matches": true
+          },
+          "total_failure_frequency": {
+            "generated": 17.0,
+            "independent": 17.0,
+            "matches": true
+          },
+          "average_failure_frequency": {
+            "generated": 2.4285714285714284,
+            "independent": 2.4285714285714284,
+            "matches": true
+          }
+        }
+      }
+    ],
+    "shift": [
+      {
+        "group": "evening",
+        "status": "PASS",
+        "metrics": {
+          "incident_count": {
+            "generated": 10,
+            "independent": 10,
+            "matches": true
+          },
+          "total_downtime_minutes": {
+            "generated": 935.0,
+            "independent": 935.0,
+            "matches": true
+          },
+          "average_downtime_minutes": {
+            "generated": 93.5,
+            "independent": 93.5,
+            "matches": true
+          },
+          "total_failure_frequency": {
+            "generated": 22.0,
+            "independent": 22.0,
+            "matches": true
+          },
+          "average_failure_frequency": {
+            "generated": 2.2,
+            "independent": 2.2,
+            "matches": true
+          }
+        }
+      },
+      {
+        "group": "morning",
+        "status": "PASS",
+        "metrics": {
+          "incident_count": {
+            "generated": 11,
+            "independent": 11,
+            "matches": true
+          },
+          "total_downtime_minutes": {
+            "generated": 1060.0,
+            "independent": 1060.0,
+            "matches": true
+          },
+          "average_downtime_minutes": {
+            "generated": 96.36363636363636,
+            "independent": 96.36363636363636,
+            "matches": true
+          },
+          "total_failure_frequency": {
+            "generated": 26.0,
+            "independent": 26.0,
+            "matches": true
+          },
+          "average_failure_frequency": {
+            "generated": 2.3636363636363638,
+            "independent": 2.3636363636363638,
+            "matches": true
+          }
+        }
+      },
+      {
+        "group": "night",
+        "status": "PASS",
+        "metrics": {
+          "incident_count": {
+            "generated": 9,
+            "independent": 9,
+            "matches": true
+          },
+          "total_downtime_minutes": {
+            "generated": 800.0,
+            "independent": 800.0,
+            "matches": true
+          },
+          "average_downtime_minutes": {
+            "generated": 88.88888888888889,
+            "independent": 88.88888888888889,
+            "matches": true
+          },
+          "total_failure_frequency": {
+            "generated": 17.0,
+            "independent": 17.0,
+            "matches": true
+          },
+          "average_failure_frequency": {
+            "generated": 1.8888888888888888,
+            "independent": 1.8888888888888888,
+            "matches": true
+          }
+        }
+      }
+    ]
+  },
+  "validation_conclusion": "Independent deterministic recalculation matched the generated Track A comparative intelligence outputs.",
+  "limitations": [
+    "Validation confirms calculation consistency, not real-world representativeness.",
+    "The canonical dataset remains entirely synthetic.",
+    "Results remain descriptive and do not establish causality or predictive capability."
+  ]
+}
