@@ -9,15 +9,24 @@ ROOT = Path(__file__).resolve().parents[2]
 CSV_PATH = ROOT / "data" / "canonical" / "intelligence_data.csv"
 
 RESULTS_PATH = (
-    ROOT / "data-science" / "outputs" / "intelligence_results.json"
+    ROOT
+    / "data-science"
+    / "outputs"
+    / "intelligence_results.json"
 )
 
 VALIDATION_PATH = (
-    ROOT / "data-science" / "outputs" / "analytical_validation.json"
+    ROOT
+    / "data-science"
+    / "outputs"
+    / "analytical_validation.json"
 )
 
-
 VALIDATION_METHOD_VERSION = "1.0.0"
+
+ANALYTICAL_TRACK = (
+    "TRACK A - COMPARATIVE INTELLIGENCE"
+)
 
 
 def to_number(value):
@@ -82,7 +91,7 @@ def independently_build_incidents(rows):
         if metric_name == "downtime_minutes":
             incident["downtime_minutes"] = numeric_value
 
-        if metric_name == "failure_frequency":
+        elif metric_name == "failure_frequency":
             incident["failure_frequency"] = numeric_value
 
     complete_incidents = {
@@ -97,7 +106,7 @@ def independently_build_incidents(rows):
 
 def independently_group(
     complete_incidents,
-    grouping_key
+    grouping_key,
 ):
     """
     Independently calculate group metrics using sums and counters.
@@ -135,22 +144,24 @@ def independently_group(
 
         count = values["incident_count"]
 
-        independent_results.append({
-            "group": group_name,
-            "incident_count": count,
-            "total_downtime_minutes": (
-                values["total_downtime_minutes"]
-            ),
-            "average_downtime_minutes": (
-                values["total_downtime_minutes"] / count
-            ),
-            "total_failure_frequency": (
-                values["total_failure_frequency"]
-            ),
-            "average_failure_frequency": (
-                values["total_failure_frequency"] / count
-            ),
-        })
+        independent_results.append(
+            {
+                "group": group_name,
+                "incident_count": count,
+                "total_downtime_minutes": (
+                    values["total_downtime_minutes"]
+                ),
+                "average_downtime_minutes": (
+                    values["total_downtime_minutes"] / count
+                ),
+                "total_failure_frequency": (
+                    values["total_failure_frequency"]
+                ),
+                "average_failure_frequency": (
+                    values["total_failure_frequency"] / count
+                ),
+            }
+        )
 
     independent_results.sort(
         key=lambda item: (
@@ -165,7 +176,7 @@ def independently_group(
 
 def compare_group_results(
     generated_groups,
-    independently_calculated_groups
+    independently_calculated_groups,
 ):
     """
     Compare generated analytical results against independently
@@ -189,36 +200,42 @@ def compare_group_results(
 
     checks = []
 
+    metrics_to_check = [
+        "incident_count",
+        "total_downtime_minutes",
+        "average_downtime_minutes",
+        "total_failure_frequency",
+        "average_failure_frequency",
+    ]
+
     for group_name in all_groups:
 
         generated = generated_lookup.get(group_name)
         independent = independent_lookup.get(group_name)
 
         if generated is None or independent is None:
-            checks.append({
-                "group": group_name,
-                "status": "FAIL",
-                "reason": (
-                    "Group is missing from one calculation."
-                ),
-            })
+            checks.append(
+                {
+                    "group": group_name,
+                    "status": "FAIL",
+                    "reason": (
+                        "Group is missing from one calculation."
+                    ),
+                }
+            )
             continue
 
         metric_checks = {}
 
-        for metric in [
-            "incident_count",
-            "total_downtime_minutes",
-            "average_downtime_minutes",
-            "total_failure_frequency",
-            "average_failure_frequency",
-        ]:
+        for metric in metrics_to_check:
 
             generated_value = generated.get(metric)
             independent_value = independent.get(metric)
 
             matches = (
-                abs(
+                generated_value is not None
+                and independent_value is not None
+                and abs(
                     float(generated_value)
                     - float(independent_value)
                 )
@@ -240,13 +257,36 @@ def compare_group_results(
             else "FAIL"
         )
 
-        checks.append({
-            "group": group_name,
-            "status": status,
-            "metrics": metric_checks,
-        })
+        checks.append(
+            {
+                "group": group_name,
+                "status": status,
+                "metrics": metric_checks,
+            }
+        )
 
     return checks
+
+
+def values_match(
+    generated_value,
+    independent_value,
+):
+    """Compare numeric values using a small floating-point tolerance."""
+
+    if (
+        generated_value is None
+        or independent_value is None
+    ):
+        return False
+
+    return (
+        abs(
+            float(generated_value)
+            - float(independent_value)
+        )
+        < 0.000001
+    )
 
 
 def main():
@@ -258,13 +298,14 @@ def main():
 
     if not RESULTS_PATH.exists():
         raise FileNotFoundError(
-            f"Generated intelligence results not found: {RESULTS_PATH}"
+            "Generated intelligence results not found: "
+            f"{RESULTS_PATH}"
         )
 
     with CSV_PATH.open(
         "r",
         encoding="utf-8-sig",
-        newline=""
+        newline="",
     ) as file:
         rows = list(csv.DictReader(file))
 
@@ -274,34 +315,36 @@ def main():
         )
     )
 
-    complete_incidents = independently_build_incidents(rows)
+    complete_incidents = (
+        independently_build_incidents(rows)
+    )
 
     independent_category = independently_group(
         complete_incidents,
-        "category"
+        "category",
     )
 
     independent_machine = independently_group(
         complete_incidents,
-        "machine"
+        "machine",
     )
 
     independent_shift = independently_group(
         complete_incidents,
-        "shift"
+        "shift",
     )
 
     generated_comparisons = (
         generated_results.get(
             "comparisons",
-            {}
+            {},
         )
     )
 
     category_checks = compare_group_results(
         generated_comparisons.get(
             "root_cause_category",
-            []
+            [],
         ),
         independent_category,
     )
@@ -309,7 +352,7 @@ def main():
     machine_checks = compare_group_results(
         generated_comparisons.get(
             "machine",
-            []
+            [],
         ),
         independent_machine,
     )
@@ -317,7 +360,7 @@ def main():
     shift_checks = compare_group_results(
         generated_comparisons.get(
             "shift",
-            []
+            [],
         ),
         independent_shift,
     )
@@ -325,7 +368,7 @@ def main():
     generated_overall = (
         generated_results.get(
             "overall_metrics",
-            {}
+            {},
         )
     )
 
@@ -346,11 +389,15 @@ def main():
     independent_average_downtime = (
         independent_total_downtime
         / independent_incident_count
+        if independent_incident_count
+        else None
     )
 
     independent_average_frequency = (
         independent_total_frequency
         / independent_incident_count
+        if independent_incident_count
+        else None
     )
 
     overall_checks = {
@@ -388,16 +435,9 @@ def main():
 
     for check in overall_checks.values():
 
-        generated_value = check["generated"]
-        independent_value = check["independent"]
-
-        check["matches"] = (
-            generated_value is not None
-            and abs(
-                float(generated_value)
-                - float(independent_value)
-            )
-            < 0.000001
+        check["matches"] = values_match(
+            check["generated"],
+            check["independent"],
         )
 
     comparison_checks = (
@@ -427,14 +467,14 @@ def main():
 
     validation_result = {
         "project_id": "POC-21",
-        "analytical_track": (
-            "TRACK A — COMPARATIVE INTELLIGENCE"
-        ),
+        "analytical_track": ANALYTICAL_TRACK,
         "data_version": generated_results.get(
             "data_version"
         ),
-        "generated_method_version": generated_results.get(
-            "method_version"
+        "generated_method_version": (
+            generated_results.get(
+                "method_version"
+            )
         ),
         "validation_method_version": (
             VALIDATION_METHOD_VERSION
@@ -451,17 +491,19 @@ def main():
             "shift": shift_checks,
         },
         "validation_conclusion": (
-            "Independent deterministic recalculation matched the "
-            "generated Track A comparative intelligence outputs."
+            "Independent deterministic recalculation matched "
+            "the generated Track A comparative intelligence "
+            "outputs."
             if validation_status == "PASS"
             else
-            "Independent recalculation found one or more mismatches "
-            "with the generated Track A intelligence outputs."
+            "Independent recalculation found one or more "
+            "mismatches with the generated Track A "
+            "intelligence outputs."
         ),
         "limitations": [
             (
-                "Validation confirms calculation consistency, not "
-                "real-world representativeness."
+                "Validation confirms calculation consistency, "
+                "not real-world representativeness."
             ),
             (
                 "The canonical dataset remains entirely synthetic."
@@ -475,15 +517,16 @@ def main():
 
     VALIDATION_PATH.parent.mkdir(
         parents=True,
-        exist_ok=True
+        exist_ok=True,
     )
 
     VALIDATION_PATH.write_text(
         json.dumps(
             validation_result,
             indent=2,
-            ensure_ascii=False
-        ) + "\n",
+            ensure_ascii=False,
+        )
+        + "\n",
         encoding="utf-8",
     )
 
@@ -494,13 +537,16 @@ def main():
         f"Validation status: {validation_status}"
     )
     print(
-        f"Independent incidents: {independent_incident_count}"
+        f"Independent incidents: "
+        f"{independent_incident_count}"
     )
     print(
-        f"Overall checks passed: {all_overall_checks_pass}"
+        f"Overall checks passed: "
+        f"{all_overall_checks_pass}"
     )
     print(
-        f"Group checks passed: {all_group_checks_pass}"
+        f"Group checks passed: "
+        f"{all_group_checks_pass}"
     )
 
 
