@@ -333,7 +333,8 @@ def main():
     ]
 
     readiness = (
-        "DATA READY FOR ANALYTICAL TRACK DEVELOPMENT"
+        "DATA READY FOR ANALYTICAL TRACK DEVELOPMENT — "
+        "TRACK A COMPARATIVE INTELLIGENCE."
         if "A" in supported_tracks
         else "DATA INSUFFICIENT FOR ANALYTICAL TRACK DEVELOPMENT"
     )
@@ -346,9 +347,10 @@ def main():
         "not support predictive, anomaly, trend, segmentation or simulation "
         "claims."
         if "A" in supported_tracks
-        else
-        "The canonical dataset does not currently meet the defined evidence "
-        "requirements for an approved analytical track."
+        else (
+            "The canonical dataset does not currently meet the defined evidence "
+            "requirements for an approved analytical track."
+        )
     )
 
     result = {
@@ -374,7 +376,7 @@ def main():
         ),
         "tracks": tracks,
         "recommended_primary_track": (
-            "A - Comparative Intelligence"
+            "TRACK A — COMPARATIVE INTELLIGENCE"
             if "A" in supported_tracks
             else None
         ),
@@ -411,6 +413,7 @@ def main():
 
     print(f"Analytical readiness generated: {OUTPUT_PATH}")
     print(f"Data version: {data_version}")
+    print(f"Measurement rows: {len(rows)}")
     print(f"Distinct incidents: {incident_count}")
     print(f"Incidents with both metrics: {complete_metric_incidents}")
     print(f"Supported tracks: {result['supported_tracks']}")

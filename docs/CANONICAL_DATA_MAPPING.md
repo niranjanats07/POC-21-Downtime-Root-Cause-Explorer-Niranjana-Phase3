@@ -34,7 +34,7 @@ and do not duplicate a mandatory field.
 | `severity` | `severity` (domain-specific) | Trim and lowercase | No | `high` | No universal field has equivalent meaning |
 | Fixed value | `source_name` | `synthetic_downtime_incidents_csv` | Yes | `synthetic_downtime_incidents_csv` | Source provenance |
 | Fixed value | `is_synthetic` | Boolean `true` | Yes | `true` | All supplied records are synthetic |
-| Fixed value | `data_version` | `1.0.0` | Yes | `1.0.0` | Package version |
+| Fixed value | `data_version` | `1.1.0` | Yes | `1.1.0` | Package version |
 
 ## Unused Universal Fields
 

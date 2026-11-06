@@ -162,7 +162,7 @@
       "recommendation": "Allow only controlled exploratory text review as an optional supporting activity. Do not claim generalized theme prevalence."
     }
   ],
-  "recommended_primary_track": "A - Comparative Intelligence",
+  "recommended_primary_track": "TRACK A — COMPARATIVE INTELLIGENCE",
   "optional_supporting_track": "H - Text and Theme Intelligence, limited to controlled exploratory review.",
   "supported_tracks": [
     "A"
@@ -182,7 +182,7 @@
   "primary_analytical_question": "Which recorded root-cause categories, machines and shifts have the highest observed downtime totals and failure-frequency values within the approved synthetic incident dataset?",
   "decision_supported": "Identify the highest-observed groups for closer descriptive review within the synthetic downtime investigation demonstration.",
   "scope_boundary": "Track A is approved only for reproducible descriptive comparison of the approved canonical synthetic dataset. Results must be labelled synthetic demonstration outputs and must not be presented as representative of real-world operations.",
-  "overall_readiness": "DATA READY FOR ANALYTICAL TRACK DEVELOPMENT",
+  "overall_readiness": "DATA READY FOR ANALYTICAL TRACK DEVELOPMENT — TRACK A COMPARATIVE INTELLIGENCE.",
   "readiness_explanation": "The approved canonical synthetic dataset supports Track A (Comparative Intelligence) for a limited, reproducible and clearly labelled synthetic-data demonstration. The approval does not establish real-world operational representativeness and does not support predictive, anomaly, trend, segmentation or simulation claims.",
   "post_3_approval_gate": "Proceed to Post #3 only if the Post #2 reviewer accepts this limited Track A scope and approves the readiness evidence."
 }
