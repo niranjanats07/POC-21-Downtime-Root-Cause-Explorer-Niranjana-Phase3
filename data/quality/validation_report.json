@@ -1,48 +1,42 @@
-{
-  "status": "FAIL",
-  "project_id": "POC-21",
-  "data_version": "1.0.0",
-  "errors": [
-    "Manifest data_version must match package version 1.0.0."
-  ],
-  "evidence": {
-    "data_directory_size_bytes_including_report": 75132,
-    "data_directory_size_mb_including_report": 0.071651,
-    "main_file_sizes_bytes": {
-      "data\\source-sample\\source_sample.csv": 4217,
-      "data\\canonical\\intelligence_data.csv": 16182,
-      "data\\published\\intelligence_data.json": 36280
-    },
-    "canonical_row_count": 60,
-    "canonical_column_count": 22,
-    "canonical_columns": [
-      "record_id",
-      "record_type",
-      "observed_at",
-      "entity_id",
-      "related_entity_id",
-      "entity_name",
-      "category",
-      "subcategory",
-      "status",
-      "stage",
-      "metric_name",
-      "metric_value",
-      "metric_unit",
-      "text_value",
-      "latitude",
-      "longitude",
-      "source_name",
-      "source_record_id",
-      "is_synthetic",
-      "data_version",
-      "shift",
-      "severity"
-    ],
-    "source_sample_row_count": 30,
-    "source_sample_column_count": 11,
-    "synthetic_data": true,
-    "personal_data_review": "No personal data observed in supplied synthetic source; manual reviewer confirmation remains required.",
-    "phase2_visualization_changes": "No dashboard/API visualization files intentionally modified by this package build."
-  }
+﻿{
+    "data_version":  "1.1.0",
+    "status":  "PASS",
+    "evidence":  {
+                     "canonical_columns":  [
+                                               "record_id",
+                                               "record_type",
+                                               "observed_at",
+                                               "entity_id",
+                                               "related_entity_id",
+                                               "entity_name",
+                                               "category",
+                                               "subcategory",
+                                               "status",
+                                               "stage",
+                                               "metric_name",
+                                               "metric_value",
+                                               "metric_unit",
+                                               "text_value",
+                                               "latitude",
+                                               "longitude",
+                                               "source_name",
+                                               "source_record_id",
+                                               "is_synthetic",
+                                               "data_version",
+                                               "shift",
+                                               "severity"
+                                           ],
+                     "canonical_row_count":  60,
+                     "synthetic_data":  true,
+                     "source_sample_column_count":  11,
+                     "manifest_data_version":  "1.1.0",
+                     "canonical_column_count":  22,
+                     "validation_result":  "Canonical package validation PASSED.",
+                     "package_version":  "1.1.0",
+                     "source_sample_row_count":  30
+                 },
+    "errors":  [
+
+               ],
+    "project_id":  "POC-21"
 }

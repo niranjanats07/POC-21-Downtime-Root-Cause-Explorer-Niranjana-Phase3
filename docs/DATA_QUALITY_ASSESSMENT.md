@@ -1,159 +1,192 @@
-
-# Data Quality Assessment
+# Data Source Inventory
 
 ## 1. Purpose
 
-This report documents the quality assessment of the Phase 3 canonical dataset.
+This report inventories the data sources used by the Phase 3 data pipeline for **PoC-21 — Downtime Root Cause Explorer**.
 
-The sole analytical source is:
+The purpose of this inventory is to document the supplied source, canonical representation, provenance and important limitations of the dataset used for analytical development.
+
+## 2. Primary Source
+
+The project uses a synthetic downtime incident dataset.
+
+**Primary source file:**
+
+`data/synthetic/downtime_incidents.csv`
+
+The source contains:
+
+- **30 synthetic downtime incidents**
+- Incident-level operational attributes
+- Recorded downtime duration values
+- Recorded failure-frequency values
+- Machine, root-cause category, shift and severity attributes
+
+The source data is synthetic and must not be represented as verified real industrial operational data.
+
+## 3. Source Dataset Characteristics
+
+The supplied synthetic source dataset contains **30 incident records**.
+
+Each incident represents a downtime event with descriptive attributes including:
+
+- Incident identifier
+- Observation date and timestamp
+- Machine identifier
+- Root-cause category
+- Subcategory
+- Shift
+- Severity
+- Status
+- Downtime duration
+- Recorded failure-frequency value
+
+The dataset is intended for controlled data-pipeline validation and descriptive analytical demonstration.
+
+## 4. Canonical Data Source
+
+The canonical analytical source is:
 
 `data/canonical/intelligence_data.csv`
 
-Machine-readable evidence:
+It contains **60 canonical measurement records representing 30 synthetic source incidents**.
 
-`data-science/outputs/quality_assessment.json`
+Each source incident is represented by two canonical measurement records:
 
-Assessment script:
+1. `downtime_minutes`
+2. `failure_frequency`
 
-`data-science/scripts/assess_data_quality.py`
+Therefore, the 60 canonical rows must **not** be interpreted as 60 independent incidents.
 
-## 2. Assessment Summary
+The incident-level analytical population is **30 synthetic incidents**.
 
-| Measure | Result |
-|---|---:|
-| Canonical rows | 20 |
-| Canonical columns | 22 |
-| Distinct source incidents | 10 |
-| Automated checks | 19 |
-| Blocking failures | 0 |
-| Sensitive-content pattern matches | 0 |
-| Assessment status | NO_BLOCKING_FAILURES_DETECTED |
+## 5. Published Data Representation
 
-No blocking structural or validation failures were detected by the automated assessment.
+The published representation is:
 
-This result does not establish operational representativeness or predictive readiness.
+`data/published/intelligence_data.json`
 
-## 3. Quality Dimensions
+This published file is generated from the approved canonical data package.
 
-### 3.1 Completeness
+Analytical calculations must preserve the relationship between canonical measurement records and their corresponding source incident identifiers.
 
-Required identifiers, timestamps, entity references and provenance fields are assessed for missing values.
+## 6. Data Version
 
-Optional fields that are entirely empty include:
+The current canonical data package version is:
 
-- `related_entity_id`
-- `stage`
-- `latitude`
-- `longitude`
+`1.1.0`
 
-Their absence limits relationship, lifecycle-stage and geographic analysis. Missing optional information must not be fabricated.
+The version must remain consistent across:
 
-### 3.2 Uniqueness
+- Canonical data
+- Published data
+- Data manifest
+- Validation evidence
+- Analytical outputs that identify the package version
 
-The assessment checks canonical `record_id` values for duplicates.
+## 7. Dataset Expansion History
 
-The 20 measurement rows correspond to 10 distinct source incidents. Repeated source incident identifiers are expected because each incident has two metric measurements.
+The synthetic source dataset was previously expanded from **10 incidents to 30 incidents** to provide broader descriptive coverage for the Phase 3 analytical workflow.
 
-### 3.3 Validity
+The current approved dataset therefore contains:
 
-Automated checks cover:
+- **30 synthetic source incidents**
+- **60 canonical measurement records**
+- **22 canonical columns**
 
-- Numeric metric validity and non-negative values.
-- Observation timestamp parsing.
-- Coordinate pairing and geographic ranges.
-- Completeness of selected categorical fields.
-- Metric-unit consistency.
+The earlier 10-incident dataset should not be used as the current analytical basis.
 
-### 3.4 Consistency
+## 8. Data Provenance
 
-The assessment checks metric units by metric name and identifies timestamp timezone-type inconsistencies.
+The canonical records preserve provenance information including:
 
-Categorical casing warnings are retained for review rather than silently normalizing canonical values.
+- Source name
+- Source record identifier
+- Canonical record identifier
+- Synthetic-data indicator
+- Data version
 
-### 3.5 Provenance
+These fields support traceability between the canonical measurements and the supplied synthetic source records.
 
-Each row is assessed for:
+Provenance metadata supports record-level traceability but does not independently establish the accuracy of synthetic values as real operational observations.
 
-- Source name.
-- Source record identifier.
-- Canonical data version.
-- Synthetic-data indicator.
+## 9. Synthetic Data Status
 
-All supplied records are synthetic. Provenance identifiers support traceability but do not independently prove the accuracy of source values.
+All incidents in the current dataset are synthetic.
 
-### 3.6 Safety
+Accordingly:
 
-A pattern-based screening check examined canonical field values for possible:
+- The data supports descriptive demonstration and controlled analytical development.
+- The data does not establish actual industrial downtime behaviour.
+- Findings must remain tied to the supplied synthetic dataset.
+- Results must not be generalized to actual industrial operations.
+- Synthetic descriptive patterns must not be presented as real-world failure prevalence.
 
-- Email addresses.
-- Phone numbers.
-- IP addresses.
+## 10. Coverage
 
-No pattern matches were detected in this run.
+The current dataset provides attributes suitable for descriptive comparison across:
 
-This is a limited automated screening result. It is not a complete privacy, security, confidentiality or legal compliance audit.
+- Root-cause categories
+- Machines
+- Shifts
+- Severity levels
+- Total downtime
+- Average downtime
+- Incident counts
+- Recorded failure-frequency values
 
-### 3.7 Reproducibility
+These comparisons are limited to the supplied synthetic incidents.
 
-The assessment records a SHA-256 fingerprint of the canonical CSV and checks that the fingerprint remains stable during the assessment run.
+## 11. Data Limitations
 
-The script uses deterministic checks against the canonical input.
+Important limitations include:
 
-A separate repeat-run comparison of generated outputs is still required for stronger end-to-end reproducibility evidence.
+- All **30 incidents are synthetic**.
+- The dataset does not represent verified real industrial operations.
+- Source-population coverage is not established.
+- The synthetic sample cannot establish actual plant-wide incident prevalence.
+- Recorded distributions describe only the supplied synthetic dataset.
+- Trend and long-term operational conclusions are limited by the available observation coverage.
+- Missing fields must not be fabricated or inferred.
+- The data does not support predictive modelling or unsupported causal conclusions.
 
-### 3.8 Timeliness
+The dataset contains **30 synthetic incidents**, and any observed distributions or trends are illustrative and describe only the supplied synthetic sample.
 
-The assessment records the latest valid observation timestamp and its age relative to the assessment timestamp.
+## 12. Permitted Analytical Use
 
-The latest observation was approximately 295 days old at the time of this assessment.
+The approved dataset may be used for deterministic descriptive analysis and **Track A — Comparative Intelligence**.
 
-The records are synthetic and historical. This dataset cannot establish current operational conditions or real-time equipment status.
+Permitted comparisons include:
 
-### 3.9 Source Accuracy
+- Root-cause category comparisons
+- Machine comparisons
+- Shift comparisons
+- Total downtime comparisons
+- Average downtime comparisons
+- Incident counts
+- Recorded failure-frequency comparisons
 
-**Status: NOT INDEPENDENTLY VERIFIABLE**
+All calculations should use approved canonical records and preserve record-level evidence.
 
-The canonical data contains source names and source-record identifiers. However, the automated assessment does not have an authoritative original-source sample against which every recorded value can be reconciled.
+## 13. Analytical Scope Boundary
 
-Structural validity and provenance completeness do not prove that values accurately match their original source.
+The dataset must not be used to support:
 
-Independent source reconciliation remains necessary if source accuracy is to be established.
+- Predictive modelling
+- Forecasting
+- Unsupported causal conclusions
+- Generalized industrial failure claims
+- Real-world operational prevalence estimates
+- Claims that synthetic patterns represent actual plant behaviour
 
-### 3.10 Representativeness
+The project is limited to descriptive analysis of the approved synthetic dataset.
 
-The dataset contains 10 distinct synthetic incidents represented by 20 measurement rows.
+## 14. Inventory Conclusion
 
-It is a limited synthetic sample and is not evidence of the distribution of real operational incidents, machines, shifts or failure categories.
+The current Phase 3 data inventory consists of **30 synthetic downtime incidents** represented by **60 canonical measurement records**.
 
-Representativeness is assessed separately in:
+The approved canonical package is version **1.1.0**.
 
-`docs/REPRESENTATIVENESS_ASSESSMENT.md`
+The dataset supports controlled descriptive analytical development using **Track A — Comparative Intelligence**.
 
-## 4. Warnings and Limitations
-
-- All supplied records are synthetic.
-- All observed records are closed, preventing meaningful status comparison.
-- Optional relationship, stage and geographic fields are absent.
-- No sensitive-content patterns were detected, but automated screening is not exhaustive.
-- Source accuracy cannot be independently verified from the available evidence.
-- The input fingerprint was stable during this run; independent repeat-run comparison remains outstanding.
-- Historical observation timestamps do not establish current operational conditions.
-- Ten incidents do not support broad operational generalisation.
-
-## 5. Assessment Result
-
-**NO_BLOCKING_FAILURES_DETECTED**
-
-The assessment executed 19 checks and detected zero blocking failures.
-
-This result means that the automated checks did not identify a blocking structural or validation defect in the supplied canonical dataset.
-
-It does not mean that every quality dimension has been independently proven. In particular, source accuracy, operational representativeness and complete privacy compliance remain unverified.
-
-## 6. Recommendation
-
-Retain the canonical dataset and its provenance as supplied.
-
-Use it only for controlled validation and limited descriptive analysis of the synthetic sample. Do not infer real operational risk, causal relationships, predictive performance or population-level behaviour.
-
-Post #3 remains blocked until formal Post #2 review and approval.
+All findings must remain tied to the supplied synthetic data and must **not be generalized to actual industrial downtime or real operational populations**.

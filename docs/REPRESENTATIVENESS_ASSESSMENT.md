@@ -1,4 +1,4 @@
-
+@'
 # Representativeness Assessment
 
 ## 1. Purpose
@@ -23,80 +23,75 @@ The canonical dataset contains:
 
 | Measure | Observed coverage |
 |---|---:|
-| Measurement rows | 20 |
-| Distinct source incidents | 10 |
+| Measurement records | 60 |
+| Distinct source incidents | 30 |
 | Distinct machines | 4 |
-| Observation dates | 10 |
-| Synthetic incidents | 10 |
+| Synthetic incidents | 30 |
 | Non-synthetic incidents | 0 |
 | Geographic coordinate pairs | 0 |
+| Canonical data version | 1.1.0 |
 
-Each source incident has two measurement rows: downtime duration and failure frequency. The 20 rows must not be interpreted as 20 independent incidents.
+Each source incident has two measurement records: downtime duration and failure frequency. The 60 records must not be interpreted as 60 independent incidents.
 
-## 3. Sampling Method
+## 3. Dataset Expansion History
 
-**Sampling method: NOT DOCUMENTED IN THE AVAILABLE CANONICAL EVIDENCE**
+The synthetic source dataset was previously expanded from **10 incidents to 30 incidents** to provide broader descriptive coverage for the Phase 3 analytical workflow.
 
-The available canonical CSV and provenance fields identify source records and synthetic status. They do not establish a documented probability-sampling method, random selection procedure, sampling frame or inclusion probabilities.
+The current canonical package contains 60 measurement records associated with those 30 synthetic source incidents.
 
-Consequently, the sample cannot be assumed to be random or statistically representative.
+This earlier controlled expansion increased the available descriptive coverage. It did not create a representative real operational dataset and does not support generalization to actual industrial downtime behaviour.
 
-The process by which the 10 synthetic incidents were selected or constructed requires supporting source documentation before a stronger sampling claim can be made.
+## 4. Sampling Method
 
-## 4. Source-Population Coverage
+The current manifest identifies the source as synthetic data and records:
 
-**Source population: NOT ESTABLISHED**
+`full_source_retained_no_reduction_required`
+
+The available evidence establishes that the supplied synthetic source was retained without further reduction for the current package.
+
+This does not establish a probability sample of real industrial incidents, a real-world sampling frame or inclusion probabilities.
+
+Consequently, the dataset must not be assumed to be statistically representative of actual industrial operations.
+
+## 5. Source-Population Coverage
+
+**Source population: NOT ESTABLISHED FOR REAL OPERATIONAL GENERALIZATION**
 
 The available evidence does not establish:
 
-- The total population of operational incidents.
-- The complete set of machines eligible for inclusion.
-- The number of incidents excluded from the sample.
-- The sampling frame or inclusion criteria.
-- Whether the sample covers all operating locations or production environments.
+- The total population of real operational incidents.
+- The complete set of machines eligible for real-world inclusion.
+- Real operational incident exclusions.
+- A real-world sampling frame.
+- Whether the synthetic sample represents all operating locations or production environments.
 
-The four observed machine identifiers describe the supplied sample only. They do not establish complete machine-population coverage.
+The observed machine identifiers describe the supplied synthetic sample only. They do not establish complete machine-population coverage.
 
-## 5. Category and Severity Coverage
+## 6. Category, Severity and Shift Coverage
 
-Observed incident-level distributions:
+The dataset provides category, severity and shift attributes that support descriptive grouping within the supplied synthetic incidents.
 
-| Dimension | Observed distribution |
-|---|---|
-| Root-cause category | Mechanical: 4 |
-|  | Electrical: 3 |
-|  | Operational: 2 |
-|  | Maintenance: 1 |
-| Severity | High: 4 |
-|  | Medium: 4 |
-|  | Low: 2 |
-| Shift | Morning: 4 |
-|  | Evening: 3 |
-|  | Night: 3 |
+These distributions describe only the available synthetic dataset.
 
-These counts describe the 10 supplied synthetic incidents.
+They do not establish the real-world prevalence of any root-cause category, severity level or shift pattern.
 
-They do not establish the real-world prevalence of any category, severity or shift.
+Rare or absent incident behaviours in an actual operational population cannot be identified reliably from this synthetic sample.
 
-Rare or absent incident behaviours in the operational population cannot be identified reliably from this sample.
+## 7. Temporal Coverage
 
-## 6. Temporal Coverage
+The available records provide incident observations across the synthetic observation period.
 
-The observed sample covers 10 distinct dates between 5 January and 14 January 2026.
+The dataset does not establish:
 
-The available period is short and synthetic.
-
-It does not establish:
-
-- Long-term operating behaviour.
+- Long-term real operating behaviour.
 - Seasonal or annual patterns.
-- Reliable trend changes.
+- Reliable real-world trend changes.
 - Recurrence rates over representative operating cycles.
-- Coverage of unusual or exceptional operating periods.
+- Coverage of unusual or exceptional real operating periods.
 
-The sample therefore does not provide a representative operational time series.
+The dataset therefore does not provide a representative operational time series.
 
-## 7. Geographic Coverage
+## 8. Geographic Coverage
 
 No valid geographic coordinate pairs are available.
 
@@ -104,92 +99,71 @@ Geographic representativeness, location coverage and regional differences cannot
 
 No geographic distribution should be inferred from machine identifiers or other fields.
 
-## 8. Status and Lifecycle Coverage
+## 9. Status and Lifecycle Coverage
 
-All supplied incidents have closed status.
+The supplied records are limited in status and lifecycle coverage.
 
 The `stage` and `related_entity_id` fields are empty in the supplied records.
 
-Consequently, the sample does not support:
+Consequently, the dataset does not support:
 
-- Open-versus-closed incident comparisons.
-- Lifecycle-stage comparisons.
+- Broad lifecycle-stage comparisons.
 - Reliable analysis of related-incident relationships.
-- Assessment of unresolved or ongoing operational conditions.
+- Assessment of unresolved or ongoing real operational conditions.
 
-## 9. Text and Behavioural Coverage
+## 10. Text and Behavioural Coverage
 
-The sample contains a limited set of synthetic incident descriptions and categories.
+The sample contains synthetic incident descriptions and categories.
 
-The available records do not establish that the text covers the full range of operational language, failure descriptions, maintenance notes or unusual incident behaviours.
+The available records do not establish that the text covers the full range of real operational language, failure descriptions, maintenance notes or unusual incident behaviours.
 
-Text-based findings must remain exploratory and tied to the supplied records.
+Text-based findings must remain exploratory and tied to the supplied synthetic records.
 
-## 10. Underrepresented and Missing Areas
+## 11. Underrepresented and Missing Areas
 
 The following areas are underrepresented or cannot be assessed from the available evidence:
 
 | Area | Assessment |
 |---|---|
 | Real operational incidents | Absent; all records are synthetic |
-| Broader machine population | Unknown beyond four observed machines |
-| Source-population coverage | Not established |
-| Sampling frame and selection method | Not documented |
+| Broader machine population | Unknown beyond observed synthetic machine identifiers |
+| Real source-population coverage | Not established |
+| Real-world sampling frame | Not established |
 | Geographic coverage | No valid coordinate pairs |
-| Open and in-progress incidents | Not represented |
 | Lifecycle stages | Missing |
 | Related-incident relationships | Missing |
-| Long-term temporal behaviour | Not represented |
-| Rare and exceptional failures | Coverage not established |
+| Long-term real operational behaviour | Not represented |
+| Rare and exceptional real failures | Coverage not established |
 | Operational text diversity | Not established |
-| Non-synthetic source accuracy | Not independently verified |
+| Real-world source accuracy | Not independently verified |
 
-## 11. Sampling Bias Assessment
+## 12. Sampling and Construction Bias Assessment
 
-A probability-sampling method and source-population frame have not been established.
+The dataset is synthetic and does not establish a real-world probability sample or source-population frame.
 
 Potential limitations include:
 
 - Synthetic construction bias.
-- Selection bias from an undocumented sample-selection process.
-- Category imbalance within a very small sample.
-- Machine coverage limited to four observed identifiers.
-- Temporal concentration within a short date range.
-- Status restriction to closed incidents.
+- Category imbalance.
+- Limited machine coverage.
+- Limited observation coverage.
 - Absence of geographic and lifecycle information.
+- Absence of real operational population evidence.
 
 These are limitations and potential bias risks. The available evidence does not establish the exact magnitude or direction of any bias.
 
-## 12. Impact on Analytical Use
+## 13. Impact on Analytical Use
 
 The limitations have the following consequences:
 
 - Category and machine comparisons describe only the supplied synthetic incidents.
 - Downtime summaries cannot be interpreted as real operational performance estimates.
-- Shift and severity distributions cannot be generalized to an operational population.
+- Shift distributions cannot be generalized to an operational population.
 - Trend and seasonality conclusions are unsupported.
 - Geographic comparisons are unavailable.
-- Status and lifecycle comparisons are unsupported.
 - Predictive performance cannot be established from this sample.
 - Rare-event and anomaly conclusions are unreliable.
-- Causal conclusions are not supported.
-
-## 13. Mitigation and Required Improvements
-
-Before claiming operational representativeness, obtain and document:
-
-1. An authoritative source-population definition.
-2. The sampling frame and incident inclusion criteria.
-3. The sampling and synthetic-data construction method.
-4. Evidence of coverage across the eligible machine population.
-5. A sufficiently broad and representative observation period.
-6. Real operational records, where authorized and available.
-7. Coverage of relevant incident statuses and lifecycle stages.
-8. Geographic and relationship fields where they are meaningful and available.
-9. Source reconciliation evidence to assess accuracy.
-10. Evidence covering rare, exceptional and underrepresented operating conditions.
-
-Do not fill missing canonical fields with fabricated values. Any future canonical changes must follow the existing data pipeline and data-versioning process.
+- Unsupported causal conclusions are not permitted.
 
 ## 14. Suitable Uses
 
@@ -198,8 +172,12 @@ The present sample supports:
 - Canonical schema and pipeline validation.
 - Synthetic-data workflow testing.
 - Demonstration of metric and category aggregation.
+- **Track A — Comparative Intelligence**.
 - Limited descriptive comparisons within the supplied incidents.
-- Controlled testing of the existing intelligence workflow.
+- Comparisons across root-cause categories, machines and shifts.
+- Total and average downtime comparisons.
+- Incident-count comparisons.
+- Recorded failure-frequency comparisons.
 
 ## 15. Unsupported Uses
 
@@ -209,20 +187,29 @@ The present sample does not support:
 - Generalized machine failure conclusions.
 - Real-world category prevalence.
 - Forecasting or predictive modelling.
-- Reliable anomaly detection.
-- Causal root-cause claims.
+- Reliable operational anomaly detection.
+- Unsupported causal root-cause claims.
 - Geographic intelligence.
 - Seasonal or long-term trend analysis.
-- Generalized risk scoring.
+- Generalized operational risk scoring.
 
 ## 16. Assessment Conclusion
 
 **Representativeness status: INSUFFICIENT FOR OPERATIONAL GENERALIZATION**
 
-The canonical dataset contains 10 distinct synthetic incidents represented by 20 measurement rows. Its sampling method and source-population coverage are not established by the available evidence.
+The canonical dataset contains **30 distinct synthetic incidents represented by 60 canonical measurement records**.
 
-The dataset is suitable for controlled validation and limited descriptive demonstration only.
+The earlier expansion from the 10-incident dataset to 30 synthetic incidents increased the available descriptive coverage for the approved comparative analysis. However, the records remain synthetic and the dataset does not establish representative real-world industrial downtime behaviour.
 
-It is not representative evidence of real operational behaviour. Additional source-population, sampling, temporal and operational coverage evidence is required before broader analytical claims can be made.
+The dataset is suitable for:
 
-Post #3 remains blocked pending formal Post #2 review and approval.
+- Controlled synthetic-data validation.
+- Deterministic descriptive analysis.
+- **Track A — Comparative Intelligence**.
+- Comparisons across root-cause categories, machines and shifts.
+- Total and average downtime analysis.
+- Incident-count comparisons.
+- Recorded failure-frequency comparisons.
+
+The dataset is not suitable for generalization to actual industrial operations, predictive modelling or unsupported causal conclusions.
+'@ | Set-Content .\docs\REPRESENTATIVENESS_ASSESSMENT.md -Encoding UTF8

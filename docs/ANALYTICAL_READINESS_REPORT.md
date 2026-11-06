@@ -1,4 +1,4 @@
-
+@'
 # Analytical Readiness Report
 
 ## 1. Purpose
@@ -15,50 +15,61 @@ No alternate cleaned or analytical dataset is used.
 
 | Assessment | Result |
 |---|---|
-| Canonical measurement rows | 20 |
-| Distinct source incidents | 10 |
+| Canonical measurement records | 60 |
+| Distinct source incidents | 30 |
 | Distinct machines | 4 |
-| Incidents with both required metrics | 10 |
-| Synthetic incidents | 10 (100%) |
+| Incidents with both required metrics | 30 |
+| Synthetic incidents | 30 (100%) |
 | Real incidents | 0 |
 | Blocking data quality failures | 0 |
 | Representativeness | INSUFFICIENT_FOR_OPERATIONAL_GENERALIZATION |
-| Predictive Intelligence | REJECTED |
+| Approved analytical track | TRACK A — COMPARATIVE INTELLIGENCE |
 
-The 20 canonical rows represent metric measurements. They must not be interpreted as 20 independent incidents.
+The 60 canonical measurement records represent metric measurements associated with 30 source incidents. They must not be interpreted as 60 independent incidents.
+
+The dataset is approved for controlled synthetic-data descriptive analysis under **Track A — Comparative Intelligence**.
+
+It is not approved for generalization to actual industrial operations.
 
 ## 3. Confirmed Data Archetype
 
 **Incident-centric structured event records with repeated metric measurements per source incident.**
 
-The canonical dataset contains incident attributes and associated numerical measurements. Its ten synthetic incidents do not establish a sufficiently representative time-series history.
+The canonical dataset contains incident attributes and associated numerical measurements. Its 30 synthetic incidents support controlled descriptive comparison but do not establish a sufficiently representative real-world operational history.
 
 ## 4. Analytical Readiness Matrix
 
 | Track | Analytical Track | Status | Supporting Evidence | Missing Requirements | Recommendation |
 |---|---|---|---|---|---|
-| A | Comparative Intelligence | CONDITIONAL | Ten distinct incidents; all ten contain downtime and failure-frequency measurements. Machine, category and shift attributes permit descriptive grouping. | All incidents are synthetic; sampling method and source population are unknown; sample size is limited. | Permit limited synthetic-data descriptive comparisons using incident-level aggregation only. |
-| B | Trend Intelligence | NOT_SUPPORTED | Incident dates are available over a short observation period. | Repeated observations over a sufficiently long horizon, consistent intervals, representative history and seasonal coverage. | Reject trend and seasonality conclusions until suitable longitudinal data exists. |
-| C | Condition Intelligence | CONDITIONAL | Recorded severity, shift, machine, category, downtime and failure-frequency fields permit descriptive review. | Validated condition indicators, thresholds, representative real observations and validated urgency relationships. | Permit descriptive summaries only; do not infer operational risk or validated condition. |
-| D | Anomaly Intelligence | NOT_SUPPORTED | Numerical downtime and failure-frequency measurements are available. | Representative normal-operation baseline, sufficient history and validated anomaly definitions. | Reject anomaly detection until a reliable operational baseline is established. |
-| E | Segmentation Intelligence | NOT_SUPPORTED | Ten incidents and four machines have descriptive grouping attributes. | Adequate representative group sizes, stable meaningful groups and a defined segmentation objective. | Do not develop operational segments or claim stable clusters. |
-| F | Predictive Intelligence | NOT_SUPPORTED | Recorded numerical measurements exist. | Genuine validated target, sufficient historical examples, decision-time inputs, leakage-safe design, target distribution, baseline, defensible validation and decision value. | Reject predictive modelling. Reconsider only when every predictive approval requirement is evidenced. |
-| G | Simulation Intelligence | NOT_SUPPORTED | Recorded measurements provide limited descriptive context. | Validated scenario inputs, calibrated operational parameters, comparable scenarios and evidence supporting assumptions. | Reject operational simulation; do not invent scenario parameters. |
-| H | Text and Theme Intelligence | CONDITIONAL | Ten incident records contain synthetic text descriptions that can be reviewed with incident attributes. | Sufficient meaningful and diverse real text, representative vocabulary, consistent context and evidence for reliable theme interpretation. | Permit manual exploratory review of supplied synthetic descriptions only. |
+| A | Comparative Intelligence | APPROVED | Thirty distinct synthetic incidents contain downtime and failure-frequency measurements. Machine, category and shift attributes permit deterministic descriptive grouping. | Real operational representativeness is not established. | Proceed with controlled synthetic-data descriptive comparisons using incident-aware aggregation. |
+| B | Trend Intelligence | NOT_SUPPORTED | Observation timestamps are available. | Representative long-term history, sufficient temporal coverage and seasonal evidence. | Do not make trend or seasonality conclusions. |
+| C | Condition Intelligence | CONDITIONAL_DESCRIPTIVE_ONLY | Recorded severity, shift, machine, category, downtime and failure-frequency fields permit descriptive review. | Validated condition indicators, thresholds and representative real observations. | Permit descriptive summaries only; do not infer operational risk or validated condition. |
+| D | Anomaly Intelligence | NOT_SUPPORTED | Numerical downtime and failure-frequency measurements are available. | Representative normal-operation baseline and validated anomaly definitions. | Do not develop operational anomaly conclusions. |
+| E | Segmentation Intelligence | NOT_SUPPORTED | Grouping attributes are available. | Adequate representative group sizes and stable operational groups. | Do not claim stable operational segments or clusters. |
+| F | Predictive Intelligence | NOT_SUPPORTED | Recorded numerical measurements exist. | Genuine validated target, sufficient historical examples, leakage-safe validation and decision-value evidence. | Predictive modelling is not approved. |
+| G | Simulation Intelligence | NOT_SUPPORTED | Recorded measurements provide descriptive context. | Validated scenario inputs and calibrated operational parameters. | Do not introduce operational simulation. |
+| H | Text and Theme Intelligence | CONDITIONAL_DESCRIPTIVE_ONLY | Synthetic text descriptions can be reviewed as supporting context. | Sufficient meaningful and representative real operational text. | Permit limited manual exploratory review only. |
 
 ## 5. Recommended Primary Analytical Track
 
 **Track A — Comparative Intelligence**
 
-Status: `CONDITIONAL`
+Status: `APPROVED`
 
-The dataset permits limited descriptive comparisons of recorded downtime and failure-frequency values by:
+The dataset permits deterministic descriptive comparisons of recorded values by:
 
-- Machine
-- Root-cause category
-- Shift
+- Root-cause category.
+- Machine.
+- Shift.
 
-All comparisons must use incident-level aggregation. The two measurement rows associated with an incident must not be counted as two independent incidents.
+The approved comparisons include:
+
+- Total downtime.
+- Average downtime.
+- Incident counts.
+- Recorded failure-frequency values.
+
+All comparisons must preserve incident-level relationships. The two measurement records associated with an incident must not be counted as two independent incidents when calculating incident counts or incident-level averages.
 
 These comparisons describe the supplied synthetic sample only.
 
@@ -66,58 +77,61 @@ These comparisons describe the supplied synthetic sample only.
 
 **Track H — Text and Theme Intelligence**
 
-Status: `CONDITIONAL`
+Status: `CONDITIONAL_DESCRIPTIVE_ONLY`
 
-Manual exploratory review of the supplied synthetic incident descriptions may be used as supporting context. The available text does not support reliable or generalizable theme prevalence conclusions.
+Manual exploratory review of the supplied synthetic incident descriptions may be used as supporting context.
 
-## 7. Tracks Rejected
+The available text does not support reliable or generalizable real-world theme prevalence conclusions.
 
-The following tracks are not supported by the current canonical data:
+## 7. Tracks Not Approved for Development
 
-- Track B — Trend Intelligence
-- Track D — Anomaly Intelligence
-- Track E — Segmentation Intelligence
-- Track F — Predictive Intelligence
-- Track G — Simulation Intelligence
+The following analytical capabilities are not approved for development using the current dataset:
 
-Predictive Intelligence is explicitly rejected. Row count alone does not justify predictive modelling, and the required target, history, leakage-safe validation and decision-value evidence are not established.
+- Track B — Trend Intelligence.
+- Track D — Anomaly Intelligence.
+- Track E — Segmentation Intelligence.
+- Track F — Predictive Intelligence.
+- Track G — Simulation Intelligence.
+
+Predictive Intelligence is explicitly not approved.
+
+The available synthetic dataset does not provide the required real-world target, history, validation evidence or decision-value evidence for predictive modelling.
 
 ## 8. Primary Analytical Question
 
 **Target user:** Downtime investigation reviewer.
 
-**Canonical data version:** Use the version recorded in the canonical data manifest and profile.
+**Canonical data version:** `1.1.0`
 
 **Confirmed data archetype:** Incident-centric structured event records with repeated metric measurements per source incident.
 
-**Observed data coverage:** 20 measurement rows, 10 distinct synthetic incidents, four machines, and recorded category, shift and severity attributes.
+**Observed data coverage:** 60 canonical measurement records representing 30 synthetic incidents, with recorded machine, category, shift and severity attributes.
 
-**Operational problem:** Understanding how the supplied incident sample distributes recorded downtime and failure-frequency measurements across incident groups.
+**Operational problem:** Understanding how the supplied synthetic incident sample distributes recorded downtime and failure-frequency measurements across descriptive incident groups.
 
 **Primary analytical question:**
 
-Which recorded root-cause categories, machines and shifts have the highest observed downtime totals and recorded failure-frequency values among the available synthetic incidents?
+Which recorded root-cause categories, machines and shifts have the highest observed total and average downtime, incident counts and recorded failure-frequency values among the available synthetic incidents?
 
 ## 9. Decision to Be Supported
 
 Identify recorded groups for closer descriptive review in a downtime investigation demonstration.
 
-This is a descriptive demonstration decision, not a real-world operational recommendation.
+This is a descriptive synthetic-data demonstration decision, not a real-world operational recommendation.
 
-**Recommended primary track:** Track A — Comparative Intelligence.
+**Approved primary track:** Track A — Comparative Intelligence.
 
-**Optional supporting track:** Track H — Text and Theme Intelligence, limited to manual exploratory review.
+**Optional supporting context:** Track H — Text and Theme Intelligence, limited to manual exploratory review.
 
 ## 10. Important Data Limitations
 
-- All ten available incidents are synthetic.
-- The source population and sampling method are not established.
-- Only four machine identifiers are represented.
-- The observation period is short and does not establish long-term or seasonal coverage.
-- Only closed incidents are represented.
+- All 30 available incidents are synthetic.
+- The dataset does not establish representative real operational behaviour.
+- Only the observed machine identifiers are represented.
+- The available synthetic observation period does not establish long-term or seasonal real-world coverage.
 - No valid geographic coordinate pairs are available.
 - Lifecycle-stage and related-entity coverage is absent.
-- Source accuracy is not independently verified.
+- Source accuracy for real-world operations cannot be independently established from this synthetic dataset.
 - The sample cannot establish actual plant-wide incident prevalence or operational failure patterns.
 
 ## 11. Scope Boundaries
@@ -126,23 +140,64 @@ The current dataset does not support:
 
 - Predictive modelling or forecasting.
 - Operational risk scoring.
-- Anomaly detection.
+- Unsupported anomaly conclusions.
 - Defensible operational segmentation.
 - Calibrated operational simulation.
 - Generalization to actual plant operations.
 - Claims about actual plant-wide failure patterns.
-- Causal root-cause conclusions.
+- Unsupported causal root-cause conclusions.
 
 ## 12. Final Readiness Result
 
-**DATA INSUFFICIENT FOR PHASE 3**
+**DATA READY FOR ANALYTICAL TRACK DEVELOPMENT — TRACK A COMPARATIVE INTELLIGENCE.**
 
-The canonical dataset supports limited synthetic-data descriptive demonstration, but it does not establish representative real operational data for Phase 3 analytical track development.
+The approved canonical dataset contains **60 canonical measurement records representing 30 synthetic downtime incidents** and is versioned as **1.1.0**.
 
-Track A remains the recommended primary candidate for a limited descriptive demonstration. This does not constitute approval to begin analytical track development.
+The dataset is approved for **Track A — Comparative Intelligence** using deterministic, incident-aware descriptive calculations.
+
+The approved analytical scope includes comparisons across:
+
+- Root-cause categories.
+- Machines.
+- Shifts.
+- Total downtime.
+- Average downtime.
+- Incident counts.
+- Recorded failure-frequency values.
+
+All calculations must preserve the relationship between the two canonical measurement records associated with each source incident.
+
+Measurement records must not be incorrectly treated as independent incidents when incident-level counts or averages are calculated.
+
+This approval applies only to **descriptive analysis of the supplied synthetic dataset**.
+
+The results must not be generalized to actual industrial operations, plant-wide failure behaviour, real equipment populations or real-world downtime prevalence.
+
+The dataset remains unsuitable for:
+
+- Predictive modelling.
+- Forecasting.
+- Unsupported anomaly conclusions.
+- Operational risk scoring.
+- Unsupported causal conclusions.
+- Generalization to actual industrial downtime behaviour.
 
 ## 13. Approval Gate
 
-Post #3 remains blocked until the Post #2 readiness package is reviewed and approved.
+**Track A — Comparative Intelligence is approved for analytical track development.**
 
-No predictive, risk-scoring, anomaly, forecasting, segmentation, simulation, operational text intelligence or Data Intelligence page development may begin before approval.
+Post #3 may proceed using the approved canonical dataset and deterministic calculations.
+
+Analytical development must:
+
+- Use approved canonical records as the governing analytical source.
+- Preserve record-level evidence and source identifiers.
+- Retain data version `1.1.0` in generated outputs.
+- Preserve the synthetic-data limitation in all analytical conclusions.
+- Use deterministic and reproducible calculations.
+- Avoid predictive modelling.
+- Avoid unsupported causal conclusions.
+- Avoid introducing a new data architecture.
+
+The analytical output must remain a controlled synthetic-data demonstration and must not be represented as evidence of actual industrial downtime behaviour.
+'@ | Set-Content .\docs\ANALYTICAL_READINESS_REPORT.md -Encoding UTF8
