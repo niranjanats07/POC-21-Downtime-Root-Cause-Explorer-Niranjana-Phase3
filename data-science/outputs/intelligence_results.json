@@ -1,162 +1,519 @@
-{
-  "project_id": "POC-21",
-  "poc_title": "Downtime Root Cause Explorer",
-  "analytical_track": "TRACK A - COMPARATIVE INTELLIGENCE",
-  "data_version": "1.1.0",
-  "method_version": "1.0.0",
-  "source_file": "data/canonical/intelligence_data.csv",
-  "source_measurement_rows": 60,
-  "distinct_source_incidents": 30,
-  "complete_incidents_used_for_comparison": 30,
-  "minimum_group_size": 3,
-  "ranking_method": "Descending total downtime, then descending incident count, then ascending group name for deterministic tie handling.",
-  "calculation_scope": "Descriptive comparison of the approved synthetic canonical incident dataset only.",
-  "synthetic_data_limitation": "All source incidents are synthetic. Results are descriptive demonstration outputs and must not be generalized as actual industrial performance or causal evidence.",
-  "overall_metrics": {
-    "incident_count": 30,
-    "total_downtime_minutes": 2795.0,
-    "average_downtime_minutes": 93.16666666666667,
-    "total_failure_frequency": 65.0,
-    "average_failure_frequency": 2.1666666666666665
+[
+  {
+    "result_id": "RES-0001",
+    "result_type": "comparative_group_ranking",
+    "record_id": null,
+    "entity_id": null,
+    "group_key": "mechanical",
+    "period_start": null,
+    "period_end": null,
+    "metric_name": "total_downtime_minutes",
+    "result_value": 1265.0,
+    "result_unit": "minutes",
+    "result_category": "root_cause_category",
+    "priority_rank": 1,
+    "finding": "mechanical ranks #1 among observed root-cause category groups by total downtime, with 1265.0 downtime minutes across 10 complete incidents.",
+    "evidence": [
+      {
+        "factor": "grouping_dimension",
+        "value": "root_cause_category",
+        "contribution": null
+      },
+      {
+        "factor": "incident_count",
+        "value": 10,
+        "contribution": 10
+      },
+      {
+        "factor": "average_downtime_minutes",
+        "value": 126.5,
+        "contribution": 126.5
+      },
+      {
+        "factor": "total_failure_frequency",
+        "value": 28.0,
+        "contribution": 28.0
+      },
+      {
+        "factor": "average_failure_frequency",
+        "value": 2.8,
+        "contribution": 2.8
+      }
+    ],
+    "method_version": "1.0.0",
+    "data_version": "1.1.0",
+    "generated_at": "2026-11-07T09:53:54Z",
+    "quality_status": "validated",
+    "limitation": "All source incidents are synthetic. Results are descriptive demonstration outputs only and must not be generalized as actual industrial performance, causal evidence or predictive evidence."
   },
-  "comparisons": {
-    "root_cause_category": [
+  {
+    "result_id": "RES-0002",
+    "result_type": "comparative_group_ranking",
+    "record_id": null,
+    "entity_id": null,
+    "group_key": "electrical",
+    "period_start": null,
+    "period_end": null,
+    "metric_name": "total_downtime_minutes",
+    "result_value": 950.0,
+    "result_unit": "minutes",
+    "result_category": "root_cause_category",
+    "priority_rank": 2,
+    "finding": "electrical ranks #2 among observed root-cause category groups by total downtime, with 950.0 downtime minutes across 9 complete incidents.",
+    "evidence": [
       {
-        "group": "mechanical",
-        "incident_count": 10,
-        "downtime_measurement_count": 10,
-        "failure_frequency_measurement_count": 10,
-        "total_downtime_minutes": 1265.0,
-        "average_downtime_minutes": 126.5,
-        "total_failure_frequency": 28.0,
-        "average_failure_frequency": 2.8,
-        "meets_minimum_group_size": true,
-        "rank_by_total_downtime": 1
+        "factor": "grouping_dimension",
+        "value": "root_cause_category",
+        "contribution": null
       },
       {
-        "group": "electrical",
-        "incident_count": 9,
-        "downtime_measurement_count": 9,
-        "failure_frequency_measurement_count": 9,
-        "total_downtime_minutes": 950.0,
-        "average_downtime_minutes": 105.55555555555556,
-        "total_failure_frequency": 23.0,
-        "average_failure_frequency": 2.5555555555555554,
-        "meets_minimum_group_size": true,
-        "rank_by_total_downtime": 2
+        "factor": "incident_count",
+        "value": 9,
+        "contribution": 9
       },
       {
-        "group": "maintenance",
-        "incident_count": 5,
-        "downtime_measurement_count": 5,
-        "failure_frequency_measurement_count": 5,
-        "total_downtime_minutes": 360.0,
-        "average_downtime_minutes": 72.0,
-        "total_failure_frequency": 8.0,
-        "average_failure_frequency": 1.6,
-        "meets_minimum_group_size": true,
-        "rank_by_total_downtime": 3
+        "factor": "average_downtime_minutes",
+        "value": 105.55555555555556,
+        "contribution": 105.55555555555556
       },
       {
-        "group": "operational",
-        "incident_count": 6,
-        "downtime_measurement_count": 6,
-        "failure_frequency_measurement_count": 6,
-        "total_downtime_minutes": 220.0,
-        "average_downtime_minutes": 36.666666666666664,
-        "total_failure_frequency": 6.0,
-        "average_failure_frequency": 1.0,
-        "meets_minimum_group_size": true,
-        "rank_by_total_downtime": 4
+        "factor": "total_failure_frequency",
+        "value": 23.0,
+        "contribution": 23.0
+      },
+      {
+        "factor": "average_failure_frequency",
+        "value": 2.5555555555555554,
+        "contribution": 2.5555555555555554
       }
     ],
-    "machine": [
+    "method_version": "1.0.0",
+    "data_version": "1.1.0",
+    "generated_at": "2026-11-07T09:53:54Z",
+    "quality_status": "validated",
+    "limitation": "All source incidents are synthetic. Results are descriptive demonstration outputs only and must not be generalized as actual industrial performance, causal evidence or predictive evidence."
+  },
+  {
+    "result_id": "RES-0003",
+    "result_type": "comparative_group_ranking",
+    "record_id": null,
+    "entity_id": null,
+    "group_key": "maintenance",
+    "period_start": null,
+    "period_end": null,
+    "metric_name": "total_downtime_minutes",
+    "result_value": 360.0,
+    "result_unit": "minutes",
+    "result_category": "root_cause_category",
+    "priority_rank": 3,
+    "finding": "maintenance ranks #3 among observed root-cause category groups by total downtime, with 360.0 downtime minutes across 5 complete incidents.",
+    "evidence": [
       {
-        "group": "MCH-02",
-        "incident_count": 8,
-        "downtime_measurement_count": 8,
-        "failure_frequency_measurement_count": 8,
-        "total_downtime_minutes": 850.0,
-        "average_downtime_minutes": 106.25,
-        "total_failure_frequency": 20.0,
-        "average_failure_frequency": 2.5,
-        "meets_minimum_group_size": true,
-        "rank_by_total_downtime": 1
+        "factor": "grouping_dimension",
+        "value": "root_cause_category",
+        "contribution": null
       },
       {
-        "group": "MCH-04",
-        "incident_count": 7,
-        "downtime_measurement_count": 7,
-        "failure_frequency_measurement_count": 7,
-        "total_downtime_minutes": 700.0,
-        "average_downtime_minutes": 100.0,
-        "total_failure_frequency": 17.0,
-        "average_failure_frequency": 2.4285714285714284,
-        "meets_minimum_group_size": true,
-        "rank_by_total_downtime": 2
+        "factor": "incident_count",
+        "value": 5,
+        "contribution": 5
       },
       {
-        "group": "MCH-01",
-        "incident_count": 8,
-        "downtime_measurement_count": 8,
-        "failure_frequency_measurement_count": 8,
-        "total_downtime_minutes": 635.0,
-        "average_downtime_minutes": 79.375,
-        "total_failure_frequency": 15.0,
-        "average_failure_frequency": 1.875,
-        "meets_minimum_group_size": true,
-        "rank_by_total_downtime": 3
+        "factor": "average_downtime_minutes",
+        "value": 72.0,
+        "contribution": 72.0
       },
       {
-        "group": "MCH-03",
-        "incident_count": 7,
-        "downtime_measurement_count": 7,
-        "failure_frequency_measurement_count": 7,
-        "total_downtime_minutes": 610.0,
-        "average_downtime_minutes": 87.14285714285714,
-        "total_failure_frequency": 13.0,
-        "average_failure_frequency": 1.8571428571428572,
-        "meets_minimum_group_size": true,
-        "rank_by_total_downtime": 4
+        "factor": "total_failure_frequency",
+        "value": 8.0,
+        "contribution": 8.0
+      },
+      {
+        "factor": "average_failure_frequency",
+        "value": 1.6,
+        "contribution": 1.6
       }
     ],
-    "shift": [
+    "method_version": "1.0.0",
+    "data_version": "1.1.0",
+    "generated_at": "2026-11-07T09:53:54Z",
+    "quality_status": "validated",
+    "limitation": "All source incidents are synthetic. Results are descriptive demonstration outputs only and must not be generalized as actual industrial performance, causal evidence or predictive evidence."
+  },
+  {
+    "result_id": "RES-0004",
+    "result_type": "comparative_group_ranking",
+    "record_id": null,
+    "entity_id": null,
+    "group_key": "operational",
+    "period_start": null,
+    "period_end": null,
+    "metric_name": "total_downtime_minutes",
+    "result_value": 220.0,
+    "result_unit": "minutes",
+    "result_category": "root_cause_category",
+    "priority_rank": 4,
+    "finding": "operational ranks #4 among observed root-cause category groups by total downtime, with 220.0 downtime minutes across 6 complete incidents.",
+    "evidence": [
       {
-        "group": "morning",
-        "incident_count": 11,
-        "downtime_measurement_count": 11,
-        "failure_frequency_measurement_count": 11,
-        "total_downtime_minutes": 1060.0,
-        "average_downtime_minutes": 96.36363636363636,
-        "total_failure_frequency": 26.0,
-        "average_failure_frequency": 2.3636363636363638,
-        "meets_minimum_group_size": true,
-        "rank_by_total_downtime": 1
+        "factor": "grouping_dimension",
+        "value": "root_cause_category",
+        "contribution": null
       },
       {
-        "group": "evening",
-        "incident_count": 10,
-        "downtime_measurement_count": 10,
-        "failure_frequency_measurement_count": 10,
-        "total_downtime_minutes": 935.0,
-        "average_downtime_minutes": 93.5,
-        "total_failure_frequency": 22.0,
-        "average_failure_frequency": 2.2,
-        "meets_minimum_group_size": true,
-        "rank_by_total_downtime": 2
+        "factor": "incident_count",
+        "value": 6,
+        "contribution": 6
       },
       {
-        "group": "night",
-        "incident_count": 9,
-        "downtime_measurement_count": 9,
-        "failure_frequency_measurement_count": 9,
-        "total_downtime_minutes": 800.0,
-        "average_downtime_minutes": 88.88888888888889,
-        "total_failure_frequency": 17.0,
-        "average_failure_frequency": 1.8888888888888888,
-        "meets_minimum_group_size": true,
-        "rank_by_total_downtime": 3
+        "factor": "average_downtime_minutes",
+        "value": 36.666666666666664,
+        "contribution": 36.666666666666664
+      },
+      {
+        "factor": "total_failure_frequency",
+        "value": 6.0,
+        "contribution": 6.0
+      },
+      {
+        "factor": "average_failure_frequency",
+        "value": 1.0,
+        "contribution": 1.0
       }
-    ]
+    ],
+    "method_version": "1.0.0",
+    "data_version": "1.1.0",
+    "generated_at": "2026-11-07T09:53:54Z",
+    "quality_status": "validated",
+    "limitation": "All source incidents are synthetic. Results are descriptive demonstration outputs only and must not be generalized as actual industrial performance, causal evidence or predictive evidence."
+  },
+  {
+    "result_id": "RES-0005",
+    "result_type": "comparative_group_ranking",
+    "record_id": null,
+    "entity_id": "MCH-02",
+    "group_key": "MCH-02",
+    "period_start": null,
+    "period_end": null,
+    "metric_name": "total_downtime_minutes",
+    "result_value": 850.0,
+    "result_unit": "minutes",
+    "result_category": "machine",
+    "priority_rank": 1,
+    "finding": "MCH-02 ranks #1 among observed machine groups by total downtime, with 850.0 downtime minutes across 8 complete incidents.",
+    "evidence": [
+      {
+        "factor": "grouping_dimension",
+        "value": "machine",
+        "contribution": null
+      },
+      {
+        "factor": "incident_count",
+        "value": 8,
+        "contribution": 8
+      },
+      {
+        "factor": "average_downtime_minutes",
+        "value": 106.25,
+        "contribution": 106.25
+      },
+      {
+        "factor": "total_failure_frequency",
+        "value": 20.0,
+        "contribution": 20.0
+      },
+      {
+        "factor": "average_failure_frequency",
+        "value": 2.5,
+        "contribution": 2.5
+      }
+    ],
+    "method_version": "1.0.0",
+    "data_version": "1.1.0",
+    "generated_at": "2026-11-07T09:53:54Z",
+    "quality_status": "validated",
+    "limitation": "All source incidents are synthetic. Results are descriptive demonstration outputs only and must not be generalized as actual industrial performance, causal evidence or predictive evidence."
+  },
+  {
+    "result_id": "RES-0006",
+    "result_type": "comparative_group_ranking",
+    "record_id": null,
+    "entity_id": "MCH-04",
+    "group_key": "MCH-04",
+    "period_start": null,
+    "period_end": null,
+    "metric_name": "total_downtime_minutes",
+    "result_value": 700.0,
+    "result_unit": "minutes",
+    "result_category": "machine",
+    "priority_rank": 2,
+    "finding": "MCH-04 ranks #2 among observed machine groups by total downtime, with 700.0 downtime minutes across 7 complete incidents.",
+    "evidence": [
+      {
+        "factor": "grouping_dimension",
+        "value": "machine",
+        "contribution": null
+      },
+      {
+        "factor": "incident_count",
+        "value": 7,
+        "contribution": 7
+      },
+      {
+        "factor": "average_downtime_minutes",
+        "value": 100.0,
+        "contribution": 100.0
+      },
+      {
+        "factor": "total_failure_frequency",
+        "value": 17.0,
+        "contribution": 17.0
+      },
+      {
+        "factor": "average_failure_frequency",
+        "value": 2.4285714285714284,
+        "contribution": 2.4285714285714284
+      }
+    ],
+    "method_version": "1.0.0",
+    "data_version": "1.1.0",
+    "generated_at": "2026-11-07T09:53:54Z",
+    "quality_status": "validated",
+    "limitation": "All source incidents are synthetic. Results are descriptive demonstration outputs only and must not be generalized as actual industrial performance, causal evidence or predictive evidence."
+  },
+  {
+    "result_id": "RES-0007",
+    "result_type": "comparative_group_ranking",
+    "record_id": null,
+    "entity_id": "MCH-01",
+    "group_key": "MCH-01",
+    "period_start": null,
+    "period_end": null,
+    "metric_name": "total_downtime_minutes",
+    "result_value": 635.0,
+    "result_unit": "minutes",
+    "result_category": "machine",
+    "priority_rank": 3,
+    "finding": "MCH-01 ranks #3 among observed machine groups by total downtime, with 635.0 downtime minutes across 8 complete incidents.",
+    "evidence": [
+      {
+        "factor": "grouping_dimension",
+        "value": "machine",
+        "contribution": null
+      },
+      {
+        "factor": "incident_count",
+        "value": 8,
+        "contribution": 8
+      },
+      {
+        "factor": "average_downtime_minutes",
+        "value": 79.375,
+        "contribution": 79.375
+      },
+      {
+        "factor": "total_failure_frequency",
+        "value": 15.0,
+        "contribution": 15.0
+      },
+      {
+        "factor": "average_failure_frequency",
+        "value": 1.875,
+        "contribution": 1.875
+      }
+    ],
+    "method_version": "1.0.0",
+    "data_version": "1.1.0",
+    "generated_at": "2026-11-07T09:53:54Z",
+    "quality_status": "validated",
+    "limitation": "All source incidents are synthetic. Results are descriptive demonstration outputs only and must not be generalized as actual industrial performance, causal evidence or predictive evidence."
+  },
+  {
+    "result_id": "RES-0008",
+    "result_type": "comparative_group_ranking",
+    "record_id": null,
+    "entity_id": "MCH-03",
+    "group_key": "MCH-03",
+    "period_start": null,
+    "period_end": null,
+    "metric_name": "total_downtime_minutes",
+    "result_value": 610.0,
+    "result_unit": "minutes",
+    "result_category": "machine",
+    "priority_rank": 4,
+    "finding": "MCH-03 ranks #4 among observed machine groups by total downtime, with 610.0 downtime minutes across 7 complete incidents.",
+    "evidence": [
+      {
+        "factor": "grouping_dimension",
+        "value": "machine",
+        "contribution": null
+      },
+      {
+        "factor": "incident_count",
+        "value": 7,
+        "contribution": 7
+      },
+      {
+        "factor": "average_downtime_minutes",
+        "value": 87.14285714285714,
+        "contribution": 87.14285714285714
+      },
+      {
+        "factor": "total_failure_frequency",
+        "value": 13.0,
+        "contribution": 13.0
+      },
+      {
+        "factor": "average_failure_frequency",
+        "value": 1.8571428571428572,
+        "contribution": 1.8571428571428572
+      }
+    ],
+    "method_version": "1.0.0",
+    "data_version": "1.1.0",
+    "generated_at": "2026-11-07T09:53:54Z",
+    "quality_status": "validated",
+    "limitation": "All source incidents are synthetic. Results are descriptive demonstration outputs only and must not be generalized as actual industrial performance, causal evidence or predictive evidence."
+  },
+  {
+    "result_id": "RES-0009",
+    "result_type": "comparative_group_ranking",
+    "record_id": null,
+    "entity_id": null,
+    "group_key": "morning",
+    "period_start": null,
+    "period_end": null,
+    "metric_name": "total_downtime_minutes",
+    "result_value": 1060.0,
+    "result_unit": "minutes",
+    "result_category": "shift",
+    "priority_rank": 1,
+    "finding": "morning ranks #1 among observed shift groups by total downtime, with 1060.0 downtime minutes across 11 complete incidents.",
+    "evidence": [
+      {
+        "factor": "grouping_dimension",
+        "value": "shift",
+        "contribution": null
+      },
+      {
+        "factor": "incident_count",
+        "value": 11,
+        "contribution": 11
+      },
+      {
+        "factor": "average_downtime_minutes",
+        "value": 96.36363636363636,
+        "contribution": 96.36363636363636
+      },
+      {
+        "factor": "total_failure_frequency",
+        "value": 26.0,
+        "contribution": 26.0
+      },
+      {
+        "factor": "average_failure_frequency",
+        "value": 2.3636363636363638,
+        "contribution": 2.3636363636363638
+      }
+    ],
+    "method_version": "1.0.0",
+    "data_version": "1.1.0",
+    "generated_at": "2026-11-07T09:53:54Z",
+    "quality_status": "validated",
+    "limitation": "All source incidents are synthetic. Results are descriptive demonstration outputs only and must not be generalized as actual industrial performance, causal evidence or predictive evidence."
+  },
+  {
+    "result_id": "RES-0010",
+    "result_type": "comparative_group_ranking",
+    "record_id": null,
+    "entity_id": null,
+    "group_key": "evening",
+    "period_start": null,
+    "period_end": null,
+    "metric_name": "total_downtime_minutes",
+    "result_value": 935.0,
+    "result_unit": "minutes",
+    "result_category": "shift",
+    "priority_rank": 2,
+    "finding": "evening ranks #2 among observed shift groups by total downtime, with 935.0 downtime minutes across 10 complete incidents.",
+    "evidence": [
+      {
+        "factor": "grouping_dimension",
+        "value": "shift",
+        "contribution": null
+      },
+      {
+        "factor": "incident_count",
+        "value": 10,
+        "contribution": 10
+      },
+      {
+        "factor": "average_downtime_minutes",
+        "value": 93.5,
+        "contribution": 93.5
+      },
+      {
+        "factor": "total_failure_frequency",
+        "value": 22.0,
+        "contribution": 22.0
+      },
+      {
+        "factor": "average_failure_frequency",
+        "value": 2.2,
+        "contribution": 2.2
+      }
+    ],
+    "method_version": "1.0.0",
+    "data_version": "1.1.0",
+    "generated_at": "2026-11-07T09:53:54Z",
+    "quality_status": "validated",
+    "limitation": "All source incidents are synthetic. Results are descriptive demonstration outputs only and must not be generalized as actual industrial performance, causal evidence or predictive evidence."
+  },
+  {
+    "result_id": "RES-0011",
+    "result_type": "comparative_group_ranking",
+    "record_id": null,
+    "entity_id": null,
+    "group_key": "night",
+    "period_start": null,
+    "period_end": null,
+    "metric_name": "total_downtime_minutes",
+    "result_value": 800.0,
+    "result_unit": "minutes",
+    "result_category": "shift",
+    "priority_rank": 3,
+    "finding": "night ranks #3 among observed shift groups by total downtime, with 800.0 downtime minutes across 9 complete incidents.",
+    "evidence": [
+      {
+        "factor": "grouping_dimension",
+        "value": "shift",
+        "contribution": null
+      },
+      {
+        "factor": "incident_count",
+        "value": 9,
+        "contribution": 9
+      },
+      {
+        "factor": "average_downtime_minutes",
+        "value": 88.88888888888889,
+        "contribution": 88.88888888888889
+      },
+      {
+        "factor": "total_failure_frequency",
+        "value": 17.0,
+        "contribution": 17.0
+      },
+      {
+        "factor": "average_failure_frequency",
+        "value": 1.8888888888888888,
+        "contribution": 1.8888888888888888
+      }
+    ],
+    "method_version": "1.0.0",
+    "data_version": "1.1.0",
+    "generated_at": "2026-11-07T09:53:54Z",
+    "quality_status": "validated",
+    "limitation": "All source incidents are synthetic. Results are descriptive demonstration outputs only and must not be generalized as actual industrial performance, causal evidence or predictive evidence."
   }
-}
+]

@@ -1,9 +1,51 @@
 {
   "project_id": "POC-21",
-  "analytical_track": "TRACK A - COMPARATIVE INTELLIGENCE",
+  "poc_title": "Downtime Root Cause Explorer",
   "data_version": "1.1.0",
   "method_version": "1.0.0",
-  "overall_result": "Comparative Intelligence completed using deterministic descriptive calculations on the approved synthetic canonical dataset.",
+  "approved_track": "TRACK A - COMPARATIVE INTELLIGENCE",
+  "primary_analytical_question": "Which observed root-cause categories, machines and shifts contribute the greatest downtime and failure-frequency burden in the approved synthetic canonical dataset?",
+  "decision_to_be_supported": "Support deterministic review and prioritisation of observed groups for further investigation based on comparative downtime and failure-frequency results.",
+  "total_result_count": 11,
+  "key_findings": [
+    "mechanical is the top observed root-cause category by total downtime at 1265.0 minutes.",
+    "MCH-02 is the top observed machine by total downtime at 850.0 minutes.",
+    "morning is the top observed shift by total downtime at 1060.0 minutes."
+  ],
+  "priority_items": [
+    {
+      "comparison": "root_cause_category",
+      "group": "mechanical",
+      "priority_rank": 1
+    },
+    {
+      "comparison": "machine",
+      "group": "MCH-02",
+      "priority_rank": 1
+    },
+    {
+      "comparison": "shift",
+      "group": "morning",
+      "priority_rank": 1
+    }
+  ],
+  "validation_result": "PASS",
+  "important_limitations": [
+    "All source incidents are synthetic.",
+    "Results are descriptive demonstration outputs only.",
+    "Results must not be generalized as actual industrial performance.",
+    "Results do not establish causal relationships.",
+    "Results are not predictive evidence.",
+    "Small group sizes may affect ranking stability."
+  ],
+  "generation_timestamp": "2026-11-07T09:53:54Z",
+  "overall_metrics": {
+    "incident_count": 30,
+    "total_downtime_minutes": 2795.0,
+    "average_downtime_minutes": 93.16666666666667,
+    "total_failure_frequency": 65.0,
+    "average_failure_frequency": 2.1666666666666665
+  },
   "top_observed_root_cause_category": {
     "group": "mechanical",
     "incident_count": 10,
@@ -39,11 +81,5 @@
     "average_failure_frequency": 2.3636363636363638,
     "meets_minimum_group_size": true,
     "rank_by_total_downtime": 1
-  },
-  "limitations": [
-    "All records are synthetic and results are not representative of real-world industrial operations.",
-    "The analysis is descriptive and does not establish causality.",
-    "The dataset contains only the approved observation period and represented machines.",
-    "Small group sizes may affect ranking stability and must be interpreted with caution."
-  ]
+  }
 }
