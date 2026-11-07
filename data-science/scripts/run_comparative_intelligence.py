@@ -16,7 +16,7 @@ SUMMARY_PATH = (
     ROOT / "data-science" / "outputs" / "intelligence_summary.json"
 )
 
-MINIMUM_GROUP_SIZE = 1
+MINIMUM_GROUP_SIZE = 3
 
 
 def load_incidents():

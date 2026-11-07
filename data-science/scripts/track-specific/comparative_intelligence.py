@@ -171,7 +171,7 @@ def normalise_group_name(value: Any) -> str:
 def calculate_group_comparison(
     incidents: list[dict[str, Any]],
     grouping_field: str,
-    minimum_group_size: int = 1,
+    minimum_group_size: int = 3,
 ) -> list[dict[str, Any]]:
     """
     Calculate deterministic comparative metrics for one grouping dimension.
@@ -246,7 +246,7 @@ def calculate_group_comparison(
 
 def calculate_comparisons(
     incidents: list[dict[str, Any]],
-    minimum_group_size: int = 1,
+    minimum_group_size: int = 3,
 ) -> dict[str, list[dict[str, Any]]]:
     """
     Calculate comparative intelligence across all approved grouping dimensions.
@@ -338,7 +338,7 @@ def all_records_synthetic(records: list[dict[str, str]]) -> bool:
 
 def run_comparative_intelligence(
     csv_path: str | Path,
-    minimum_group_size: int = 1,
+    minimum_group_size: int = 3,
 ) -> dict[str, Any]:
     """
     Execute the reusable Track A comparative intelligence workflow.

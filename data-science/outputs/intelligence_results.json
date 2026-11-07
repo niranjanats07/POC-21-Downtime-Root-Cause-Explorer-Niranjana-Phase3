@@ -8,7 +8,7 @@
   "source_measurement_rows": 60,
   "distinct_source_incidents": 30,
   "complete_incidents_used_for_comparison": 30,
-  "minimum_group_size": 1,
+  "minimum_group_size": 3,
   "ranking_method": "Descending total downtime, then descending incident count, then ascending group name for deterministic tie handling.",
   "calculation_scope": "Descriptive comparison of the approved synthetic canonical incident dataset only.",
   "synthetic_data_limitation": "All source incidents are synthetic. Results are descriptive demonstration outputs and must not be generalized as actual industrial performance or causal evidence.",

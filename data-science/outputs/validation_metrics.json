@@ -93,6 +93,7 @@
         "downtime_totals_match": true,
         "failure_frequency_totals_match": true,
         "ranks_match": true,
+        "duplicate_exported_groups": false,
         "passed": true
       },
       "machine": {
@@ -103,6 +104,7 @@
         "downtime_totals_match": true,
         "failure_frequency_totals_match": true,
         "ranks_match": true,
+        "duplicate_exported_groups": false,
         "passed": true
       },
       "shift": {
@@ -113,6 +115,7 @@
         "downtime_totals_match": true,
         "failure_frequency_totals_match": true,
         "ranks_match": true,
+        "duplicate_exported_groups": false,
         "passed": true
       },
       "passed": true

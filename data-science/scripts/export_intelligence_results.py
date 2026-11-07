@@ -313,7 +313,7 @@ def export_intelligence_results() -> tuple[Path, Path]:
 
     analysis = run_comparative_intelligence(
         csv_path=canonical_path,
-        minimum_group_size=1,
+        minimum_group_size=3,
     )
 
     versions = analysis["data_versions_detected"]

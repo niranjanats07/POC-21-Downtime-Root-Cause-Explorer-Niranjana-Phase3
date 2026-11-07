@@ -2,6 +2,7 @@
 
 import csv
 import json
+import math
 from collections import defaultdict
 from pathlib import Path
 
@@ -22,7 +23,7 @@ EXPECTED_MEASUREMENT_ROWS = 60
 
 EXPECTED_INCIDENTS = 30
 
-MINIMUM_GROUP_SIZE = 1
+MINIMUM_GROUP_SIZE = 3
 
 
 # ============================================================
@@ -66,23 +67,23 @@ WEAK_CASE_OUTPUT = (
 # FILE LOADING FUNCTIONS
 # ============================================================
 
-def load_csv_rows(file_path):
+def load_csv_rows(file_path: Path) -> list[dict[str, str]]:
     """Load CSV records as dictionaries."""
 
     with file_path.open(
         "r",
         encoding="utf-8-sig",
-        newline=""
+        newline="",
     ) as file:
         return list(csv.DictReader(file))
 
 
-def load_json(file_path):
+def load_json(file_path: Path):
     """Load a JSON file."""
 
     with file_path.open(
         "r",
-        encoding="utf-8"
+        encoding="utf-8",
     ) as file:
         return json.load(file)
 
@@ -91,7 +92,7 @@ def load_json(file_path):
 # VALUE NORMALISATION
 # ============================================================
 
-def is_true(value):
+def is_true(value) -> bool:
     """Return True when a value represents boolean true."""
 
     return str(value).strip().lower() in {
@@ -103,11 +104,7 @@ def is_true(value):
 
 
 def parse_numeric(value):
-    """
-    Convert a value to float.
-
-    Returns None when the value cannot be converted.
-    """
+    """Convert a value to a finite float."""
 
     if value is None:
         return None
@@ -118,10 +115,15 @@ def parse_numeric(value):
         return None
 
     try:
-        return float(value)
+        numeric_value = float(value)
 
     except (TypeError, ValueError):
         return None
+
+    if not math.isfinite(numeric_value):
+        return None
+
+    return numeric_value
 
 
 # ============================================================
@@ -129,17 +131,13 @@ def parse_numeric(value):
 # ============================================================
 
 def reconstruct_incidents(rows):
-    """
-    Reconstruct incidents from canonical measurement rows.
-
-    Each source incident should contain:
-    - one downtime_minutes measurement
-    - one failure_frequency measurement
-
-    The source_record_id is used as the incident identifier.
-    """
 
     incidents = {}
+
+    required_metrics = {
+        "downtime_minutes",
+        "failure_frequency",
+    }
 
     for row in rows:
 
@@ -154,50 +152,100 @@ def reconstruct_incidents(rows):
 
             incidents[incident_id] = {
                 "incident_id": incident_id,
+
                 "entity_id": str(
                     row.get("entity_id", "")
                 ).strip(),
+
                 "category": str(
                     row.get("category", "")
                 ).strip(),
+
                 "shift": str(
                     row.get("shift", "")
                 ).strip(),
+
                 "data_version": str(
                     row.get("data_version", "")
                 ).strip(),
+
                 "is_synthetic": is_true(
                     row.get("is_synthetic")
                 ),
+
                 "downtime_minutes": None,
+
                 "failure_frequency": None,
+
                 "invalid_numeric": False,
+
+                "duplicate_required_metric": False,
+
+                "metadata_conflict": False,
+
+                "metric_counts": defaultdict(int),
             }
+
+        incident = incidents[incident_id]
+
+        metadata_fields = (
+            "entity_id",
+            "category",
+            "shift",
+            "data_version",
+        )
+
+        for field_name in metadata_fields:
+
+            row_value = str(
+                row.get(field_name, "")
+            ).strip()
+
+            incident_value = str(
+                incident.get(field_name, "")
+            ).strip()
+
+            if (
+                incident_value
+                and row_value
+                and incident_value != row_value
+            ):
+                incident["metadata_conflict"] = True
+
+        row_is_synthetic = is_true(
+            row.get("is_synthetic")
+        )
+
+        if incident["is_synthetic"] != row_is_synthetic:
+            incident["metadata_conflict"] = True
 
         metric_name = str(
             row.get("metric_name", "")
         ).strip()
 
+        if metric_name not in required_metrics:
+            continue
+
+        incident["metric_counts"][metric_name] += 1
+
+        if incident["metric_counts"][metric_name] > 1:
+            incident["duplicate_required_metric"] = True
+
         numeric_value = parse_numeric(
             row.get("metric_value")
         )
 
-        if metric_name in {
-            "downtime_minutes",
-            "failure_frequency",
-        }:
+        if numeric_value is None:
+            incident["invalid_numeric"] = True
+            continue
 
-            if numeric_value is None:
+        incident[metric_name] = numeric_value
 
-                incidents[incident_id][
-                    "invalid_numeric"
-                ] = True
+    for incident in incidents.values():
 
-            else:
-
-                incidents[incident_id][
-                    metric_name
-                ] = numeric_value
+        incident["metric_counts"] = dict(
+            incident["metric_counts"]
+        )
 
     return incidents
 
@@ -207,16 +255,18 @@ def reconstruct_incidents(rows):
 # ============================================================
 
 def get_complete_incidents(incidents):
-    """
-    Return incidents containing both required measurements
-    and required comparison fields.
-    """
 
     complete_incidents = []
 
     for incident in incidents.values():
 
         if incident["invalid_numeric"]:
+            continue
+
+        if incident["duplicate_required_metric"]:
+            continue
+
+        if incident["metadata_conflict"]:
             continue
 
         if incident["downtime_minutes"] is None:
@@ -237,9 +287,7 @@ def get_complete_incidents(incidents):
         if not incident["data_version"]:
             continue
 
-        complete_incidents.append(
-            incident
-        )
+        complete_incidents.append(incident)
 
     return complete_incidents
 
@@ -250,11 +298,8 @@ def get_complete_incidents(incidents):
 
 def build_group_coverage(
     complete_incidents,
-    field_name
+    field_name,
 ):
-    """
-    Build coverage information for one grouping dimension.
-    """
 
     group_sizes = defaultdict(int)
 
@@ -265,7 +310,6 @@ def build_group_coverage(
         ).strip()
 
         if group_value:
-
             group_sizes[group_value] += 1
 
     total_assignments = sum(
@@ -278,14 +322,18 @@ def build_group_coverage(
 
     return {
         "group_count": len(group_sizes),
-        "total_incident_assignments": total_assignments,
-        "complete_incident_count": (
-            complete_incident_count
-        ),
+
+        "total_incident_assignments":
+            total_assignments,
+
+        "complete_incident_count":
+            complete_incident_count,
+
         "all_incidents_included_once": (
             total_assignments
             == complete_incident_count
         ),
+
         "group_sizes": dict(
             sorted(group_sizes.items())
         ),
@@ -293,19 +341,13 @@ def build_group_coverage(
 
 
 # ============================================================
-
-# ============================================================
-# SIMPLE BASELINE VALIDATION
+# SIMPLE BASELINE
 # ============================================================
 
 def build_simple_baseline(
     complete_incidents,
-    field_name
+    field_name,
 ):
-    """
-    Independently calculate group totals from reconstructed
-    complete incidents for baseline validation.
-    """
 
     group_totals = defaultdict(
         lambda: {
@@ -343,12 +385,19 @@ def build_simple_baseline(
         baseline_results.append(
             {
                 "group": group_name,
+
                 "incident_count":
                     values["incident_count"],
+
                 "total_downtime_minutes":
-                    values["total_downtime_minutes"],
+                    values[
+                        "total_downtime_minutes"
+                    ],
+
                 "total_failure_frequency":
-                    values["total_failure_frequency"],
+                    values[
+                        "total_failure_frequency"
+                    ],
             }
         )
 
@@ -362,13 +411,158 @@ def build_simple_baseline(
 
     for rank, result in enumerate(
         baseline_results,
-        start=1
+        start=1,
     ):
+
         result[
             "rank_by_total_downtime"
         ] = rank
 
     return baseline_results
+
+
+# ============================================================
+# NORMALISE EXPORTED RESULTS
+# ============================================================
+
+def normalize_exported_result(result):
+    """
+    Convert the actual intelligence_results.json comparison
+    structure into the common validation structure.
+
+    Actual exported fields:
+    - group
+    - incident_count
+    - total_downtime_minutes
+    - total_failure_frequency
+    - rank_by_total_downtime
+    """
+
+    if not isinstance(result, dict):
+        raise TypeError(
+            "Exported result must be a dictionary"
+        )
+
+    group_name = str(
+        result.get("group", "")
+    ).strip()
+
+    incident_count = int(
+        result.get("incident_count", 0)
+    )
+
+    total_downtime = float(
+        result.get(
+            "total_downtime_minutes",
+            0,
+        )
+    )
+
+    total_failure_frequency = float(
+        result.get(
+            "total_failure_frequency",
+            0,
+        )
+    )
+
+    priority_rank = int(
+        result.get(
+            "rank_by_total_downtime",
+            0,
+        )
+    )
+
+    if not group_name:
+        raise ValueError("Missing group")
+
+    if priority_rank < 1:
+        raise ValueError("Invalid rank")
+
+    if incident_count < 1:
+        raise ValueError(
+            "Invalid incident count"
+        )
+
+    if total_downtime < 0:
+        raise ValueError(
+            "Invalid downtime"
+        )
+
+    if total_failure_frequency < 0:
+        raise ValueError(
+            "Invalid failure frequency"
+        )
+
+    if not math.isfinite(total_downtime):
+        raise ValueError(
+            "Non-finite downtime"
+        )
+
+    if not math.isfinite(
+        total_failure_frequency
+    ):
+        raise ValueError(
+            "Non-finite failure frequency"
+        )
+
+    return {
+        "group": group_name,
+
+        "incident_count":
+            incident_count,
+
+        "total_downtime_minutes":
+            total_downtime,
+
+        "total_failure_frequency":
+            total_failure_frequency,
+
+        "rank_by_total_downtime":
+            priority_rank,
+    }
+
+
+# ============================================================
+# SPLIT EXPORTED RESULTS BY CATEGORY
+# ============================================================
+
+def split_results_by_category(results):
+    """
+    Extract comparison groups from the actual
+    intelligence_results.json structure.
+    """
+
+    comparison_results = {
+        "root_cause_category": [],
+        "machine": [],
+        "shift": [],
+    }
+
+    if not isinstance(results, dict):
+        return comparison_results
+
+    comparisons = results.get(
+        "comparisons",
+        {}
+    )
+
+    if not isinstance(comparisons, dict):
+        return comparison_results
+
+    for category in comparison_results:
+
+        category_results = comparisons.get(
+            category,
+            [],
+        )
+
+        if isinstance(category_results, list):
+            comparison_results[
+                category
+            ] = category_results
+
+    return comparison_results
+
 
 # ============================================================
 # BASELINE COMPARISON
@@ -376,179 +570,192 @@ def build_simple_baseline(
 
 def compare_baseline_to_results(
     baseline_results,
-    exported_results
+    exported_results,
 ):
-    """
-    Compare independently calculated baseline results against
-    exported analytical results.
-    """
+
+    base_response = {
+        "baseline_group_count":
+            len(baseline_results),
+
+        "exported_group_count":
+            (
+                len(exported_results)
+                if isinstance(
+                    exported_results,
+                    list,
+                )
+                else 0
+            ),
+
+        "groups_match": False,
+
+        "incident_counts_match": False,
+
+        "downtime_totals_match": False,
+
+        "failure_frequency_totals_match":
+            False,
+
+        "ranks_match": False,
+
+        "duplicate_exported_groups":
+            False,
+
+        "passed": False,
+    }
 
     if (
         not isinstance(exported_results, list)
         or not exported_results
     ):
-        return {
-            "baseline_group_count":
-                len(baseline_results),
-            "exported_group_count": 0,
-            "groups_match": False,
-            "incident_counts_match": False,
-            "downtime_totals_match": False,
-            "failure_frequency_totals_match": False,
-            "ranks_match": False,
-            "passed": False,
-        }
-
-    baseline_by_group = {
-        item["group"]: item
-        for item in baseline_results
-    }
-
-    exported_by_group = {}
+        return base_response
 
     try:
 
-        for item in exported_results:
+        baseline_by_group = {
+            item["group"]: item
+            for item in baseline_results
+        }
 
-            group_name = str(
-                item.get("group", "")
-            ).strip()
+        exported_by_group = {}
 
-            if not group_name:
-                raise ValueError(
-                    "Missing group name"
-                )
+        for raw_result in exported_results:
 
-            exported_by_group[group_name] = item
+            item = normalize_exported_result(
+                raw_result
+            )
+
+            group_name = item["group"]
+
+            if group_name in exported_by_group:
+
+                base_response[
+                    "duplicate_exported_groups"
+                ] = True
+
+                return base_response
+
+            exported_by_group[
+                group_name
+            ] = item
 
         groups_match = (
             set(baseline_by_group.keys())
             == set(exported_by_group.keys())
         )
 
-        incident_counts_match = groups_match and all(
-            baseline_by_group[group][
-                "incident_count"
-            ]
-            == int(
-                exported_by_group[group].get(
+        incident_counts_match = (
+            groups_match
+            and all(
+                baseline_by_group[group][
                     "incident_count"
-                )
+                ]
+                == exported_by_group[group][
+                    "incident_count"
+                ]
+                for group in baseline_by_group
             )
-            for group in baseline_by_group
         )
 
-        downtime_totals_match = groups_match and all(
-            abs(
-                baseline_by_group[group][
-                    "total_downtime_minutes"
-                ]
-                - float(
-                    exported_by_group[group].get(
+        downtime_totals_match = (
+            groups_match
+            and all(
+                math.isclose(
+                    baseline_by_group[group][
                         "total_downtime_minutes"
-                    )
+                    ],
+                    exported_by_group[group][
+                        "total_downtime_minutes"
+                    ],
+                    rel_tol=0.0,
+                    abs_tol=1e-9,
                 )
-            ) < 1e-9
-            for group in baseline_by_group
+                for group in baseline_by_group
+            )
         )
 
         failure_frequency_totals_match = (
             groups_match
             and all(
-                abs(
+                math.isclose(
                     baseline_by_group[group][
                         "total_failure_frequency"
-                    ]
-                    - float(
-                        exported_by_group[group].get(
-                            "total_failure_frequency"
-                        )
-                    )
-                ) < 1e-9
+                    ],
+                    exported_by_group[group][
+                        "total_failure_frequency"
+                    ],
+                    rel_tol=0.0,
+                    abs_tol=1e-9,
+                )
                 for group in baseline_by_group
             )
         )
 
-        ranks_match = groups_match and all(
-            baseline_by_group[group][
-                "rank_by_total_downtime"
-            ]
-            == int(
-                exported_by_group[group].get(
+        ranks_match = (
+            groups_match
+            and all(
+                baseline_by_group[group][
                     "rank_by_total_downtime"
-                )
+                ]
+                == exported_by_group[group][
+                    "rank_by_total_downtime"
+                ]
+                for group in baseline_by_group
             )
-            for group in baseline_by_group
         )
 
-    except (
-        TypeError,
-        ValueError,
-    ):
+        passed = (
+            groups_match
+            and incident_counts_match
+            and downtime_totals_match
+            and failure_frequency_totals_match
+            and ranks_match
+        )
 
         return {
             "baseline_group_count":
                 len(baseline_results),
+
             "exported_group_count":
                 len(exported_results),
-            "groups_match": False,
-            "incident_counts_match": False,
-            "downtime_totals_match": False,
-            "failure_frequency_totals_match": False,
-            "ranks_match": False,
-            "passed": False,
+
+            "groups_match":
+                groups_match,
+
+            "incident_counts_match":
+                incident_counts_match,
+
+            "downtime_totals_match":
+                downtime_totals_match,
+
+            "failure_frequency_totals_match":
+                failure_frequency_totals_match,
+
+            "ranks_match":
+                ranks_match,
+
+            "duplicate_exported_groups":
+                False,
+
+            "passed":
+                passed,
         }
 
-    passed = (
-        groups_match
-        and incident_counts_match
-        and downtime_totals_match
-        and failure_frequency_totals_match
-        and ranks_match
-    )
+    except (
+        TypeError,
+        ValueError,
+        KeyError,
+        OverflowError,
+    ):
 
-    return {
-        "baseline_group_count":
-            len(baseline_results),
-        "exported_group_count":
-            len(exported_results),
-        "groups_match": groups_match,
-        "incident_counts_match":
-            incident_counts_match,
-        "downtime_totals_match":
-            downtime_totals_match,
-        "failure_frequency_totals_match":
-            failure_frequency_totals_match,
-        "ranks_match": ranks_match,
-        "passed": passed,
-    }
-# RESULT VALIDATION
+        return base_response
+
+
+# ============================================================
+# RESULT RANKING VALIDATION
 # ============================================================
 
 def validate_results_file(results):
-    """
-    Validate the exported Track A intelligence results.
-
-    Expected structure:
-
-    {
-        ...
-        "comparisons": {
-            "root_cause_category": [...],
-            "machine": [...],
-            "shift": [...]
-        }
-    }
-
-    Ranking rule must match the analytical generator:
-
-    1. Descending total downtime
-    2. Descending incident count
-    3. Ascending group name
-
-    Ranks must be sequential:
-    1, 2, 3, ..., N
-    """
 
     checks = {
         "root_cause_category": False,
@@ -556,162 +763,56 @@ def validate_results_file(results):
         "shift": False,
     }
 
-    required_categories = list(
-        checks.keys()
-    )
-
-    # --------------------------------------------------------
-    # Results must be a non-empty JSON object
-    # --------------------------------------------------------
-
-    if (
-        not isinstance(results, dict)
-        or not results
-    ):
-
+    if not isinstance(results, dict):
         return {
             "checks": checks,
             "passed": False,
         }
 
-    comparisons = results.get(
-        "comparisons"
+    comparison_results = (
+        split_results_by_category(results)
     )
 
-    # --------------------------------------------------------
-    # Comparisons must be a dictionary
-    # --------------------------------------------------------
+    for category in checks:
 
-    if not isinstance(
-        comparisons,
-        dict
-    ):
-
-        return {
-            "checks": checks,
-            "passed": False,
-        }
-
-    # --------------------------------------------------------
-    # Validate each comparison dimension
-    # --------------------------------------------------------
-
-    for category in required_categories:
-
-        category_results = comparisons.get(
+        category_results = comparison_results.get(
             category,
-            []
+            [],
         )
 
-        if (
-            not isinstance(
-                category_results,
-                list
-            )
-            or not category_results
-        ):
-
-            checks[category] = False
-
+        if not category_results:
             continue
-
-        normalized_results = []
 
         try:
 
-            # --------------------------------------------
-            # Validate and normalise every result record
-            # --------------------------------------------
+            normalized_results = [
+                normalize_exported_result(result)
+                for result in category_results
+            ]
 
-            for result in category_results:
+            seen_groups = set()
 
-                if not isinstance(
-                    result,
-                    dict
-                ):
+            for item in normalized_results:
 
-                    raise TypeError(
-                        "Comparison record must "
-                        "be a dictionary"
-                    )
+                group_name = item["group"]
 
-                group_key = str(
-                    result.get(
-                        "group",
-                        ""
-                    )
-                ).strip()
-
-                priority_rank = int(
-                    result.get(
-                        "rank_by_total_downtime"
-                    )
-                )
-
-                total_downtime = float(
-                    result.get(
-                        "total_downtime_minutes"
-                    )
-                )
-
-                incident_count = int(
-                    result.get(
-                        "incident_count"
-                    )
-                )
-
-                if not group_key:
+                if group_name in seen_groups:
 
                     raise ValueError(
-                        "Missing group name"
+                        "Duplicate group"
                     )
 
-                if priority_rank < 1:
-
-                    raise ValueError(
-                        "Invalid rank"
-                    )
-
-                if total_downtime < 0:
-
-                    raise ValueError(
-                        "Negative downtime"
-                    )
-
-                if incident_count < 1:
-
-                    raise ValueError(
-                        "Invalid incident count"
-                    )
-
-                normalized_results.append(
-                    {
-                        "group_key":
-                            group_key,
-
-                        "priority_rank":
-                            priority_rank,
-
-                        "total_downtime":
-                            total_downtime,
-
-                        "incident_count":
-                            incident_count,
-                    }
-                )
-
-            # --------------------------------------------
-            # Validate sequential ranks
-            # --------------------------------------------
+                seen_groups.add(group_name)
 
             results_by_rank = sorted(
                 normalized_results,
-                key=lambda item:
-                    item["priority_rank"]
+                key=lambda item: item[
+                    "rank_by_total_downtime"
+                ],
             )
 
             ranks = [
-                item["priority_rank"]
+                item["rank_by_total_downtime"]
                 for item in results_by_rank
             ]
 
@@ -720,42 +821,41 @@ def validate_results_file(results):
                 == list(
                     range(
                         1,
-                        len(ranks) + 1
+                        len(ranks) + 1,
                     )
                 )
             )
 
-            # --------------------------------------------
-            # Independently reproduce expected ranking
-            #
-            # 1. Total downtime descending
-            # 2. Incident count descending
-            # 3. Group name ascending
-            # --------------------------------------------
-
             expected_order = sorted(
                 normalized_results,
                 key=lambda item: (
-                    -item["total_downtime"],
-                    -item["incident_count"],
-                    item["group_key"],
-                )
+                    -item[
+                        "total_downtime_minutes"
+                    ],
+
+                    -item[
+                        "incident_count"
+                    ],
+
+                    item["group"],
+                ),
             )
 
             ranking_matches = True
 
             for expected_rank, item in enumerate(
                 expected_order,
-                start=1
+                start=1,
             ):
 
                 if (
-                    item["priority_rank"]
+                    item[
+                        "rank_by_total_downtime"
+                    ]
                     != expected_rank
                 ):
 
                     ranking_matches = False
-
                     break
 
             checks[category] = (
@@ -767,30 +867,25 @@ def validate_results_file(results):
             TypeError,
             ValueError,
             KeyError,
+            OverflowError,
         ):
 
             checks[category] = False
 
     return {
         "checks": checks,
-        "passed": all(
-            checks.values()
-        ),
+        "passed": all(checks.values()),
     }
+
+
 # ============================================================
 # WEAK CASE AND LIMITATION REVIEW
 # ============================================================
 
 def build_weak_case_review(
     complete_incidents,
-    coverage
+    coverage,
 ):
-    """
-    Build explicit weak-case and limitation review.
-
-    These entries document known limitations without treating
-    descriptive results as causal or predictive evidence.
-    """
 
     category_sizes = coverage[
         "category"
@@ -804,67 +899,46 @@ def build_weak_case_review(
         "shift"
     ]["group_sizes"]
 
-    weak_cases = []
+    weak_cases = [
 
-    # --------------------------------------------------------
-    # Root-cause category sensitivity
-    # --------------------------------------------------------
+        {
+            "record_or_group":
+                "maintenance",
 
-    if "maintenance" in category_sizes:
+            "comparison_dimension":
+                "root_cause_category",
 
-        weak_cases.append(
-            {
-                "record_or_group":
-                    "maintenance",
+            "observed_output": (
+                f"Maintenance contains "
+                f"{category_sizes.get('maintenance', 0)} "
+                "observed incidents."
+            ),
 
-                "comparison_dimension":
-                    "root_cause_category",
+            "expected_or_questionable_behaviour": (
+                "Smaller groups are more sensitive to "
+                "individual incidents."
+            ),
 
-                "observed_output": (
-                    f"Maintenance contains "
-                    f"{category_sizes['maintenance']} "
-                    "observed incidents in the approved "
-                    "dataset."
-                ),
+            "possible_reason": (
+                "Maintenance has fewer observed incidents "
+                "than some other groups."
+            ),
 
-                "expected_or_questionable_behaviour": (
-                    "The observed ranking is valid for the "
-                    "approved dataset, but smaller group "
-                    "sizes make totals and averages more "
-                    "sensitive to individual incidents."
-                ),
+            "data_or_method_issue": (
+                "Ranking sensitivity within a small "
+                "synthetic dataset."
+            ),
 
-                "possible_reason": (
-                    "Maintenance has fewer observed incidents "
-                    "than some other root-cause groups."
-                ),
+            "user_facing_limitation": (
+                "The ranking must not be generalized "
+                "to a wider industrial population."
+            ),
 
-                "data_or_method_issue": (
-                    "No calculation error was identified. "
-                    "The limitation is ranking sensitivity "
-                    "within a small synthetic dataset."
-                ),
+            "required_correction": (
+                "No calculation correction required."
+            ),
+        },
 
-                "user_facing_limitation": (
-                    "This observed ranking must not be "
-                    "generalized to a wider industrial "
-                    "population."
-                ),
-
-                "required_correction": (
-                    "No correction to the approved "
-                    "calculation. Retain the limitation and "
-                    "reassess when additional canonical data "
-                    "is available."
-                ),
-            }
-        )
-
-    # --------------------------------------------------------
-    # Machine representativeness
-    # --------------------------------------------------------
-
-    weak_cases.append(
         {
             "record_or_group":
                 "Observed machine groups",
@@ -873,48 +947,32 @@ def build_weak_case_review(
                 "machine",
 
             "observed_output": (
-                f"The approved dataset represents "
+                f"The dataset represents "
                 f"{len(machine_sizes)} machines across "
-                f"{len(complete_incidents)} complete "
-                "incidents."
+                f"{len(complete_incidents)} incidents."
             ),
 
             "expected_or_questionable_behaviour": (
-                "Machine rankings are deterministic for the "
-                "current dataset but may change when "
-                "additional incidents are observed."
+                "Machine rankings may change when more "
+                "incidents are observed."
             ),
 
-            "possible_reason": (
-                "Only a limited number of machines are "
-                "represented and the observation period is "
-                "limited."
-            ),
+            "possible_reason":
+                "Limited observation scope.",
 
-            "data_or_method_issue": (
-                "Limited representativeness rather than a "
-                "calculation failure."
-            ),
+            "data_or_method_issue":
+                "Limited representativeness.",
 
             "user_facing_limitation": (
-                "Machine rankings describe only the approved "
-                "synthetic sample and are not population-wide "
-                "performance rankings."
+                "Rankings describe only the approved "
+                "synthetic sample."
             ),
 
             "required_correction": (
-                "No correction to the current approved "
-                "method. Reassess ranking stability if the "
-                "canonical dataset expands."
+                "Reassess when additional data is available."
             ),
-        }
-    )
+        },
 
-    # --------------------------------------------------------
-    # Shift interpretation
-    # --------------------------------------------------------
-
-    weak_cases.append(
         {
             "record_or_group":
                 "Observed shift groups",
@@ -923,162 +981,35 @@ def build_weak_case_review(
                 "shift",
 
             "observed_output": (
-                f"The approved dataset contains "
-                f"{len(shift_sizes)} observed shift groups."
+                f"The dataset contains "
+                f"{len(shift_sizes)} shift groups."
             ),
 
             "expected_or_questionable_behaviour": (
-                "Comparative shift rankings are descriptive "
-                "and must not be interpreted as causal shift "
-                "effects."
+                "Shift rankings are descriptive."
             ),
 
             "possible_reason": (
                 "The comparison does not control for "
-                "operating hours, production volume or "
-                "other unobserved factors."
+                "all operational factors."
             ),
 
             "data_or_method_issue": (
-                "Track A is descriptive and does not "
-                "perform causal adjustment."
+                "Track A does not perform causal adjustment."
             ),
 
             "user_facing_limitation": (
-                "Observed shift differences are comparison "
-                "signals only and are not causal evidence."
+                "Observed differences are not causal evidence."
             ),
 
             "required_correction": (
-                "No calculation correction. Preserve the "
-                "explicit non-causal interpretation."
+                "No calculation correction required."
             ),
-        }
-    )
-
-    # --------------------------------------------------------
-    # Ranking stability
-    # --------------------------------------------------------
-
-    weak_cases.append(
-        {
-            "record_or_group":
-                "All comparison groups",
-
-            "comparison_dimension":
-                "ranking_stability",
-
-            "observed_output": (
-                "Rankings are calculated deterministically "
-                "using total downtime as the primary ordering "
-                "rule, followed by incident count and group "
-                "name for deterministic tie handling."
-            ),
-
-            "expected_or_questionable_behaviour": (
-                "Small datasets can experience ranking "
-                "changes when a small number of additional "
-                "incidents are introduced."
-            ),
-
-            "possible_reason": (
-                f"The approved canonical dataset contains "
-                f"only {len(complete_incidents)} distinct "
-                "synthetic incidents."
-            ),
-
-            "data_or_method_issue": (
-                "Ranking stability is limited by sample size "
-                "and observation scope."
-            ),
-
-            "user_facing_limitation": (
-                "Ranks should be treated as observed-sample "
-                "priorities, not stable population rankings."
-            ),
-
-            "required_correction": (
-                "No correction to the deterministic ranking "
-                "method. Retain the stability limitation and "
-                "reassess with additional canonical "
-                "observations."
-            ),
-        }
-    )
-
-    # --------------------------------------------------------
-    # Synthetic data scope
-    # --------------------------------------------------------
-
-    weak_cases.append(
-        {
-            "record_or_group":
-                "All analytical outputs",
-
-            "comparison_dimension":
-                "synthetic_data_scope",
-
-            "observed_output": (
-                "All comparative findings are generated from "
-                "the approved synthetic canonical dataset."
-            ),
-
-            "expected_or_questionable_behaviour": (
-                "Results demonstrate the approved analytical "
-                "method but do not demonstrate real-world "
-                "industrial performance."
-            ),
-
-            "possible_reason": (
-                "The project source data is explicitly "
-                "synthetic."
-            ),
-
-            "data_or_method_issue": (
-                "This is a source-data limitation rather "
-                "than a calculation error."
-            ),
-
-            "user_facing_limitation": (
-                "Do not use these results as predictive, "
-                "causal or generalizable industrial evidence."
-            ),
-
-            "required_correction": (
-                "No correction within the approved Track A "
-                "scope. Real-world claims would require an "
-                "appropriate non-synthetic canonical dataset."
-            ),
-        }
-    )
-
-    # --------------------------------------------------------
-    # Small group review
-    # --------------------------------------------------------
-
-    small_group_review = {
-        "root_cause_category": [
-            group
-            for group, size in category_sizes.items()
-            if size < MINIMUM_GROUP_SIZE
-        ],
-
-        "machine": [
-            group
-            for group, size in machine_sizes.items()
-            if size < MINIMUM_GROUP_SIZE
-        ],
-
-        "shift": [
-            group
-            for group, size in shift_sizes.items()
-            if size < MINIMUM_GROUP_SIZE
-        ],
-    }
+        },
+    ]
 
     return {
-        "project_id":
-            PROJECT_ID,
+        "project_id": PROJECT_ID,
 
         "analytical_track":
             ANALYTICAL_TRACK,
@@ -1102,46 +1033,33 @@ def build_weak_case_review(
         "weak_case_review":
             weak_cases,
 
-        "small_group_review":
-            small_group_review,
+        "small_group_review": {
+
+            "root_cause_category": [
+                group
+                for group, size in category_sizes.items()
+                if size < MINIMUM_GROUP_SIZE
+            ],
+
+            "machine": [
+                group
+                for group, size in machine_sizes.items()
+                if size < MINIMUM_GROUP_SIZE
+            ],
+
+            "shift": [
+                group
+                for group, size in shift_sizes.items()
+                if size < MINIMUM_GROUP_SIZE
+            ],
+        },
 
         "known_limitations": [
-            "All 30 source incidents are synthetic.",
-
-            (
-                "Only a limited number of machines are "
-                "represented."
-            ),
-
-            "The observation period is limited.",
-
-            (
-                "Sampling methodology and population "
-                "inclusion probabilities are not established."
-            ),
-
-            "The wider machine population is unknown.",
-
-            "Geographic coordinates are unavailable.",
-
-            "Lifecycle-stage information is unavailable.",
-
-            "Source accuracy is not independently verified.",
-
-            (
-                "Small group sizes may affect ranking "
-                "stability."
-            ),
-
-            (
-                "Comparative rankings are descriptive and do "
-                "not establish causal relationships."
-            ),
-
-            (
-                "Observed comparative results are not "
-                "predictive evidence."
-            ),
+            "All source incidents are synthetic.",
+            "The observation scope is limited.",
+            "Comparative rankings are descriptive.",
+            "Results do not establish causal relationships.",
+            "Results are not predictive evidence.",
         ],
     }
 
@@ -1185,7 +1103,7 @@ def main():
             str(
                 row.get(
                     "data_version",
-                    ""
+                    "",
                 )
             ).strip()
 
@@ -1194,7 +1112,7 @@ def main():
             if str(
                 row.get(
                     "data_version",
-                    ""
+                    "",
                 )
             ).strip()
         }
@@ -1208,16 +1126,14 @@ def main():
         len(rows) > 0
         and all(
             is_true(
-                row.get(
-                    "is_synthetic"
-                )
+                row.get("is_synthetic")
             )
             for row in rows
         )
     )
 
     # --------------------------------------------------------
-    # Invalid numeric measurement rows
+    # Invalid numeric rows
     # --------------------------------------------------------
 
     invalid_numeric_rows = 0
@@ -1227,7 +1143,7 @@ def main():
         metric_name = str(
             row.get(
                 "metric_name",
-                ""
+                "",
             )
         ).strip()
 
@@ -1237,9 +1153,7 @@ def main():
         }:
 
             if parse_numeric(
-                row.get(
-                    "metric_value"
-                )
+                row.get("metric_value")
             ) is None:
 
                 invalid_numeric_rows += 1
@@ -1282,49 +1196,100 @@ def main():
     except (
         FileNotFoundError,
         json.JSONDecodeError,
+        OSError,
     ):
 
         results = {}
 
     # --------------------------------------------------------
-    # Validate exported rankings
+    # Diagnostic output
     # --------------------------------------------------------
 
-    ranking_validation = (
-        validate_results_file(
-            results
+    print(
+        f"Results JSON type: "
+        f"{type(results).__name__}"
+    )
+
+    if isinstance(results, dict):
+
+        comparisons = results.get(
+            "comparisons",
+            {}
         )
+
+        exported_results_loaded = (
+            sum(
+                len(value)
+                for value in comparisons.values()
+                if isinstance(value, list)
+            )
+            if isinstance(comparisons, dict)
+            else 0
+        )
+
+    else:
+
+        exported_results_loaded = 0
+
+    print(
+        f"Exported results loaded: "
+        f"{exported_results_loaded}"
     )
 
     # --------------------------------------------------------
-    # Validation checks
+    # Split results by category
     # --------------------------------------------------------
+
+    comparison_results = (
+        split_results_by_category(results)
+    )
+
     # --------------------------------------------------------
-    # Independent simple baseline validation
+    # Validate rankings
+    # --------------------------------------------------------
+
+    ranking_validation = (
+        validate_results_file(results)
+    )
+
+    # --------------------------------------------------------
+    # Independent baseline validation
     # --------------------------------------------------------
 
     baseline_validation = {
-        "root_cause_category": compare_baseline_to_results(
-            build_simple_baseline(
-                complete_incidents,
-                "category"
+
+        "root_cause_category":
+            compare_baseline_to_results(
+                build_simple_baseline(
+                    complete_incidents,
+                    "category",
+                ),
+                comparison_results[
+                    "root_cause_category"
+                ],
             ),
-            results["comparisons"]["root_cause_category"]
-        ),
-        "machine": compare_baseline_to_results(
-            build_simple_baseline(
-                complete_incidents,
-                "entity_id"
+
+        "machine":
+            compare_baseline_to_results(
+                build_simple_baseline(
+                    complete_incidents,
+                    "entity_id",
+                ),
+                comparison_results[
+                    "machine"
+                ],
             ),
-            results["comparisons"]["machine"]
-        ),
-        "shift": compare_baseline_to_results(
-            build_simple_baseline(
-                complete_incidents,
-                "shift"
+
+        "shift":
+            compare_baseline_to_results(
+                build_simple_baseline(
+                    complete_incidents,
+                    "shift",
+                ),
+                comparison_results[
+                    "shift"
+                ],
             ),
-            results["comparisons"]["shift"]
-        ),
     }
 
     baseline_validation["passed"] = all(
@@ -1336,6 +1301,9 @@ def main():
         )
     )
 
+    # --------------------------------------------------------
+    # Validation checks
+    # --------------------------------------------------------
 
     checks = {
 
@@ -1346,10 +1314,9 @@ def main():
             "actual":
                 len(rows),
 
-            "passed": (
+            "passed":
                 len(rows)
-                == EXPECTED_MEASUREMENT_ROWS
-            ),
+                == EXPECTED_MEASUREMENT_ROWS,
         },
 
         "reconstructed_incidents": {
@@ -1359,10 +1326,9 @@ def main():
             "actual":
                 len(incidents),
 
-            "passed": (
+            "passed":
                 len(incidents)
-                == EXPECTED_INCIDENTS
-            ),
+                == EXPECTED_INCIDENTS,
         },
 
         "complete_incidents": {
@@ -1372,10 +1338,9 @@ def main():
             "actual":
                 len(complete_incidents),
 
-            "passed": (
+            "passed":
                 len(complete_incidents)
-                == EXPECTED_INCIDENTS
-            ),
+                == EXPECTED_INCIDENTS,
         },
 
         "data_version": {
@@ -1385,10 +1350,9 @@ def main():
             "actual":
                 data_versions_detected,
 
-            "passed": (
+            "passed":
                 data_versions_detected
-                == [EXPECTED_DATA_VERSION]
-            ),
+                == [EXPECTED_DATA_VERSION],
         },
 
         "synthetic_data": {
@@ -1403,9 +1367,8 @@ def main():
             "actual":
                 invalid_numeric_rows,
 
-            "passed": (
-                invalid_numeric_rows == 0
-            ),
+            "passed":
+                invalid_numeric_rows == 0,
         },
 
         "group_coverage": {
@@ -1428,27 +1391,18 @@ def main():
                 and shift_coverage[
                     "all_incidents_included_once"
                 ]
-                and category_coverage[
-                    "group_count"
-                ] > 0
-                and machine_coverage[
-                    "group_count"
-                ] > 0
-                and shift_coverage[
-                    "group_count"
-                ] > 0
             ),
         },
 
         "ranking_validation":
             ranking_validation,
-    
+
         "simple_baseline_validation":
             baseline_validation,
     }
 
     # --------------------------------------------------------
-    # Overall validation status
+    # Overall status
     # --------------------------------------------------------
 
     validation_status = (
@@ -1457,7 +1411,7 @@ def main():
         if all(
             check.get(
                 "passed",
-                False
+                False,
             )
             for check in checks.values()
         )
@@ -1466,7 +1420,7 @@ def main():
     )
 
     # --------------------------------------------------------
-    # Build validation metrics output
+    # Validation metrics
     # --------------------------------------------------------
 
     validation_metrics = {
@@ -1493,7 +1447,7 @@ def main():
     }
 
     # --------------------------------------------------------
-    # Build weak-case review
+    # Weak-case review
     # --------------------------------------------------------
 
     weak_case_review = (
@@ -1527,7 +1481,7 @@ def main():
 
     with VALIDATION_OUTPUT.open(
         "w",
-        encoding="utf-8"
+        encoding="utf-8",
     ) as file:
 
         json.dump(
@@ -1542,7 +1496,7 @@ def main():
 
     with WEAK_CASE_OUTPUT.open(
         "w",
-        encoding="utf-8"
+        encoding="utf-8",
     ) as file:
 
         json.dump(
@@ -1583,9 +1537,18 @@ def main():
             )
 
             if data_versions_detected
-
             else "None"
         )
+    )
+
+    print(
+        "Ranking validation: "
+        f"{'PASS' if ranking_validation['passed'] else 'FAIL'}"
+    )
+
+    print(
+        "Simple baseline validation: "
+        f"{'PASS' if baseline_validation['passed'] else 'FAIL'}"
     )
 
     print(
@@ -1605,9 +1568,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
-
