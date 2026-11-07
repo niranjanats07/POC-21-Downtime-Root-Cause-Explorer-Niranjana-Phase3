@@ -1,0 +1,121 @@
+{
+  "project_id": "POC-21",
+  "analytical_track": "TRACK A - COMPARATIVE INTELLIGENCE",
+  "method_version": "1.0.0",
+  "data_version_expected": "1.1.0",
+  "data_versions_detected": [
+    "1.1.0"
+  ],
+  "validation_status": "PASS",
+  "checks": {
+    "source_measurement_rows": {
+      "expected": 60,
+      "actual": 60,
+      "passed": true
+    },
+    "reconstructed_incidents": {
+      "expected": 30,
+      "actual": 30,
+      "passed": true
+    },
+    "complete_incidents": {
+      "expected": 30,
+      "actual": 30,
+      "passed": true
+    },
+    "data_version": {
+      "expected": "1.1.0",
+      "actual": [
+        "1.1.0"
+      ],
+      "passed": true
+    },
+    "synthetic_data": {
+      "all_records_synthetic": true,
+      "passed": true
+    },
+    "invalid_numeric_rows": {
+      "actual": 0,
+      "passed": true
+    },
+    "group_coverage": {
+      "category": {
+        "group_count": 4,
+        "total_incident_assignments": 30,
+        "complete_incident_count": 30,
+        "all_incidents_included_once": true,
+        "group_sizes": {
+          "electrical": 9,
+          "maintenance": 5,
+          "mechanical": 10,
+          "operational": 6
+        }
+      },
+      "machine": {
+        "group_count": 4,
+        "total_incident_assignments": 30,
+        "complete_incident_count": 30,
+        "all_incidents_included_once": true,
+        "group_sizes": {
+          "MCH-01": 8,
+          "MCH-02": 8,
+          "MCH-03": 7,
+          "MCH-04": 7
+        }
+      },
+      "shift": {
+        "group_count": 3,
+        "total_incident_assignments": 30,
+        "complete_incident_count": 30,
+        "all_incidents_included_once": true,
+        "group_sizes": {
+          "evening": 10,
+          "morning": 11,
+          "night": 9
+        }
+      },
+      "passed": true
+    },
+    "ranking_validation": {
+      "checks": {
+        "root_cause_category": true,
+        "machine": true,
+        "shift": true
+      },
+      "passed": true
+    },
+    "simple_baseline_validation": {
+      "root_cause_category": {
+        "baseline_group_count": 4,
+        "exported_group_count": 4,
+        "groups_match": true,
+        "incident_counts_match": true,
+        "downtime_totals_match": true,
+        "failure_frequency_totals_match": true,
+        "ranks_match": true,
+        "passed": true
+      },
+      "machine": {
+        "baseline_group_count": 4,
+        "exported_group_count": 4,
+        "groups_match": true,
+        "incident_counts_match": true,
+        "downtime_totals_match": true,
+        "failure_frequency_totals_match": true,
+        "ranks_match": true,
+        "passed": true
+      },
+      "shift": {
+        "baseline_group_count": 3,
+        "exported_group_count": 3,
+        "groups_match": true,
+        "incident_counts_match": true,
+        "downtime_totals_match": true,
+        "failure_frequency_totals_match": true,
+        "ranks_match": true,
+        "passed": true
+      },
+      "passed": true
+    }
+  }
+}

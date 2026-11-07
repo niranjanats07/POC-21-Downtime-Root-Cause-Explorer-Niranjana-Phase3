@@ -1,0 +1,78 @@
+{
+  "project_id": "POC-21",
+  "analytical_track": "TRACK A - COMPARATIVE INTELLIGENCE",
+  "data_version": "1.1.0",
+  "method_version": "1.0.0",
+  "minimum_group_size": 1,
+  "overall_limitation": "All source incidents are synthetic. Results are descriptive demonstration outputs and must not be generalized as real-world industrial performance or causal evidence.",
+  "weak_case_review": [
+    {
+      "record_or_group": "maintenance",
+      "comparison_dimension": "root_cause_category",
+      "observed_output": "Maintenance contains 5 observed incidents in the approved dataset.",
+      "expected_or_questionable_behaviour": "The observed ranking is valid for the approved dataset, but smaller group sizes make totals and averages more sensitive to individual incidents.",
+      "possible_reason": "Maintenance has fewer observed incidents than some other root-cause groups.",
+      "data_or_method_issue": "No calculation error was identified. The limitation is ranking sensitivity within a small synthetic dataset.",
+      "user_facing_limitation": "This observed ranking must not be generalized to a wider industrial population.",
+      "required_correction": "No correction to the approved calculation. Retain the limitation and reassess when additional canonical data is available."
+    },
+    {
+      "record_or_group": "Observed machine groups",
+      "comparison_dimension": "machine",
+      "observed_output": "The approved dataset represents 4 machines across 30 complete incidents.",
+      "expected_or_questionable_behaviour": "Machine rankings are deterministic for the current dataset but may change when additional incidents are observed.",
+      "possible_reason": "Only a limited number of machines are represented and the observation period is limited.",
+      "data_or_method_issue": "Limited representativeness rather than a calculation failure.",
+      "user_facing_limitation": "Machine rankings describe only the approved synthetic sample and are not population-wide performance rankings.",
+      "required_correction": "No correction to the current approved method. Reassess ranking stability if the canonical dataset expands."
+    },
+    {
+      "record_or_group": "Observed shift groups",
+      "comparison_dimension": "shift",
+      "observed_output": "The approved dataset contains 3 observed shift groups.",
+      "expected_or_questionable_behaviour": "Comparative shift rankings are descriptive and must not be interpreted as causal shift effects.",
+      "possible_reason": "The comparison does not control for operating hours, production volume or other unobserved factors.",
+      "data_or_method_issue": "Track A is descriptive and does not perform causal adjustment.",
+      "user_facing_limitation": "Observed shift differences are comparison signals only and are not causal evidence.",
+      "required_correction": "No calculation correction. Preserve the explicit non-causal interpretation."
+    },
+    {
+      "record_or_group": "All comparison groups",
+      "comparison_dimension": "ranking_stability",
+      "observed_output": "Rankings are calculated deterministically using total downtime as the primary ordering rule, followed by incident count and group name for deterministic tie handling.",
+      "expected_or_questionable_behaviour": "Small datasets can experience ranking changes when a small number of additional incidents are introduced.",
+      "possible_reason": "The approved canonical dataset contains only 30 distinct synthetic incidents.",
+      "data_or_method_issue": "Ranking stability is limited by sample size and observation scope.",
+      "user_facing_limitation": "Ranks should be treated as observed-sample priorities, not stable population rankings.",
+      "required_correction": "No correction to the deterministic ranking method. Retain the stability limitation and reassess with additional canonical observations."
+    },
+    {
+      "record_or_group": "All analytical outputs",
+      "comparison_dimension": "synthetic_data_scope",
+      "observed_output": "All comparative findings are generated from the approved synthetic canonical dataset.",
+      "expected_or_questionable_behaviour": "Results demonstrate the approved analytical method but do not demonstrate real-world industrial performance.",
+      "possible_reason": "The project source data is explicitly synthetic.",
+      "data_or_method_issue": "This is a source-data limitation rather than a calculation error.",
+      "user_facing_limitation": "Do not use these results as predictive, causal or generalizable industrial evidence.",
+      "required_correction": "No correction within the approved Track A scope. Real-world claims would require an appropriate non-synthetic canonical dataset."
+    }
+  ],
+  "small_group_review": {
+    "root_cause_category": [],
+    "machine": [],
+    "shift": []
+  },
+  "known_limitations": [
+    "All 30 source incidents are synthetic.",
+    "Only a limited number of machines are represented.",
+    "The observation period is limited.",
+    "Sampling methodology and population inclusion probabilities are not established.",
+    "The wider machine population is unknown.",
+    "Geographic coordinates are unavailable.",
+    "Lifecycle-stage information is unavailable.",
+    "Source accuracy is not independently verified.",
+    "Small group sizes may affect ranking stability.",
+    "Comparative rankings are descriptive and do not establish causal relationships.",
+    "Observed comparative results are not predictive evidence."
+  ]
+}
