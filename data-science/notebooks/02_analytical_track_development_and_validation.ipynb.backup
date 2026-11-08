@@ -1,0 +1,285 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "# POC-21 Phase 3 Post #3\n",
+        "\n",
+        "## Analytical Track Development and Validation\n",
+        "\n",
+        "**Approved Track:** Track A - Comparative Intelligence  \n",
+        "**Canonical Dataset:** `data/canonical/intelligence_data.csv`  \n",
+        "**Data Version:** 1.1.0  \n",
+        "**Method Version:** 1.0.0\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 1,
+      "metadata": {},
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "Project root: c:\\Users\\SURESH\\POC-21-Downtime-Root-Cause-Explorer-Niranjana-Phase3\\data-science\n",
+            "Canonical dataset: c:\\Users\\SURESH\\POC-21-Downtime-Root-Cause-Explorer-Niranjana-Phase3\\data-science\\data\\canonical\\intelligence_data.csv\n",
+            "Dataset exists: False\n"
+          ]
+        }
+      ],
+      "source": [
+        "from pathlib import Path\n",
+        "import json\n",
+        "import pandas as pd\n",
+        "\n",
+        "PROJECT_ROOT = Path.cwd()\n",
+        "\n",
+        "if not (PROJECT_ROOT / 'data').exists():\n",
+        "    PROJECT_ROOT = PROJECT_ROOT.parent\n",
+        "\n",
+        "CANONICAL_PATH = PROJECT_ROOT / 'data' / 'canonical' / 'intelligence_data.csv'\n",
+        "OUTPUT_DIR = PROJECT_ROOT / 'data-science' / 'outputs'\n",
+        "\n",
+        "print('Project root:', PROJECT_ROOT)\n",
+        "print('Canonical dataset:', CANONICAL_PATH)\n",
+        "print('Dataset exists:', CANONICAL_PATH.exists())\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 2,
+      "metadata": {},
+      "outputs": [
+        {
+          "ename": "FileNotFoundError",
+          "evalue": "Canonical dataset not found: c:\\Users\\SURESH\\POC-21-Downtime-Root-Cause-Explorer-Niranjana-Phase3\\data-science\\data\\canonical\\intelligence_data.csv",
+          "output_type": "error",
+          "traceback": [
+            "\u001b[31m---------------------------------------------------------------------------\u001b[39m",
+            "\u001b[31mFileNotFoundError\u001b[39m                         Traceback (most recent call last)",
+            "\u001b[36mCell\u001b[39m\u001b[36m \u001b[39m\u001b[32mIn[2]\u001b[39m\u001b[32m, line 2\u001b[39m\n\u001b[32m      1\u001b[39m \u001b[38;5;28;01mif\u001b[39;00m \u001b[38;5;28;01mnot\u001b[39;00m CANONICAL_PATH.exists():\n\u001b[32m----> \u001b[39m\u001b[32m2\u001b[39m     \u001b[38;5;28;01mraise\u001b[39;00m FileNotFoundError(f'Canonical dataset not found: {CANONICAL_PATH}')\n\u001b[32m      3\u001b[39m \n\u001b[32m      4\u001b[39m df = pd.read_csv(CANONICAL_PATH)\n\u001b[32m      5\u001b[39m \n",
+            "\u001b[31mFileNotFoundError\u001b[39m: Canonical dataset not found: c:\\Users\\SURESH\\POC-21-Downtime-Root-Cause-Explorer-Niranjana-Phase3\\data-science\\data\\canonical\\intelligence_data.csv"
+          ]
+        }
+      ],
+      "source": [
+        "if not CANONICAL_PATH.exists():\n",
+        "    raise FileNotFoundError(f'Canonical dataset not found: {CANONICAL_PATH}')\n",
+        "\n",
+        "df = pd.read_csv(CANONICAL_PATH)\n",
+        "\n",
+        "print('Measurement rows:', len(df))\n",
+        "print('Columns:', list(df.columns))\n",
+        "print('Data versions:', sorted(df['data_version'].dropna().astype(str).unique()))\n",
+        "print('Distinct source incidents:', df['source_record_id'].nunique())\n",
+        "\n",
+        "df.head()\n"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Input Validation\n",
+        "\n",
+        "The analytical workflow uses only the approved canonical dataset and verifies the required fields before reconstruction.\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "required_fields = [\n",
+        "    'source_record_id',\n",
+        "    'category',\n",
+        "    'entity_id',\n",
+        "    'shift',\n",
+        "    'metric_name',\n",
+        "    'metric_value',\n",
+        "    'data_version',\n",
+        "    'is_synthetic'\n",
+        "]\n",
+        "\n",
+        "missing_fields = [field for field in required_fields if field not in df.columns]\n",
+        "\n",
+        "if missing_fields:\n",
+        "    raise ValueError(f'Missing required fields: {missing_fields}')\n",
+        "\n",
+        "print('Required field validation: PASS')\n",
+        "print('Expected data version: 1.1.0')\n",
+        "print('Actual data versions:', sorted(df['data_version'].dropna().astype(str).unique()))\n",
+        "print('All records synthetic:', bool(df['is_synthetic'].astype(bool).all()))\n"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Incident Reconstruction\n",
+        "\n",
+        "Each source incident is reconstructed by pairing `downtime_minutes` and `failure_frequency` using `source_record_id`.\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "working = df.copy()\n",
+        "working['metric_value'] = pd.to_numeric(working['metric_value'], errors='coerce')\n",
+        "\n",
+        "invalid_numeric_rows = int(working['metric_value'].isna().sum())\n",
+        "\n",
+        "pivot = working.pivot_table(\n",
+        "    index=['source_record_id', 'category', 'entity_id', 'shift'],\n",
+        "    columns='metric_name',\n",
+        "    values='metric_value',\n",
+        "    aggfunc='first'\n",
+        ").reset_index()\n",
+        "\n",
+        "required_metrics = ['downtime_minutes', 'failure_frequency']\n",
+        "\n",
+        "for metric in required_metrics:\n",
+        "    if metric not in pivot.columns:\n",
+        "        pivot[metric] = pd.NA\n",
+        "\n",
+        "complete_incidents = pivot.dropna(subset=required_metrics).copy()\n",
+        "\n",
+        "print('Invalid numeric rows:', invalid_numeric_rows)\n",
+        "print('Reconstructed incidents:', len(pivot))\n",
+        "print('Complete incidents:', len(complete_incidents))\n",
+        "\n",
+        "complete_incidents.head()\n"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Baseline and Comparative Intelligence\n",
+        "\n",
+        "The baseline is descriptive group comparison using incident count, total downtime, average downtime, total failure frequency, and average failure frequency.\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "def calculate_group_results(data, group_field):\n",
+        "    result = (\n",
+        "        data.groupby(group_field, dropna=False)\n",
+        "        .agg(\n",
+        "            incident_count=('source_record_id', 'nunique'),\n",
+        "            total_downtime=('downtime_minutes', 'sum'),\n",
+        "            average_downtime=('downtime_minutes', 'mean'),\n",
+        "            total_failure_frequency=('failure_frequency', 'sum'),\n",
+        "            average_failure_frequency=('failure_frequency', 'mean')\n",
+        "        )\n",
+        "        .reset_index()\n",
+        "    )\n",
+        "\n",
+        "    result[group_field] = result[group_field].fillna('(blank)').astype(str)\n",
+        "\n",
+        "    result = result.sort_values(\n",
+        "        by=['total_downtime', 'incident_count', group_field],\n",
+        "        ascending=[False, False, True]\n",
+        "    ).reset_index(drop=True)\n",
+        "\n",
+        "    result['rank_by_total_downtime'] = range(1, len(result) + 1)\n",
+        "\n",
+        "    return result\n",
+        "\n",
+        "category_results = calculate_group_results(complete_incidents, 'category')\n",
+        "machine_results = calculate_group_results(complete_incidents, 'entity_id')\n",
+        "shift_results = calculate_group_results(complete_incidents, 'shift')\n",
+        "\n",
+        "print('Top category:')\n",
+        "display(category_results.head())\n",
+        "\n",
+        "print('Top machine:')\n",
+        "display(machine_results.head())\n",
+        "\n",
+        "print('Top shift:')\n",
+        "display(shift_results.head())\n"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Validation and Limitations\n",
+        "\n",
+        "Validation confirms row counts, incident reconstruction, complete metric pairing, version consistency, synthetic-data status, group coverage, and deterministic ranking. Results remain descriptive because the dataset contains synthetic incidents and small observed groups.\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "validation_summary = {\n",
+        "    'measurement_rows': int(len(df)),\n",
+        "    'distinct_source_incidents': int(df['source_record_id'].nunique()),\n",
+        "    'reconstructed_incidents': int(len(pivot)),\n",
+        "    'complete_incidents': int(len(complete_incidents)),\n",
+        "    'data_versions': sorted(df['data_version'].dropna().astype(str).unique().tolist()),\n",
+        "    'invalid_numeric_rows': invalid_numeric_rows,\n",
+        "    'all_records_synthetic': bool(df['is_synthetic'].astype(bool).all())\n",
+        "}\n",
+        "\n",
+        "print(json.dumps(validation_summary, indent=2))\n",
+        "\n",
+        "assert validation_summary['measurement_rows'] == 60\n",
+        "assert validation_summary['distinct_source_incidents'] == 30\n",
+        "assert validation_summary['complete_incidents'] == 30\n",
+        "assert validation_summary['data_versions'] == ['1.1.0']\n",
+        "\n",
+        "print('\\nNotebook validation checks: PASS')\n"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Reproducibility\n",
+        "\n",
+        "The reusable scripts remain the authoritative execution path:\n",
+        "\n",
+        "- `data-science/scripts/run_analytical_track.py`\n",
+        "- `data-science/scripts/validate_analytical_track.py`\n",
+        "- `data-science/scripts/export_intelligence_results.py`\n",
+        "\n",
+        "This notebook provides reproducible development and validation evidence and does not introduce an alternative data source.\n"
+      ]
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "display_name": "Python 3",
+      "language": "python",
+      "name": "python3"
+    },
+    "language_info": {
+      "codemirror_mode": {
+        "name": "ipython",
+        "version": 3
+      },
+      "file_extension": ".py",
+      "mimetype": "text/x-python",
+      "name": "python",
+      "nbconvert_exporter": "python",
+      "pygments_lexer": "ipython3",
+      "version": "3.13.15"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}
