@@ -4,39 +4,7 @@
   "data_version": "1.1.0",
   "method_version": "1.0.0",
   "minimum_group_size": 3,
-  "overall_limitation": "All source incidents are synthetic. Results are descriptive demonstration outputs and must not be generalized as real-world industrial performance or causal evidence.",
-  "weak_case_review": [
-    {
-      "record_or_group": "maintenance",
-      "comparison_dimension": "root_cause_category",
-      "observed_output": "Maintenance contains 5 observed incidents.",
-      "expected_or_questionable_behaviour": "Smaller groups are more sensitive to individual incidents.",
-      "possible_reason": "Maintenance has fewer observed incidents than some other groups.",
-      "data_or_method_issue": "Ranking sensitivity within a small synthetic dataset.",
-      "user_facing_limitation": "The ranking must not be generalized to a wider industrial population.",
-      "required_correction": "No calculation correction required."
-    },
-    {
-      "record_or_group": "Observed machine groups",
-      "comparison_dimension": "machine",
-      "observed_output": "The dataset represents 4 machines across 30 incidents.",
-      "expected_or_questionable_behaviour": "Machine rankings may change when more incidents are observed.",
-      "possible_reason": "Limited observation scope.",
-      "data_or_method_issue": "Limited representativeness.",
-      "user_facing_limitation": "Rankings describe only the approved synthetic sample.",
-      "required_correction": "Reassess when additional data is available."
-    },
-    {
-      "record_or_group": "Observed shift groups",
-      "comparison_dimension": "shift",
-      "observed_output": "The dataset contains 3 shift groups.",
-      "expected_or_questionable_behaviour": "Shift rankings are descriptive.",
-      "possible_reason": "The comparison does not control for all operational factors.",
-      "data_or_method_issue": "Track A does not perform causal adjustment.",
-      "user_facing_limitation": "Observed differences are not causal evidence.",
-      "required_correction": "No calculation correction required."
-    }
-  ],
+  "overall_limitation": "All source incidents are synthetic. Results are descriptive demonstration outputs and must not be generalized as real-world industrial performance, causal evidence or predictive evidence.",
   "small_group_review": {
     "root_cause_category": [],
     "machine": [],
@@ -47,6 +15,38 @@
     "The observation scope is limited.",
     "Comparative rankings are descriptive.",
     "Results do not establish causal relationships.",
-    "Results are not predictive evidence."
+    "Results are not predictive evidence.",
+    "Rankings may change when additional observations become available."
+  ],
+  "weak_case_review": [
+    {
+      "comparison_dimension": "root_cause_category",
+      "minimum_group_size": 3,
+      "group_sizes": {
+        "electrical": 9,
+        "maintenance": 5,
+        "mechanical": 10,
+        "operational": 6
+      }
+    },
+    {
+      "comparison_dimension": "machine",
+      "minimum_group_size": 3,
+      "group_sizes": {
+        "MCH-01": 8,
+        "MCH-02": 8,
+        "MCH-03": 7,
+        "MCH-04": 7
+      }
+    },
+    {
+      "comparison_dimension": "shift",
+      "minimum_group_size": 3,
+      "group_sizes": {
+        "evening": 10,
+        "morning": 11,
+        "night": 9
+      }
+    }
   ]
 }

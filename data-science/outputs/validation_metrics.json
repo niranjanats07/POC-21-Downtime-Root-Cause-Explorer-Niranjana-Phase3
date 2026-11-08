@@ -76,6 +76,17 @@
       },
       "passed": true
     },
+    "flat_export_structure": {
+      "is_flat_array": true,
+      "expected_result_count": 11,
+      "actual_result_count": 11,
+      "required_fields_present": true,
+      "unique_result_ids": true,
+      "versions_match": true,
+      "quality_status_validated": true,
+      "valid_result_categories": true,
+      "passed": true
+    },
     "ranking_validation": {
       "checks": {
         "root_cause_category": true,
@@ -84,7 +95,7 @@
       },
       "passed": true
     },
-    "simple_baseline_validation": {
+    "independent_baseline_validation": {
       "root_cause_category": {
         "baseline_group_count": 4,
         "exported_group_count": 4,
@@ -93,7 +104,7 @@
         "downtime_totals_match": true,
         "failure_frequency_totals_match": true,
         "ranks_match": true,
-        "duplicate_exported_groups": false,
+        "minimum_group_size_passed": true,
         "passed": true
       },
       "machine": {
@@ -104,7 +115,7 @@
         "downtime_totals_match": true,
         "failure_frequency_totals_match": true,
         "ranks_match": true,
-        "duplicate_exported_groups": false,
+        "minimum_group_size_passed": true,
         "passed": true
       },
       "shift": {
@@ -115,7 +126,7 @@
         "downtime_totals_match": true,
         "failure_frequency_totals_match": true,
         "ranks_match": true,
-        "duplicate_exported_groups": false,
+        "minimum_group_size_passed": true,
         "passed": true
       },
       "passed": true

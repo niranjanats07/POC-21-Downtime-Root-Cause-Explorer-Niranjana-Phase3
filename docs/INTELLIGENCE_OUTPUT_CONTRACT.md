@@ -2,171 +2,257 @@
 
 ## Project
 
-**Project ID:** POC-21  
+**Project ID:** POC-21
 **PoC Title:** Downtime Root Cause Explorer
+**Approved Primary Analytical Track:** Track A — Comparative Intelligence
+**Data Version:** 1.1.0
+**Method Version:** 1.0.0
 
 ---
 
 ## Purpose
 
-This document defines the intelligence output contract for Phase 3 Post #3.
+This document defines the standard output contract for the Phase 3 analytical intelligence package.
 
-The approved analytical implementation is:
+The intelligence output is generated from the approved canonical data source:
 
-**Track A - Comparative Intelligence**
+`/data/canonical/intelligence_data.csv`
 
-All calculations use only the approved canonical dataset:
+The output contains deterministic comparative findings produced by Track A — Comparative Intelligence.
 
-`data/canonical/intelligence_data.csv`
-
-**Data Version:** `1.1.0`  
-**Method Version:** `1.0.0`
-
-The intelligence outputs are prepared for future integration. This Post #3 package does not implement a Data Intelligence page, production analytical API, chatbot, or dashboard integration.
+The output is intended for future Data Intelligence page integration and must remain reproducible, explainable, and versioned.
 
 ---
 
-## 1. Required Intelligence Output Files
+## Output File
 
-The Post #3 analytical package generates:
+The primary analytical output file is:
 
-- `data-science/outputs/intelligence_results.json`
-- `data-science/outputs/intelligence_summary.json`
-- `data-science/outputs/validation_metrics.json`
-- `data-science/outputs/weak_case_review.json`
+`/data-science/outputs/intelligence_results.json`
 
----
+The final exported structure is a **flat JSON array of standardized analytical findings**.
 
-## 2. Intelligence Results Contract
+The output does **not** use the older grouped-results structure.
 
-The primary detailed output is:
+Each item in the array represents one independently identifiable analytical finding.
 
-`data-science/outputs/intelligence_results.json`
-
-The output uses a **structured grouped-comparison format** for the approved Track A implementation.
-
-### Required top-level metadata
-
-The output must preserve:
-
-- `project_id`
-- `poc_title`
-- `analytical_track`
-- `data_version`
-- `method_version`
-- `source_file`
-- `source_measurement_rows`
-- `distinct_source_incidents`
-- `complete_incidents_used_for_comparison`
-- `minimum_group_size`
-- `ranking_method`
-- `calculation_scope`
-- `synthetic_data_limitation`
-- `overall_metrics`
-- `comparisons`
-
-### Overall metrics
-
-`overall_metrics` must provide descriptive totals for the approved complete incidents, including:
-
-- `incident_count`
-- `total_downtime_minutes`
-- `average_downtime_minutes`
-- `total_failure_frequency`
-- `average_failure_frequency`
-
-### Comparison dimensions
-
-`comparisons` must contain the approved Track A grouping dimensions:
-
-- `root_cause_category`
-- `machine`
-- `shift`
-
-Each comparison dimension contains one or more group-level results.
-
-### Required group-level fields
-
-Each group-level result must contain:
-
-- `group`
-- `incident_count`
-- `downtime_measurement_count`
-- `failure_frequency_measurement_count`
-- `total_downtime_minutes`
-- `average_downtime_minutes`
-- `total_failure_frequency`
-- `average_failure_frequency`
-- `meets_minimum_group_size`
-- `rank_by_total_downtime`
-
-This grouped structure is the approved contract for the current deterministic Track A implementation.
+For the current approved dataset and Track A implementation, the export contains **11 standardized findings**.
 
 ---
 
-## 3. Track A Comparative Result Types
+## Required Top-Level Structure
 
-The approved Track A implementation supports deterministic descriptive comparison across:
+The `intelligence_results.json` file must have the following structure:
 
-- Root-cause categories
-- Machines
-- Shifts
+```json
+[
+  {
+    "result_id": "RES-0001",
+    "result_type": "comparative_group_ranking",
+    "record_id": null,
+    "entity_id": null,
+    "group_key": "example_group",
+    "period_start": null,
+    "period_end": null,
+    "metric_name": "total_downtime_minutes",
+    "result_value": 0.0,
+    "result_unit": "minutes",
+    "result_category": "root_cause_category",
+    "priority_rank": 1,
+    "finding": "Example deterministic comparative finding.",
+    "evidence": [],
+    "method_version": "1.0.0",
+    "data_version": "1.1.0",
+    "generated_at": "ISO-8601 UTC timestamp",
+    "quality_status": "validated",
+    "limitation": "Descriptive result based on the approved synthetic canonical dataset."
+  }
+]
+```
 
-The comparative calculations include:
+The exported JSON must be a **valid JSON array**.
 
-- Incident counts
-- Total downtime
-- Average downtime
+---
+
+## Standard Result Fields
+
+Each exported analytical finding must use the following standardized fields.
+
+| Field | Required | Description |
+|---|---|---|
+| `result_id` | Yes | Unique identifier for the analytical result |
+| `result_type` | Yes | Type of analytical result |
+| `record_id` | Yes | Source record identifier when applicable; otherwise `null` |
+| `entity_id` | Yes | Entity identifier when applicable; otherwise `null` |
+| `group_key` | Yes | Group or comparison value represented by the finding |
+| `period_start` | Yes | Start period when applicable; otherwise `null` |
+| `period_end` | Yes | End period when applicable; otherwise `null` |
+| `metric_name` | Yes | Name of the measured metric |
+| `result_value` | Yes | Numeric value of the analytical metric |
+| `result_unit` | Yes | Unit of the result |
+| `result_category` | Yes | Result classification or category |
+| `priority_rank` | Yes | Deterministic comparative rank when applicable; otherwise `null` |
+| `finding` | Yes | Human-readable deterministic finding |
+| `evidence` | Yes | Structured evidence supporting the finding |
+| `method_version` | Yes | Analytical method version |
+| `data_version` | Yes | Canonical data version |
+| `generated_at` | Yes | Generation timestamp |
+| `quality_status` | Yes | Validation status of the result |
+| `limitation` | Yes | Applicable analytical limitation |
+
+Fields that are not applicable must remain present and use `null` where appropriate.
+
+---
+
+## Approved Comparison Dimensions
+
+Track A compares the approved canonical dataset across the following dimensions:
+
+1. Root-cause category
+2. Machine
+3. Shift
+
+The approved comparative metrics include:
+
+- Incident count
+- Total downtime minutes
+- Average downtime minutes
 - Total failure frequency
 - Average failure frequency
-- Deterministic rankings
-
-The approved current implementation does not require unsupported predictive, causal, or externally inferred results.
-
-Where additional descriptive measures are explicitly implemented and validated, they must be documented and reproducibly generated from the approved canonical dataset.
-
-All outputs remain descriptive observations and do not establish causal relationships.
+- Comparative ranking by total downtime
 
 ---
 
-## 4. Ranking Contract
+## Minimum Group-Size Rule
 
-The approved deterministic ranking method is:
+The minimum group size is:
 
-1. Descending total downtime.
-2. Descending incident count when total downtime is tied.
-3. Ascending group name for deterministic tie handling.
+**3 incidents**
 
-The resulting rank is stored as:
+Each comparison group must be evaluated against this rule.
 
-`rank_by_total_downtime`
+The exported analytical result must preserve sufficient evidence to determine whether the observed group meets the minimum group-size requirement.
 
-The ranking describes only the approved observed synthetic dataset.
+Groups below the minimum threshold must not be presented as equally stable comparative findings without an appropriate limitation or qualification.
 
----
-
-## 5. Minimum Group Size
-
-The approved minimum group size is:
-
-**1 incident**
-
-All observed groups meeting this threshold are retained because the approved dataset contains only 30 synthetic incidents and all observed groups are relevant to descriptive review.
-
-The threshold of 1 is acceptable for this synthetic demonstration because the purpose is to preserve all observed groups for deterministic descriptive comparison, not to estimate a wider population or make statistically generalizable claims.
-
-A group meeting the minimum size requirement must not be interpreted as representative of a wider operational population.
-
-Small-group sensitivity and ranking stability are reviewed separately in:
-
-- `data-science/outputs/weak_case_review.json`
-- `docs/WEAK_CASE_AND_LIMITATION_REVIEW.md`
-- `docs/ANALYTICAL_VALIDATION_REPORT.md`
+The current validation process must independently check this rule against the canonical dataset.
 
 ---
 
-## 6. Missing Groups and Blank Values
+## Flat Export Requirement
 
-Track A reconstructs complete incidents using `source_record_id`.
+The final `intelligence_results.json` output must be validated as a **flat array of analytical result objects**.
 
-A complete incident requires both:
+The validator must not assume or require an older grouped structure.
+
+The validator must independently:
+
+1. Load the approved canonical CSV.
+2. Recalculate the relevant comparative values.
+3. Load the actual exported `intelligence_results.json`.
+4. Confirm that the exported file is a valid flat array.
+5. Confirm the expected result count.
+6. Validate required fields for every exported result.
+7. Confirm data and method versions.
+8. Confirm result values against independently calculated canonical results.
+9. Confirm ranking consistency.
+10. Confirm the minimum group-size rule.
+11. Report `PASS` only when all required checks succeed.
+
+---
+
+## Validation Status
+
+A result may use:
+
+`"quality_status": "validated"`
+
+only when the exported result has passed the required Track A validation checks.
+
+The overall validation status is:
+
+- `PASS` when all required checks pass.
+- `FAIL` when any required validation check fails.
+
+A `PASS` result must be based on validation of the **actual exported JSON file**, not only internal intermediate calculations.
+
+---
+
+## Evidence Requirements
+
+Each finding must contain deterministic evidence derived from the approved canonical dataset.
+
+Evidence may include:
+
+- Comparison dimension
+- Group name
+- Incident count
+- Downtime totals
+- Downtime averages
+- Failure-frequency totals
+- Failure-frequency averages
+- Ranking information
+- Minimum group-size status
+
+The output must not contain unsupported or LLM-generated numerical findings.
+
+---
+
+## Version Requirements
+
+Every exported result must include:
+
+**Data Version:** `1.1.0`
+**Method Version:** `1.0.0`
+
+The validator must confirm that exported results use the approved canonical data version.
+
+Changes to the analytical method, comparison logic, ranking rules, or other material method parameters require a method-version review.
+
+---
+
+## Important Limitations
+
+The intelligence outputs are subject to the following limitations:
+
+- All source incidents are synthetic.
+- Results are descriptive demonstration outputs.
+- Results are not representative of actual industrial performance.
+- Results do not establish causal relationships.
+- Results are not predictive evidence.
+- Comparative rankings may change when additional observations become available.
+- Small groups may have reduced ranking stability.
+
+---
+
+## Unsupported Uses
+
+The intelligence outputs must not be used as:
+
+- Predictive evidence
+- Causal evidence
+- A probability of future downtime
+- A guarantee of future failure outcomes
+- Evidence of real-world industrial performance beyond the approved synthetic dataset
+
+---
+
+## Reproducibility Requirement
+
+The analytical output must be reproducible through the reusable analytical scripts.
+
+The required execution flow is:
+
+1. Load the approved canonical CSV.
+2. Verify the approved data version.
+3. Validate required analytical inputs.
+4. Apply approved Track A comparative calculations.
+5. Generate the flat standardized intelligence-results export.
+6. Independently validate the actual exported results against canonical calculations.
+7. Generate validation metrics.
+8. Generate weak-case review evidence.
+9. Export the final intelligence summary.
+
+No hidden manual calculation or alternate dataset may be required.
+
+
