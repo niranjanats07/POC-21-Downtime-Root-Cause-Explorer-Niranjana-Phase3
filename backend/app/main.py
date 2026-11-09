@@ -226,27 +226,49 @@ def get_incident(incident_id: str):
 # Data Intelligence API
 # -------------------------------------------------------------------
 
+def _load_intelligence_or_http_error():
+    try:
+        return load_intelligence()
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        raise HTTPException(
+            status_code=503,
+            detail="Data Intelligence data is unavailable or failed contract validation.",
+        ) from exc
+
 @app.get("/api/intelligence/summary")
 def intelligence_summary():
-    package = load_intelligence()
+    package = _load_intelligence_or_http_error()
     return package["summary"]
 
 
 @app.get("/api/intelligence/results")
 def intelligence_results():
-    package = load_intelligence()
+    package = _load_intelligence_or_http_error()
     return package["results"]
 
 
+@app.get("/api/intelligence/results/{result_id}")
+def intelligence_result_detail(result_id: str):
+    package = _load_intelligence_or_http_error()
+
+    for result in package["results"]:
+        if result.get("result_id") == result_id:
+            return result
+
+    raise HTTPException(
+        status_code=404,
+        detail="Intelligence result not found.",
+    )
+
 @app.get("/api/intelligence/metadata")
 def intelligence_metadata():
-    package = load_intelligence()
+    package = _load_intelligence_or_http_error()
     return package["metadata"]
 
 
 @app.get("/api/intelligence/health")
 def intelligence_health():
-    package = load_intelligence()
+    package = _load_intelligence_or_http_error()
 
     return {
         "status": "healthy",

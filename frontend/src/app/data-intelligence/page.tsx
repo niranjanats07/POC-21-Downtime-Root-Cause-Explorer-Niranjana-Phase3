@@ -1,13 +1,26 @@
-﻿"use client";
+﻿
+"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import TrackAComparison from "./TrackAComparison";
 
 const API =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 const EXPECTED_DATA_VERSION = "1.1.0";
 const EXPECTED_METHOD_VERSION = "1.0.0";
+const DIAGNOSTIC_REFERENCE = "DI-POC21-LOAD";
+
+const STALE_AFTER_DAYS = (() => {
+  const configured = Number(
+    process.env.NEXT_PUBLIC_INTELLIGENCE_STALE_AFTER_DAYS
+  );
+
+  return Number.isFinite(configured) && configured > 0
+    ? configured
+    : 7;
+})();
 
 type IntelligenceResult = {
   result_id: string;
@@ -42,34 +55,85 @@ type IntelligenceSummary = {
   [key: string]: unknown;
 };
 
+type IntelligenceMetadata = {
+  data_version?: string;
+  method_version?: string;
+  generated_at?: string;
+};
+
 export default function DataIntelligencePage() {
-  const [summary, setSummary] = useState<IntelligenceSummary | null>(null);
-  const [results, setResults] = useState<IntelligenceResult[]>([]);
+  const [summary, setSummary] =
+    useState<IntelligenceSummary | null>(null);
+  const [results, setResults] =
+    useState<IntelligenceResult[]>([]);
+  const [generatedAt, setGeneratedAt] = useState("");
+  const [freshnessCheckedAt, setFreshnessCheckedAt] =
+    useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [selectedType, setSelectedType] = useState("all");
+  const [selectedDimension, setSelectedDimension] =
+    useState("all");
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function loadData() {
       try {
         setLoading(true);
         setError("");
 
-        const [summaryResponse, resultsResponse] = await Promise.all([
+        const [
+          summaryResponse,
+          resultsResponse,
+          metadataResponse,
+        ] = await Promise.all([
           fetch(`${API}/api/intelligence/summary`),
           fetch(`${API}/api/intelligence/results`),
+          fetch(`${API}/api/intelligence/metadata`),
         ]);
 
         if (!summaryResponse.ok) {
-          throw new Error("Unable to load intelligence summary.");
+          throw new Error(
+            "Unable to load intelligence summary."
+          );
         }
 
         if (!resultsResponse.ok) {
-          throw new Error("Unable to load intelligence results.");
+          throw new Error(
+            "Unable to load intelligence results."
+          );
         }
 
-        const summaryData = await summaryResponse.json();
-        const resultsData = await resultsResponse.json();
+        if (!metadataResponse.ok) {
+          throw new Error(
+            "Unable to load intelligence metadata."
+          );
+        }
+
+        const summaryData: IntelligenceSummary =
+          await summaryResponse.json();
+
+        const resultsData: unknown =
+          await resultsResponse.json();
+
+        const metadataData: IntelligenceMetadata =
+          await metadataResponse.json();
+
+        if (!Array.isArray(resultsData)) {
+          throw new Error(
+            "The intelligence results response has an invalid format."
+          );
+        }
+
+        if (
+          metadataData.data_version !== EXPECTED_DATA_VERSION ||
+          metadataData.method_version !== EXPECTED_METHOD_VERSION
+        ) {
+          throw new Error(
+            "Intelligence metadata version mismatch."
+          );
+        }
 
         if (
           summaryData.data_version !== EXPECTED_DATA_VERSION ||
@@ -80,7 +144,10 @@ export default function DataIntelligencePage() {
           );
         }
 
-        for (const result of resultsData) {
+        const validatedResults =
+          resultsData as IntelligenceResult[];
+
+        for (const result of validatedResults) {
           if (
             result.data_version !== EXPECTED_DATA_VERSION ||
             result.method_version !== EXPECTED_METHOD_VERSION
@@ -91,55 +158,127 @@ export default function DataIntelligencePage() {
           }
         }
 
+        if (cancelled) return;
+
         setSummary(summaryData);
-        setResults(resultsData);
+        setResults(validatedResults);
+        setGeneratedAt(
+          metadataData.generated_at ||
+            summaryData.generation_timestamp ||
+            ""
+        );
+        setFreshnessCheckedAt(Date.now());
       } catch (err) {
+        if (cancelled) return;
+
         setError(
           err instanceof Error
             ? err.message
             : "Unable to load the Data Intelligence page."
         );
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     }
 
     loadData();
-  }, []);
 
-  const resultTypes = useMemo(() => {
-    return [
-      "all",
-      ...Array.from(
-        new Set(results.map((result) => result.result_type))
-      ),
-    ];
-  }, [results]);
+    return () => {
+      cancelled = true;
+    };
+  }, [retryCount]);
 
   const filteredResults = useMemo(() => {
-    if (selectedType === "all") {
+    if (selectedDimension === "all") {
       return results;
     }
 
     return results.filter(
-      (result) => result.result_type === selectedType
+      (result) =>
+        result.result_category === selectedDimension
     );
-  }, [results, selectedType]);
+  }, [results, selectedDimension]);
+
+  const generatedAtDate = generatedAt
+    ? new Date(generatedAt)
+    : null;
+
+  const generatedAtTimestamp =
+    generatedAtDate?.getTime();
+
+  const generatedAtValid =
+    freshnessCheckedAt !== null &&
+    generatedAtTimestamp !== undefined &&
+    Number.isFinite(generatedAtTimestamp) &&
+    generatedAtTimestamp <= freshnessCheckedAt;
+
+  const ageInDays =
+    generatedAtValid &&
+    freshnessCheckedAt !== null &&
+    generatedAtTimestamp !== undefined
+      ? (freshnessCheckedAt - generatedAtTimestamp) /
+        (1000 * 60 * 60 * 24)
+      : null;
+
+  const freshnessStatus =
+    ageInDays === null
+      ? "Unknown"
+      : ageInDays <= STALE_AFTER_DAYS
+        ? "Fresh"
+        : "Stale";
+
+  const freshnessColor =
+    freshnessStatus === "Fresh"
+      ? "text-emerald-300"
+      : freshnessStatus === "Stale"
+        ? "text-amber-300"
+        : "text-slate-400";
+
+  const formattedGeneratedAt = generatedAtValid
+    ? generatedAtDate!.toLocaleString()
+    : "Timestamp unavailable";
 
   const validatedCount = results.filter(
     (result) => result.quality_status === "validated"
   ).length;
 
   const topResults = [...results]
-    .sort((a, b) => a.priority_rank - b.priority_rank)
+    .sort(
+      (a, b) => a.priority_rank - b.priority_rank
+    )
     .slice(0, 3);
+
+  const selectedDimensionLabel =
+    selectedDimension === "all"
+      ? "All dimensions"
+      : selectedDimension === "root_cause_category"
+        ? "Root cause category"
+        : selectedDimension === "machine"
+          ? "Machine"
+          : selectedDimension === "shift"
+            ? "Shift"
+            : selectedDimension;
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-slate-950 px-6 py-10 text-white">
+      <main
+        className="min-h-screen bg-slate-950 px-6 py-10 text-white"
+        aria-busy="true"
+        aria-live="polite"
+      >
         <div className="mx-auto max-w-7xl">
           <div className="rounded-2xl border border-slate-800 bg-slate-900 p-8">
-            <p className="text-sm text-slate-400">
+            <div
+              className="mb-4 h-5 w-64 animate-pulse rounded bg-slate-800"
+              aria-hidden="true"
+            />
+            <div
+              className="h-4 w-96 max-w-full animate-pulse rounded bg-slate-800"
+              aria-hidden="true"
+            />
+            <p className="mt-5 text-sm text-slate-400">
               Loading approved downtime intelligence...
             </p>
           </div>
@@ -152,7 +291,11 @@ export default function DataIntelligencePage() {
     return (
       <main className="min-h-screen bg-slate-950 px-6 py-10 text-white">
         <div className="mx-auto max-w-4xl">
-          <div className="rounded-2xl border border-red-900 bg-red-950/40 p-8">
+          <div
+            className="rounded-2xl border border-red-900 bg-red-950/40 p-8"
+            role="alert"
+            aria-live="assertive"
+          >
             <h1 className="text-2xl font-semibold">
               Data Intelligence unavailable
             </h1>
@@ -161,12 +304,28 @@ export default function DataIntelligencePage() {
               {error}
             </p>
 
-            <Link
-              href="/"
-              className="mt-6 inline-flex rounded-lg border border-slate-700 px-4 py-2 text-sm text-slate-200 hover:bg-slate-800"
-            >
-              Return to Operational Dashboard
-            </Link>
+            <p className="mt-3 text-xs text-slate-400">
+              Diagnostic reference: {DIAGNOSTIC_REFERENCE}
+            </p>
+
+            <div className="mt-6 flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={() =>
+                  setRetryCount((count) => count + 1)
+                }
+                className="rounded-lg bg-cyan-700 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-600"
+              >
+                Retry loading
+              </button>
+
+              <Link
+                href="/"
+                className="inline-flex items-center rounded-lg border border-slate-700 px-4 py-2 text-sm text-slate-200 hover:bg-slate-800"
+              >
+                Return to Operational Dashboard
+              </Link>
+            </div>
           </div>
         </div>
       </main>
@@ -201,15 +360,17 @@ export default function DataIntelligencePage() {
               </p>
             </div>
 
-            <Link
-              href="/"
-              className="inline-flex items-center justify-center rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-medium text-slate-200 hover:bg-slate-700"
-            >
-              Operational Dashboard
-            </Link>
+            <nav aria-label="Main navigation">
+              <Link
+                href="/"
+                className="inline-flex items-center justify-center rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-medium text-slate-200 hover:bg-slate-700"
+              >
+                Operational Dashboard
+              </Link>
+            </nav>
           </div>
 
-          <div className="mt-6 grid gap-3 md:grid-cols-4">
+          <div className="mt-6 grid gap-3 md:grid-cols-3">
             <MetadataCard
               label="Data Version"
               value={summary?.data_version || "-"}
@@ -229,8 +390,37 @@ export default function DataIntelligencePage() {
               label="Approved Track"
               value={summary?.approved_track || "-"}
             />
+
+            <MetadataCard
+              label="Data Freshness"
+              value={freshnessStatus}
+              valueClassName={freshnessColor}
+            />
+
+            <MetadataCard
+              label="Generated At"
+              value={formattedGeneratedAt}
+            />
           </div>
         </section>
+
+        {/* Freshness warning */}
+        {freshnessStatus !== "Fresh" && (
+          <section
+            className="rounded-xl border border-amber-800 bg-amber-950/30 p-4"
+            role="status"
+          >
+            <h2 className="text-sm font-semibold text-amber-200">
+              Data freshness warning
+            </h2>
+
+            <p className="mt-2 text-sm leading-6 text-amber-100/80">
+              {freshnessStatus === "Stale"
+                ? `The approved intelligence output is older than ${STALE_AFTER_DAYS} days. Review its freshness before relying on this comparison.`
+                : "The generation timestamp is missing or invalid. Data freshness could not be verified."}
+            </p>
+          </section>
+        )}
 
         {/* KPI summary */}
         <section className="grid gap-4 md:grid-cols-4">
@@ -246,7 +436,9 @@ export default function DataIntelligencePage() {
 
           <MetricCard
             label="Source Incidents"
-            value={summary?.overall_metrics?.incident_count ?? "—"}
+            value={
+              summary?.overall_metrics?.incident_count ?? "—"
+            }
           />
 
           <MetricCard
@@ -293,7 +485,7 @@ export default function DataIntelligencePage() {
                 </p>
 
                 <div className="mt-4 rounded-lg bg-slate-900 p-3">
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-300">
                     {result.metric_name}
                   </p>
 
@@ -321,25 +513,26 @@ export default function DataIntelligencePage() {
 
             <div>
               <label
-                htmlFor="result-type"
-                className="mb-2 block text-xs font-medium uppercase tracking-wide text-slate-500"
+                htmlFor="result-dimension"
+                className="mb-2 block text-xs font-medium uppercase tracking-wide text-slate-300"
               >
                 Compare by
               </label>
 
               <select
-                id="result-type"
-                value={selectedType}
+                id="result-dimension"
+                value={selectedDimension}
                 onChange={(event) =>
-                  setSelectedType(event.target.value)
+                  setSelectedDimension(event.target.value)
                 }
                 className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white outline-none"
               >
-                {resultTypes.map((type) => (
-                  <option key={type} value={type}>
-                    {type === "all" ? "All result types" : type}
-                  </option>
-                ))}
+                <option value="all">All dimensions</option>
+                <option value="root_cause_category">
+                  Root cause category
+                </option>
+                <option value="machine">Machine</option>
+                <option value="shift">Shift</option>
               </select>
             </div>
           </div>
@@ -347,7 +540,7 @@ export default function DataIntelligencePage() {
           <div className="mt-6 overflow-x-auto">
             <table className="w-full min-w-[900px] border-collapse text-left">
               <thead>
-                <tr className="border-b border-slate-800 text-xs uppercase tracking-wide text-slate-500">
+                <tr className="border-b border-slate-800 text-xs uppercase tracking-wide text-slate-300">
                   <th className="px-4 py-3">Rank</th>
                   <th className="px-4 py-3">Type</th>
                   <th className="px-4 py-3">Group</th>
@@ -408,9 +601,23 @@ export default function DataIntelligencePage() {
                   <tr>
                     <td
                       colSpan={7}
-                      className="px-4 py-10 text-center text-sm text-slate-500"
+                      className="px-4 py-10 text-center text-sm text-slate-300"
                     >
-                      No intelligence results match this selection.
+                      <p>
+                        No intelligence results match this selection.
+                      </p>
+
+                      <p className="mt-2 text-xs text-slate-400">
+                        Active filter: {selectedDimensionLabel}
+                      </p>
+
+                      <button
+                        type="button"
+                        onClick={() => setSelectedDimension("all")}
+                        className="mt-4 rounded-lg border border-slate-700 px-4 py-2 text-sm text-cyan-300 hover:bg-slate-800"
+                      >
+                        Clear filters
+                      </button>
                     </td>
                   </tr>
                 )}
@@ -418,6 +625,12 @@ export default function DataIntelligencePage() {
             </table>
           </div>
         </section>
+
+        {/* Approved Track A comparative analysis */}
+        <TrackAComparison
+          results={filteredResults}
+          selectedDimension={selectedDimension}
+        />
 
         {/* Supporting evidence */}
         <section>
@@ -439,7 +652,7 @@ export default function DataIntelligencePage() {
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <p className="text-xs uppercase tracking-wide text-slate-500">
+                    <p className="text-xs uppercase tracking-wide text-slate-300">
                       {result.result_type}
                     </p>
 
@@ -453,7 +666,7 @@ export default function DataIntelligencePage() {
                   </span>
                 </div>
 
-                                <div className="mt-4 space-y-2">
+                <div className="mt-4 space-y-2">
                   {result.evidence.map((item, index) => (
                     <div
                       key={`${item.factor}-${index}`}
@@ -462,9 +675,11 @@ export default function DataIntelligencePage() {
                       <span className="text-slate-400">
                         {item.factor.replace(/_/g, " ")}
                       </span>
+
                       <span className="font-medium text-slate-200">
                         {item.value}
                       </span>
+
                       {item.contribution !== null && (
                         <span className="text-cyan-300">
                           Contribution: {item.contribution}
@@ -475,7 +690,7 @@ export default function DataIntelligencePage() {
                 </div>
 
                 <div className="mt-4 rounded-lg border border-slate-800 bg-slate-950 p-4">
-                  <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                  <p className="text-xs font-medium uppercase tracking-wide text-slate-300">
                     Limitation
                   </p>
 
@@ -541,7 +756,7 @@ export default function DataIntelligencePage() {
         </section>
 
         {/* Footer */}
-        <footer className="border-t border-slate-800 pt-5 text-xs text-slate-500">
+        <footer className="border-t border-slate-800 pt-5 text-xs text-slate-300">
           <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
             <span>
               Downtime Root Cause Explorer | Data Intelligence
@@ -561,17 +776,19 @@ export default function DataIntelligencePage() {
 function MetadataCard({
   label,
   value,
+  valueClassName = "text-slate-200",
 }: {
   label: string;
   value: string;
+  valueClassName?: string;
 }) {
   return (
     <div className="rounded-xl border border-slate-800 bg-slate-950 p-4">
-      <p className="text-xs uppercase tracking-wide text-slate-500">
+      <p className="text-xs uppercase tracking-wide text-slate-300">
         {label}
       </p>
 
-      <p className="mt-2 text-sm font-semibold text-slate-200">
+      <p className={`mt-2 text-sm font-semibold ${valueClassName}`}>
         {value}
       </p>
     </div>
@@ -587,7 +804,7 @@ function MetricCard({
 }) {
   return (
     <div className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
-      <p className="text-xs uppercase tracking-wide text-slate-500">
+      <p className="text-xs uppercase tracking-wide text-slate-300">
         {label}
       </p>
 
@@ -607,7 +824,9 @@ function MethodCard({
 }) {
   return (
     <div className="rounded-xl border border-slate-800 bg-slate-950 p-4">
-      <h3 className="font-semibold text-slate-200">{title}</h3>
+      <h3 className="font-semibold text-slate-200">
+        {title}
+      </h3>
 
       <p className="mt-2 text-sm leading-6 text-slate-400">
         {text}
@@ -615,6 +834,3 @@ function MethodCard({
     </div>
   );
 }
-
-
-
