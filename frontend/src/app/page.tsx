@@ -1,6 +1,7 @@
-
+﻿
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 import ParetoChart from "./components/ParetoChart";
@@ -311,14 +312,23 @@ export default function Home() {
             </p>
           </div>
 
-          <button
-            type="button"
-            onClick={() => setShowMetadata(true)}
-            aria-label="Open project information"
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-600 text-lg font-semibold text-cyan-300 transition hover:border-cyan-400 hover:bg-cyan-400/10"
-          >
-            i
-          </button>
+          <div className="flex shrink-0 items-center gap-3">
+  <Link
+    href="/data-intelligence"
+    className="rounded-lg border border-cyan-500/40 bg-cyan-500/10 px-4 py-2 text-sm font-semibold text-cyan-300 transition hover:bg-cyan-500/20"
+  >
+    Data Intelligence
+  </Link>
+
+  <button
+    type="button"
+    onClick={() => setShowMetadata(true)}
+    aria-label="Open project information"
+    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-600 text-lg font-semibold text-cyan-300 transition hover:border-cyan-400 hover:bg-cyan-400/10"
+  >
+    i
+  </button>
+</div>
         </header>
 
         {/* Project Information Modal */}
@@ -791,3 +801,6 @@ export default function Home() {
     </main>
   );
 }
+
+
+

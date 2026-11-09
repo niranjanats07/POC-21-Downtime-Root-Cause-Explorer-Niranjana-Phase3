@@ -1,4 +1,3 @@
-
 import os
 from io import StringIO
 
@@ -14,6 +13,7 @@ from app.analytics.downtime import (
     calculate_machine_shift_heatmap,
 )
 from app.data.loader import load_downtime_data
+from app.intelligence.service import load_intelligence
 
 
 app = FastAPI(
@@ -220,3 +220,37 @@ def get_incident(incident_id: str):
         )
 
     return incident.iloc[0].to_dict()
+
+
+# -------------------------------------------------------------------
+# Data Intelligence API
+# -------------------------------------------------------------------
+
+@app.get("/api/intelligence/summary")
+def intelligence_summary():
+    package = load_intelligence()
+    return package["summary"]
+
+
+@app.get("/api/intelligence/results")
+def intelligence_results():
+    package = load_intelligence()
+    return package["results"]
+
+
+@app.get("/api/intelligence/metadata")
+def intelligence_metadata():
+    package = load_intelligence()
+    return package["metadata"]
+
+
+@app.get("/api/intelligence/health")
+def intelligence_health():
+    package = load_intelligence()
+
+    return {
+        "status": "healthy",
+        "data_version": package["metadata"]["data_version"],
+        "method_version": package["metadata"]["method_version"],
+        "quality_status": package["metadata"]["quality_status"],
+    }
