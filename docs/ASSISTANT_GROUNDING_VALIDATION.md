@@ -92,3 +92,23 @@ The executed checks passed, but complete numerator/denominator measurements were
 - Maintainer review and Post #5 approval remain pending.
 
 **Current assessment:** Critical executed grounding and safety checks passed. The document does not claim unmeasured 100% metrics or maintainer approval.
+
+## Live Phase 3 verification update — 2026-11-14
+
+This update supplements the earlier local-only verification record.
+
+### Live assistant checks
+- Phase 3 backend health endpoint: PASS — returned healthy status, data_version 1.1.0, method_version 1.0.0 and quality_status PASS.
+- Live overall-summary query: PASS — returned 30 incidents and 2,795 observed downtime minutes with evidence references.
+- Live highest-downtime-machine query: PASS — identified MCH-02 with 850 observed downtime minutes and rank 1.
+- Evidence references RES-0005 through RES-0008 were returned for the machine-ranking query.
+- Response metadata and synthetic-data limitations were present in the observed responses.
+
+### Automated browser evidence
+- Post #5 assistant Selenium suite: 5 passed, 0 failed.
+- Evidence record: `docs/POST5_ASSISTANT_SELENIUM_EVIDENCE.md`.
+
+### Updated verification boundary
+These live checks supplement the earlier local test evidence. They do not establish exhaustive accuracy percentages, production certification or maintainer approval.
+
+Post #5 maintainer approval remains PENDING.

@@ -143,3 +143,28 @@ Reviewer comments: PENDING
 ---
 
 **Submission integrity note:** This package records local implementation and verification evidence separately from live deployment and maintainer approval. No unverified deployment, production-readiness or approval claim is made.
+
+## 12. Deployment and verification status update — 2026-11-14
+
+This section supersedes the earlier deployment-status statement in Section 9, which recorded that live Post #5 verification had not yet been completed.
+
+### Current Phase 3 deployment
+- Frontend: https://downtime-frontend-phase3.onrender.com
+- Data Intelligence page: https://downtime-frontend-phase3.onrender.com/data-intelligence
+- Backend: https://downtime-backend-phase3.onrender.com
+- Assistant API: `/api/assistant/query`
+
+### Verification evidence
+- Backend health and approved version metadata: PASS.
+- Live overall-summary query: PASS.
+- Live MCH-02 highest-downtime query: PASS — 850 observed downtime minutes.
+- Live evidence references and synthetic-data limitations: observed.
+- Assistant Selenium suite: 5 passed, 0 failed.
+- Selenium evidence: `docs/POST5_ASSISTANT_SELENIUM_EVIDENCE.md`.
+
+### Current submission status
+Implementation, deployment checks and recorded verification evidence are complete for submission to maintainer review.
+
+Post #5 maintainer approval: PENDING.
+
+The final outcome must be selected by the maintainer after review. No official approval or production certification is claimed.

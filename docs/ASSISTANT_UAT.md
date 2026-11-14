@@ -97,3 +97,32 @@ The following checks were completed after the earlier browser regression record.
 ### Updated UAT interpretation
 
 The earlier pending list is superseded by the additional manual checks above where explicitly marked PASS. These checks do not establish live deployment, production readiness, or maintainer approval.
+
+## Live Phase 3 assistant UAT update — 2026-11-14
+
+The following additional checks were performed against the deployed Phase 3 application.
+
+| Test | Observed result | Status |
+|---|---|---|
+| Backend intelligence health | Healthy; data 1.1.0, method 1.0.0, quality PASS | PASS |
+| Live assistant overall summary | 30 incidents and 2,795 observed downtime minutes returned with evidence | PASS |
+| Live highest-downtime machine | MCH-02 identified with 850 observed downtime minutes | PASS |
+| Assistant evidence | Evidence references returned with the machine-ranking response | PASS |
+| Assistant metadata | Approved data and method versions and quality metadata observed | PASS |
+| Synthetic-data limitation | Descriptive-only limitation displayed | PASS |
+
+### Automated assistant browser tests
+
+- Test file: `tests/test_assistant_selenium.py`
+- Command: `py -m pytest ".\tests\test_assistant_selenium.py" -v`
+- Result: 5 passed, 0 failed.
+- Coverage: assistant loading, overall summary, MCH-02 ranking, evidence and metadata, unsupported-question handling.
+- Detailed record: `docs/POST5_ASSISTANT_SELENIUM_EVIDENCE.md`.
+
+### Updated UAT interpretation
+
+This update supplements the earlier local manual UAT record and supersedes the earlier statement that live Render assistant verification remained unverified.
+
+These checks do not establish exhaustive interaction coverage, production certification or maintainer approval.
+
+Post #5 maintainer approval remains PENDING.

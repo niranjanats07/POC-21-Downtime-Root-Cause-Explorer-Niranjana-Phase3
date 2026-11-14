@@ -361,3 +361,30 @@ These results supersede the earlier 30-test backend result recorded in Section 1
 
 ### Verification limitation
 These checks were performed locally and are based on user-reported results and supplied browser output. Live Render verification remains outstanding.
+
+## 14. Live Phase 3 deployment and assistant verification - 2026-11-14
+
+### Deployed Phase 3 services
+- Frontend: https://downtime-frontend-phase3.onrender.com
+- Data Intelligence page: https://downtime-frontend-phase3.onrender.com/data-intelligence
+- Backend: https://downtime-backend-phase3.onrender.com
+- Assistant endpoint: `/api/assistant/query`
+
+### Live verification
+- Backend intelligence health endpoint: PASS.
+- Health response confirmed data version 1.1.0, method version 1.0.0 and quality status PASS.
+- Live overall-summary assistant query: PASS - 30 incidents and 2,795 observed downtime minutes returned with evidence.
+- Live machine-ranking assistant query: PASS - MCH-02 identified with 850 observed downtime minutes and rank 1.
+- Evidence references and approved version metadata were observed in the response.
+- Synthetic-data and descriptive-only limitations were displayed.
+
+### Automated Selenium verification
+- Test file: `tests/test_assistant_selenium.py`
+- Command: `py -m pytest ".\tests\test_assistant_selenium.py" -v`
+- Result: 5 passed, 0 failed.
+- Detailed evidence: `docs/POST5_ASSISTANT_SELENIUM_EVIDENCE.md`.
+
+### Status boundary
+This section supersedes earlier statements that live Render assistant verification was outstanding. It records the live checks performed on 2026-11-14. It does not claim production certification or maintainer approval.
+
+Post #5 maintainer approval remains PENDING.
