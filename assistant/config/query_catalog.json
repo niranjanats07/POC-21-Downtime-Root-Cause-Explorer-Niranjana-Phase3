@@ -1,0 +1,24 @@
+﻿
+{
+  "mode": "A",
+  "source": "validated_intelligence_service",
+  "allowed_result_type": "comparative_group_ranking",
+  "allowed_metric": "total_downtime_minutes",
+  "handlers": {
+    "get_summary": "summary",
+    "list_priority_items": "priority_items",
+    "explain_result": "result_by_id",
+    "compare_groups": "ranked_groups",
+    "describe_segment": "ranked_groups",
+    "explain_method": "methodology",
+    "explain_limitation": "limitations",
+    "get_data_freshness": "metadata"
+  },
+  "dimensions": {
+    "root_cause_category": "root_cause_category",
+    "machine": "machine",
+    "shift": "shift"
+  },
+  "no_arbitrary_query_execution": true,
+  "no_canonical_csv_access": true
+}

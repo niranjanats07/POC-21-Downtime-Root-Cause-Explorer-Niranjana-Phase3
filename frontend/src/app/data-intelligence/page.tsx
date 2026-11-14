@@ -4,6 +4,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import TrackAComparison from "./TrackAComparison";
+import AssistantPanel from "../components/data-assistant/AssistantPanel";
 
 const API =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -726,6 +727,9 @@ export default function DataIntelligencePage() {
             />
           </div>
         </section>
+
+        {/* Grounded Data Assistant - Phase 3 Post #5 */}
+        <AssistantPanel />
 
         {/* Limitations */}
         <section className="rounded-2xl border border-amber-900/60 bg-amber-950/20 p-6">

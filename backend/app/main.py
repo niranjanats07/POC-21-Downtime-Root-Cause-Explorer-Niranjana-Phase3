@@ -3,6 +3,7 @@ from io import StringIO
 
 import pandas as pd
 from fastapi import FastAPI, HTTPException, Query
+from pydantic import BaseModel, Field
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 
@@ -14,6 +15,7 @@ from app.analytics.downtime import (
 )
 from app.data.loader import load_downtime_data
 from app.intelligence.service import load_intelligence
+from app.assistant.service import answer_question
 
 
 app = FastAPI(
@@ -276,3 +278,35 @@ def intelligence_health():
         "method_version": package["metadata"]["method_version"],
         "quality_status": package["metadata"]["quality_status"],
     }
+
+# -------------------------------------------------------------------
+# Grounded Data Assistant API - Phase 3 Post #5
+# -------------------------------------------------------------------
+
+class AssistantQuestionRequest(BaseModel):
+    question: str = Field(..., min_length=1, max_length=500)
+
+
+@app.post("/api/assistant/query")
+def assistant_query(request: AssistantQuestionRequest):
+    question = request.question.strip()
+
+    if not question:
+        raise HTTPException(
+            status_code=422,
+            detail="Question must not be empty.",
+        )
+
+    if len(question) > 500:
+        raise HTTPException(
+            status_code=422,
+            detail="Question must not exceed 500 characters.",
+        )
+
+    try:
+        return answer_question(question)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail="The assistant could not complete this request.",
+        ) from exc

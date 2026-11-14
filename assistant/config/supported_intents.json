@@ -1,0 +1,30 @@
+﻿
+{
+  "mode": "A",
+  "assistant_name": "Downtime Root Cause Explorer - Guided Assistant",
+  "supported_intents": [
+    "get_summary",
+    "list_priority_items",
+    "explain_result",
+    "compare_groups",
+    "describe_segment",
+    "explain_method",
+    "explain_limitation",
+    "get_data_freshness"
+  ],
+  "supported_dimensions": [
+    "root_cause_category",
+    "machine",
+    "shift"
+  ],
+  "unsupported_capabilities": [
+    "prediction",
+    "forecasting",
+    "causal_explanation",
+    "statistical_significance",
+    "period_trends",
+    "arbitrary_incident_search",
+    "arbitrary_sql",
+    "external_data_lookup"
+  ]
+}
