@@ -1,5 +1,7 @@
 ﻿import re
+
 from app.assistant.core.policy import get_policy, get_supported_intents
+
 
 UNSAFE_PATTERNS = [
     r"\b(system prompt|hidden prompt|developer instructions)\b",
@@ -12,6 +14,11 @@ UNSAFE_PATTERNS = [
     r"\b(source|source data|source description|record|document|evidence|dataset)\b.{0,120}\b(instructs?|instructions|commands|tells you|says to|asks you to)\b",
     r"\b(export|download|dump|show|list|return)\b.{0,100}\b(all|every|complete|entire)\b.{0,80}\b(canonical|raw|source)?\s*(data|records|rows|incidents)\b",
     r"\b(arbitrary sql|execute code|run python|shell command)\b",
+]
+
+MANIPULATION_PATTERNS = [
+    r"\b(change|alter|modify|manipulate|adjust|rewrite|replace)\b.{0,100}\b(approved\s+)?(ranking|rank|score|downtime value|result value)\b",
+    r"\b(make|force|move|put|set)\b.{0,60}\b(?:it\s+)?(?:rank|ranking|place|position)\b",
 ]
 
 UNSUPPORTED_PATTERNS = [
@@ -36,6 +43,13 @@ def check_scope(question):
     for pattern in UNSAFE_PATTERNS:
         if re.search(pattern, question, re.IGNORECASE):
             return "unsafe", "This request is outside the assistant's permitted security scope."
+
+    for pattern in MANIPULATION_PATTERNS:
+        if re.search(pattern, question, re.IGNORECASE):
+            return "unsupported", (
+                "Requests to alter approved results, scores or rankings are not supported."
+            )
+
     for pattern in UNSUPPORTED_PATTERNS:
         if re.search(pattern, question, re.IGNORECASE):
             return "unsupported", "This capability is not supported by the approved Track A results."

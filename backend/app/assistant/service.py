@@ -1,5 +1,4 @@
-﻿
-import uuid
+﻿import uuid
 
 from app.assistant.core.policy import get_policy, get_supported_intents
 from app.assistant.core.scope_guard import check_scope
@@ -9,23 +8,43 @@ from app.assistant.core.query_router import route_query
 from app.assistant.core.evidence_builder import build_evidence
 from app.assistant.core.response_composer import compose_answer
 from app.assistant.core.output_validator import validate_response
+from app.assistant.core.gemini_explainer import generate_explanation
 from app.intelligence.service import load_intelligence
 
 
-def _response(status, question, answer=None, intent=None, evidence=None,
-              key_values=None, metadata=None, limitation=None, follow_ups=None):
+def _response(
+    status,
+    question,
+    answer=None,
+    intent=None,
+    evidence=None,
+    key_values=None,
+    metadata=None,
+    limitation=None,
+    follow_ups=None,
+    gemini_explanation=None,
+    gemini_status="not_attempted",
+):
     policy = get_policy()
+
     response = {
         "answer_id": str(uuid.uuid4()),
         "status": status,
         "intent": intent,
         "answer": answer,
-        "evidence_references": (evidence or [])[:policy["evidence_max_references"]],
+        "evidence_references": (evidence or [])[
+            :policy["evidence_max_references"]
+        ],
         "key_values": key_values or {},
         "metadata": metadata or {},
         "limitation": limitation,
-        "suggested_follow_ups": (follow_ups or [])[:policy["follow_up_max_items"]],
+        "suggested_follow_ups": (follow_ups or [])[
+            :policy["follow_up_max_items"]
+        ],
+        "gemini_explanation": gemini_explanation,
+        "gemini_status": gemini_status,
     }
+
     return validate_response(response)
 
 
@@ -37,6 +56,7 @@ def _comparison_values(results):
             item.get("result_id", ""),
         ),
     )
+
     return {
         "result_count": len(ordered),
         "groups": [
@@ -75,7 +95,11 @@ def answer_question(question):
             ),
         )
 
-    parameters, parameter_error = validate_parameters(question, classification)
+    parameters, parameter_error = validate_parameters(
+        question,
+        classification,
+    )
+
     if parameter_error:
         return _response(
             "unsupported",
@@ -90,11 +114,15 @@ def answer_question(question):
         return _response(
             "unavailable",
             question,
-            answer="Approved intelligence results are unavailable or failed contract validation.",
+            answer=(
+                "Approved intelligence results are unavailable "
+                "or failed contract validation."
+            ),
             intent=intent,
         )
 
     metadata = package["metadata"]
+
     if (
         metadata.get("data_version") != policy["allowed_data_version"]
         or metadata.get("method_version") != policy["allowed_method_version"]
@@ -104,12 +132,16 @@ def answer_question(question):
         return _response(
             "unavailable",
             question,
-            answer="The approved data or method version does not match the assistant policy.",
+            answer=(
+                "The approved data or method version does not "
+                "match the assistant policy."
+            ),
             intent=intent,
             metadata=metadata,
         )
 
     payload = route_query(package, intent, parameters or {})
+
     if payload is None or (
         intent == "explain_result" and payload.get("result") is None
     ):
@@ -126,8 +158,8 @@ def answer_question(question):
         maximum=policy["evidence_max_references"],
         excerpt_limit=policy["evidence_excerpt_max_characters"],
     )
-    answer = compose_answer(intent, payload)
 
+    answer = compose_answer(intent, payload)
     key_values = {}
 
     if intent == "get_summary":
@@ -143,14 +175,20 @@ def answer_question(question):
             "priority_rank": result["priority_rank"],
         }
 
-    elif intent in ("compare_groups", "describe_segment", "list_priority_items"):
+    elif intent in (
+        "compare_groups",
+        "describe_segment",
+        "list_priority_items",
+    ):
         key_values = _comparison_values(payload.get("results", []))
 
     elif intent == "get_data_freshness":
         key_values = dict(payload.get("metadata", {}))
 
     elif intent == "explain_limitation":
-        key_values = {"limitations": payload.get("limitations", [])}
+        key_values = {
+            "limitations": payload.get("limitations", [])
+        }
 
     limitation = (
         "All source incidents are synthetic. These results are descriptive "
@@ -158,6 +196,16 @@ def answer_question(question):
         "or actual industrial performance."
     )
 
+    gemini_explanation, gemini_status = generate_explanation(
+        question=question,
+        deterministic_answer=answer,
+        key_values=key_values,
+        evidence_references=evidence,
+        limitation=limitation,
+    )
+
+    # Gemini is an optional explanation layer.
+    # Never replace the approved deterministic answer or evidence.
     return _response(
         "answered",
         question,
@@ -167,6 +215,8 @@ def answer_question(question):
         key_values=key_values,
         metadata=metadata,
         limitation=limitation,
+        gemini_explanation=gemini_explanation,
+        gemini_status=gemini_status,
         follow_ups=[
             "Compare machines by observed downtime.",
             "Which shift ranks highest by observed downtime?",

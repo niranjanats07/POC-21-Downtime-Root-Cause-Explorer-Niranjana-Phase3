@@ -25,10 +25,7 @@ def route_query(package, intent, parameters):
     evidence_results = _evidence_results(package)
 
     if intent == "get_summary":
-        return {
-            "summary": summary,
-            "evidence_results": evidence_results,
-        }
+        return {"summary": summary, "evidence_results": evidence_results}
 
     if intent == "list_priority_items":
         dimension = parameters.get("dimension")
@@ -43,10 +40,17 @@ def route_query(package, intent, parameters):
         dimension = parameters.get("dimension")
         if dimension not in DIMENSIONS:
             return None
-        return {
-            "dimension": dimension,
-            "results": get_results_for_dimension(package, dimension),
-        }
+
+        results = get_results_for_dimension(package, dimension)
+        group_key = parameters.get("group_key")
+
+        if group_key:
+            results = [
+                item for item in results
+                if item.get("group_key", "").casefold() == group_key.casefold()
+            ]
+
+        return {"dimension": dimension, "results": results}
 
     if intent == "explain_result":
         result = get_result_by_id(package, parameters["result_id"])

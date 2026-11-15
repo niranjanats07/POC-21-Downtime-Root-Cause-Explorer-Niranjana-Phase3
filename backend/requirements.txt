@@ -5,3 +5,4 @@ duckdb
 pydantic
 pytest
 httpx
+google-genai>=2.3.0,<3.0.0

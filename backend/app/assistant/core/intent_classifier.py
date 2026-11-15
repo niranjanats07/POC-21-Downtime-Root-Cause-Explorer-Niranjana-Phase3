@@ -1,15 +1,29 @@
-﻿
-import re
+﻿import re
+
+
+MACHINE_ID_PATTERN = re.compile(r"\bMCH-\d{2}\b", re.IGNORECASE)
+RESULT_ID_PATTERN = re.compile(r"\bRES-\d{4}\b", re.IGNORECASE)
 
 
 def classify_intent(question):
     text = question.casefold()
 
-    result_ids = re.findall(r"\bRES-\d{4}\b", question.upper())
+    result_ids = RESULT_ID_PATTERN.findall(question)
     if result_ids and any(
         word in text for word in ("explain", "evidence", "detail", "result")
     ):
-        return {"intent": "explain_result", "result_id": result_ids[0]}
+        return {
+            "intent": "explain_result",
+            "result_id": result_ids[0].upper(),
+        }
+
+    machine_ids = MACHINE_ID_PATTERN.findall(question)
+    if machine_ids:
+        return {
+            "intent": "describe_segment",
+            "dimension": "machine",
+            "group_key": machine_ids[0].upper(),
+        }
 
     if any(word in text for word in ("limitation", "limitations", "synthetic", "caveat")):
         return {"intent": "explain_limitation"}

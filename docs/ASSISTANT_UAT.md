@@ -1,4 +1,4 @@
-﻿# Assistant User Acceptance Testing — Post #5
+# Assistant User Acceptance Testing — Post #5
 
 ## Functional cases
 - Ask which category ranks highest.
@@ -126,3 +126,48 @@ This update supplements the earlier local manual UAT record and supersedes the e
 These checks do not establish exhaustive interaction coverage, production certification or maintainer approval.
 
 Post #5 maintainer approval remains PENDING.
+
+## Mode B Gemini Integration UAT — 2026-11-15
+
+### Successful live Gemini execution
+
+| Test | Observed result | Status |
+|---|---|---|
+| Real Gemini API execution | Gemini returned a generated explanation | PASS |
+| Direct MCH-02 question | MCH-02 identified as rank 1 with 850 observed downtime minutes | PASS |
+| Deterministic answer preservation | Original answer retained alongside Gemini explanation | PASS |
+| Evidence grounding | Evidence reference RES-0005 retained | PASS |
+| Analytical limitations | Synthetic-data and descriptive-only limitations retained | PASS |
+| Frontend display | Deterministic answer, Gemini explanation and evidence displayed together | PASS |
+
+### Live fallback verification
+
+| Test | Configuration | Observed result | Status |
+|---|---|---|---|
+| Missing API key | Temporary backend on port 8001, no Gemini key | `fallback_missing_key`; deterministic answer and RES-0005 preserved | PASS |
+| Gemini API error | Temporary backend on port 8002, deliberately invalid placeholder key | `fallback_error`; deterministic answer and RES-0005 preserved | PASS |
+
+Detailed live evidence: `docs/POST5_GEMINI_LIVE_VERIFICATION.md`.
+
+### Automated and frontend regression
+
+- Targeted assistant and Gemini tests: 29 passed, 0 failed.
+- Gemini-specific tests: 9 passed, 0 failed (including simulated HTTP 429 quota fallback).
+- Full backend regression: 44 passed, 0 failed (15 November 2026).
+- TypeScript check (`npx tsc --noEmit`): PASS.
+- Next.js production build (`npm run build`): PASS.
+- Existing deployed Selenium evidence: 5 passed, 0 failed.
+- Selenium evidence: `docs/POST5_ASSISTANT_SELENIUM_EVIDENCE.md`.
+
+### Remaining limitations and review status
+
+- Actual quota-exhaustion behavior has not been demonstrated.
+- The invalid-key test demonstrates an API-error fallback, not quota exhaustion.
+- No claim is made that every possible Gemini API failure has been tested.
+- Final maintainer review and Post #5 approval remain PENDING.
+
+### Mode B UAT outcome
+
+The successful live Gemini execution and the tested missing-key and API-error fallback scenarios passed. Deterministic answers and evidence remained available when Gemini could not provide an explanation.
+
+This evidence supports technical progression to maintainer review. It does not constitute final Post #5 approval.
