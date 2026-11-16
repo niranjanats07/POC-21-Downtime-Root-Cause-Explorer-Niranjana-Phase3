@@ -1,8 +1,11 @@
-﻿import io
+﻿
+import io
 import json
 import sys
 from pathlib import Path
 import urllib.error
+
+import pytest
 
 BACKEND_DIR = Path(__file__).resolve().parents[1]
 if str(BACKEND_DIR) not in sys.path:
@@ -29,7 +32,28 @@ APPROVED_CONTEXT = {
                 "rank": 1,
                 "downtime": 850,
                 "unit": "minutes",
-            }
+            },
+            {
+                "result_id": "RES-0006",
+                "group": "MCH-04",
+                "rank": 2,
+                "downtime": 700,
+                "unit": "minutes",
+            },
+            {
+                "result_id": "RES-0007",
+                "group": "MCH-01",
+                "rank": 3,
+                "downtime": 635,
+                "unit": "minutes",
+            },
+            {
+                "result_id": "RES-0008",
+                "group": "MCH-03",
+                "rank": 4,
+                "downtime": 610,
+                "unit": "minutes",
+            },
         ]
     },
     "evidence_references": [{"result_id": "RES-0005"}],
@@ -193,8 +217,60 @@ def test_invalid_numeric_claim_is_rejected():
     ) is False
 
 
-def test_contradictory_ranking_is_rejected():
+def test_contradictory_mch02_ranking_is_rejected():
     explanation = "MCH-02 ranks second in the approved comparison."
+
+    assert validate_explanation(
+        explanation, APPROVED_CONTEXT
+    ) is False
+
+
+@pytest.mark.parametrize(
+    ("group", "incorrect_rank"),
+    [
+        ("MCH-01", "first"),
+        ("MCH-02", "second"),
+        ("MCH-03", "third"),
+        ("MCH-04", "first"),
+    ],
+)
+def test_incorrect_ranking_for_every_machine_is_rejected(
+    group,
+    incorrect_rank,
+):
+    explanation = (
+        f"{group} ranks {incorrect_rank} in the approved comparison."
+    )
+
+    assert validate_explanation(
+        explanation, APPROVED_CONTEXT
+    ) is False
+
+
+@pytest.mark.parametrize(
+    ("group", "correct_rank"),
+    [
+        ("MCH-02", "first"),
+        ("MCH-04", "second"),
+        ("MCH-01", "third"),
+        ("MCH-03", "fourth"),
+    ],
+)
+def test_correct_ranking_for_every_machine_is_accepted(
+    group,
+    correct_rank,
+):
+    explanation = (
+        f"{group} ranks {correct_rank} in the approved comparison."
+    )
+
+    assert validate_explanation(
+        explanation, APPROVED_CONTEXT
+    ) is True
+
+
+def test_reverse_ranking_claim_is_checked():
+    explanation = "MCH-01 is the first-ranked machine."
 
     assert validate_explanation(
         explanation, APPROVED_CONTEXT

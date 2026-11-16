@@ -112,3 +112,40 @@ This update supplements the earlier local-only verification record.
 These live checks supplement the earlier local test evidence. They do not establish exhaustive accuracy percentages, production certification or maintainer approval.
 
 Post #5 maintainer approval remains PENDING.
+
+## Final grounding-validator update - 2026-11-16
+
+### Generic machine-ranking validation
+
+The Gemini grounding validator now extracts approved ranking context from both:
+- Multi-group comparison responses containing a groups list.
+- Single-machine responses containing group and priority_rank.
+
+Explicit ranking claims are checked against the approved rank for each supported machine.
+
+### Test evidence
+
+Command:
+
+`py -m pytest .\backend\tests\test_gemini_explainer.py -v`
+
+Result: **18 passed, 0 failed**.
+
+The tests verified:
+- Incorrect ranking claims rejected for MCH-01, MCH-02, MCH-03 and MCH-04.
+- Correct rankings accepted for all four machines.
+- Reverse ranking claims checked.
+- Unsupported causal claims rejected.
+- Unsupported numeric claims rejected.
+- Safe fallback behavior and deterministic-response preservation.
+
+Full backend regression:
+
+`py -m pytest .\backend\tests -v`
+
+Result: **53 passed, 0 failed**. One non-blocking Starlette test-client deprecation warning was reported.
+
+### Assessment boundary
+
+The executed ranking and regression tests passed. No exhaustive accuracy percentage is claimed. Deployment verification and final handover evidence remain separate release tasks.
+

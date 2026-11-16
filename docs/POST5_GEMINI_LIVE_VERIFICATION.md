@@ -184,3 +184,37 @@ The tests verified deterministic assistant behavior, approved ranking preservati
 - Gemini explanation: `null`
 
 **Result: PASS — Live API-error fallback preserved the deterministic answer and evidence.**
+
+## Final grounding-validator and regression update - 2026-11-16
+
+### Ranking validator correction
+
+The Gemini explanation validator was improved to compare explicit machine-ranking claims against the approved deterministic ranking context for all supported machines. It supports both multi-group comparison context and single-machine context.
+
+### Focused Gemini test results
+
+- Command: `py -m pytest .\backend\tests\test_gemini_explainer.py -v`
+- Result: **18 passed, 0 failed**
+- Coverage included incorrect ranking rejection for MCH-01, MCH-02, MCH-03 and MCH-04; acceptance of correct rankings; reverse ranking claims; unsupported causal claims; numeric validation; missing-key, API-error and quota fallbacks; and deterministic-response preservation.
+
+### Full backend regression
+
+- Command: `py -m pytest .\backend\tests -v`
+- Result: **53 passed, 0 failed**
+- Duration: 2.58 seconds
+- Warning: One Starlette test-client deprecation warning. No test failures.
+
+### Model and timeout configuration
+
+- Source default model: `gemini-3.8-flash`
+- Runtime model used in the previously successful live Gemini execution: `gemini-3.5-flash-lite`
+- Configurable environment variable: `GEMINI_MODEL`
+- Request timeout: 45 seconds
+- API key remains backend environment-only and is not recorded here.
+
+The deployment must explicitly use the previously verified runtime model if the same tested model behavior is required. The source default and deployed runtime model must not be treated as identical.
+
+### Verification boundary
+
+These results verify the local grounding-validator correction and backend regression suite. They do not by themselves establish a new live Gemini API execution, deployed application verification, refreshed Repomix, or final handover completion.
+

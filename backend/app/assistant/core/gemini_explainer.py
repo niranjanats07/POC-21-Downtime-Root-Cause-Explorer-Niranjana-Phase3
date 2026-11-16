@@ -32,28 +32,178 @@ UNSUPPORTED_CLAIM_PATTERNS = [
     r"\bresponsible for\b",
 ]
 
-CONTRADICTION_PATTERNS = [
-    r"\bMCH-02\b.{0,50}\b(?:is not|isn't|does not rank)\b.{0,20}\b(?:first|highest)\b",
-    r"\bMCH-02\b.{0,40}\b(?:ranks?|ranked)\s+(?:second|third|last)\b",
-    r"\bMCH-02\b.{0,30}\brank\s\*#?2\b",
-]
+ORDINAL_RANKS = {
+    "first": 1, "1st": 1, "1": 1,
+    "second": 2, "2nd": 2, "2": 2,
+    "third": 3, "3rd": 3, "3": 3,
+    "fourth": 4, "4th": 4, "4": 4,
+    "fifth": 5, "5th": 5, "5": 5,
+    "sixth": 6, "6th": 6, "6": 6,
+    "seventh": 7, "7th": 7, "7": 7,
+    "eighth": 8, "8th": 8, "8": 8,
+    "ninth": 9, "9th": 9, "9": 9,
+    "tenth": 10, "10th": 10, "10": 10,
+}
 
 
 def _numeric_values(value):
     if isinstance(value, dict):
         for item in value.values():
             yield from _numeric_values(item)
+
     elif isinstance(value, (list, tuple)):
         for item in value:
             yield from _numeric_values(item)
+
     elif isinstance(value, (int, float)) and not isinstance(value, bool):
         yield float(value)
+
     elif isinstance(value, str):
         for match in NUMBER_PATTERN.findall(value):
             try:
                 yield float(match.replace(",", ""))
             except ValueError:
                 continue
+
+
+def _approved_rankings(approved_context):
+    """Extract group names and approved ranks from deterministic context."""
+    key_values = approved_context.get("key_values", {})
+
+    if not isinstance(key_values, dict):
+        return []
+
+    groups = key_values.get("groups", [])
+
+    if isinstance(groups, list):
+        rankings = []
+
+        for item in groups:
+            if not isinstance(item, dict):
+                continue
+
+            group = item.get("group")
+            rank = item.get("rank")
+
+            if (
+                isinstance(group, str)
+                and group.strip()
+                and isinstance(rank, (int, float))
+                and not isinstance(rank, bool)
+                and rank > 0
+            ):
+                rankings.append({
+                    "group": group.strip(),
+                    "rank": int(rank),
+                })
+
+        if rankings:
+            return rankings
+
+    # Single-machine responses use group and priority_rank.
+    group = key_values.get("group")
+    rank = key_values.get("priority_rank", key_values.get("rank"))
+
+    if (
+        isinstance(group, str)
+        and group.strip()
+        and isinstance(rank, (int, float))
+        and not isinstance(rank, bool)
+        and rank > 0
+    ):
+        return [{
+            "group": group.strip(),
+            "rank": int(rank),
+        }]
+
+    return []
+
+
+def _claimed_rank(token, maximum_rank):
+    """Convert an explicit ranking word or number into a rank."""
+    normalized = token.lower().strip()
+
+    if normalized in ("highest", "top"):
+        return 1
+
+    if normalized in ("lowest", "last"):
+        return maximum_rank
+
+    return ORDINAL_RANKS.get(normalized)
+
+
+def _has_contradictory_ranking(explanation, approved_context):
+    """Reject ranking claims that contradict approved group rankings."""
+    rankings = _approved_rankings(approved_context)
+
+    if not rankings:
+        return False
+
+    maximum_rank = max(item["rank"] for item in rankings)
+
+    rank_tokens = "|".join(
+        re.escape(token)
+        for token in sorted(ORDINAL_RANKS, key=len, reverse=True)
+    )
+
+    position_tokens = (
+        rank_tokens
+        + r"|highest|top|lowest|last"
+    )
+
+    for item in rankings:
+        group = item["group"]
+        approved_rank = item["rank"]
+        escaped_group = re.escape(group)
+
+        # Group followed by an explicit ranking statement.
+        forward_pattern = re.compile(
+            rf"\b{escaped_group}\b"
+            rf"[^.!?\n]{{0,60}}?"
+            rf"(?:"
+            rf"\brank(?:s|ed)?\s*(?:at\s*)?"
+            rf"(?:number\s*|no\.?\s*|#\s*)?"
+            rf"(?P<rank>{rank_tokens})\b"
+            rf"|"
+            rf"\b(?:is|was)\s+(?:ranked\s+)?(?:the\s+)?"
+            rf"(?P<position>{position_tokens})\b"
+            rf")",
+            re.IGNORECASE,
+        )
+
+        for match in forward_pattern.finditer(explanation):
+            token = match.group("rank") or match.group("position")
+            claimed_rank = _claimed_rank(token, maximum_rank)
+
+            if (
+                claimed_rank is not None
+                and claimed_rank != approved_rank
+            ):
+                return True
+
+        # Explicit ranking statement followed by the group name.
+        reverse_pattern = re.compile(
+            rf"\b(?P<position>{position_tokens}|#\s*\d+)"
+            rf"(?:\s*[- ]ranked)?"
+            rf"\s+(?:machine\s+)?{escaped_group}\b",
+            re.IGNORECASE,
+        )
+
+        for match in reverse_pattern.finditer(explanation):
+            token = match.group("position").strip().lower()
+
+            if token.startswith("#"):
+                token = token[1:].strip()
+
+            claimed_rank = _claimed_rank(token, maximum_rank)
+
+            if (
+                claimed_rank is not None
+                and claimed_rank != approved_rank
+            ):
+                return True
+
+    return False
 
 
 def validate_explanation(explanation, approved_context):
@@ -66,6 +216,7 @@ def validate_explanation(explanation, approved_context):
         return False
 
     allowed_numbers = set(_numeric_values(approved_context))
+
     claimed_numbers = {
         float(item.replace(",", ""))
         for item in NUMBER_PATTERN.findall(explanation)
@@ -80,10 +231,7 @@ def validate_explanation(explanation, approved_context):
     ):
         return False
 
-    if any(
-        re.search(pattern, explanation, re.IGNORECASE)
-        for pattern in CONTRADICTION_PATTERNS
-    ):
+    if _has_contradictory_ranking(explanation, approved_context):
         return False
 
     return True
