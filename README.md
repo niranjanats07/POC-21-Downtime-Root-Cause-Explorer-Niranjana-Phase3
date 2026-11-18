@@ -1,4 +1,4 @@
-# POC-21 | Downtime Root Cause Explorer
+﻿# POC-21 | Downtime Root Cause Explorer
 
 **Infocreon Internship Project — Phase 3**
 
@@ -507,9 +507,80 @@ Post #4 Data Intelligence documentation and analytical reports are also retained
 - Deterministic assistant responses remain the fallback when Gemini is unavailable.
 - Geographic coordinates are not available in the supplied source data.
 - Some chart and table content may require horizontal scrolling on narrow screens.
-- Post #5 maintainer review and final approval remain pending.
+- Post #5 maintainer review and final approval: Approved.
 
 ---
+
+## Post #6 — Final Certification and Handover
+
+Post #6 covers the final technical certification, deployment validation, regression testing, evidence consolidation and handover of the Phase 3 application.
+
+### Certification Scope
+
+The final certification plan contains 24 controlled steps covering:
+
+- Pre-certification source snapshot and release identity.
+- Clean-clone, canonical-data and analytical reproducibility checks.
+- Intelligence output contract and frontend/backend build validation.
+- Operational Dashboard and Data Intelligence regression.
+- Grounded Assistant validation and automated tests.
+- Final Selenium journey and technical user acceptance testing.
+- Production deployment and local Docker container validation.
+- Evidence-pack preparation, architecture, completion report and handover.
+- Final source snapshot, release tag and GitHub submission, subject to authorization.
+
+### Verified Test and Validation Results
+
+- Consolidated automated suite: 64 passed, 0 failed, 1 warning.
+- Frontend lint, TypeScript validation and production build: passed.
+- Final Selenium journey: passed.
+- Technical final UAT: passed, including mobile viewport, keyboard focus visibility, API error and retry, empty results and filter reset checks.
+- Production deployment endpoint checks: HTTP 200 for the application and Data Intelligence routes; backend health reported healthy.
+- Local Docker Compose build and runtime checks: passed; backend health and both frontend routes verified.
+- Approved Track A output: 11 results, 30 source incidents and 2,795 observed downtime minutes.
+- Data version: 1.1.0.
+- Method version: 1.0.0.
+
+The automated test warning and validation limitations are documented in the detailed reports. Technical verification does not establish independent confirmation of the deployed source commit or Render build identity.
+
+### Evidence and Handover Documents
+
+Key Post #6 documents:
+
+- `docs/PHASE3_RELEASE_MANIFEST.md`
+- `docs/PHASE3_CLEAN_CLONE_VALIDATION_REPORT.md`
+- `docs/PHASE3_CANONICAL_DATA_VALIDATION_REPORT.md`
+- `docs/PHASE3_DATA_READINESS_REVALIDATION_REPORT.md`
+- `docs/PHASE3_ANALYTICAL_REGENERATION_REPORT.md`
+- `docs/PHASE3_AUTOMATED_TEST_REPORT.md`
+- `docs/PHASE3_FINAL_SELENIUM_REPORT.md`
+- `docs/PHASE3_POST6_FINAL_UAT_REPORT.md`
+- `docs/PHASE3_POST6_DEPLOYMENT_VALIDATION_REPORT.md`
+- `docs/PHASE3_POST6_CONTAINER_VALIDATION_REPORT.md`
+- `docs/PHASE3_FINAL_ARCHITECTURE.md`
+- `docs/PHASE3_COMPLETION_REPORT.md`
+- `docs/PHASE3_HANDOVER_GUIDE.md`
+- `final-evidence/README.md`
+
+The `final-evidence/` directory contains the prescribed 15-folder evidence structure, including release, clean-clone, data, analytical, regression, assistant, automated-test, Selenium, UAT, deployment, screenshot and handover evidence.
+
+### Certification Status
+
+**Technical validation is substantially complete; final certification is pending.**
+
+The following release activities remain subject to completion and explicit authorization:
+
+- Release-manifest reconciliation against the final certified commit and tag.
+- Root README and final evidence-pack review.
+- Final Repomix generation after authorized repository changes.
+- Release tag `phase3-v1.0.0`.
+- Final GitHub submission and reviewer signoff.
+
+No final certification outcome is assigned in this README. The approved final outcomes are:
+
+- `PHASE 3 COMPLETE — CERTIFIED`
+- `PHASE 3 FINAL CHANGES REQUIRED`
+- `PHASE 3 CERTIFICATION BLOCKED`
 
 ## Project Status
 
@@ -523,7 +594,14 @@ Post #4 Data Intelligence documentation and analytical reports are also retained
 | Post #5 Backend Regression | 44 tests passed |
 | Post #5 Gemini Tests | 9 tests passed |
 | Post #5 Frontend TypeScript and Build | Passed |
-| Post #5 Maintainer Approval | Pending |
+| Post #6 Automated Test Suite | 64 passed, 0 failed, 1 warning |
+| Post #6 Final Selenium Journey | Passed |
+| Post #6 Technical UAT | Passed; reviewer signoff pending |
+| Post #6 Deployment Validation | Passed; deployed build identity not independently verified |
+| Post #6 Container Validation | Passed locally |
+| Post #6 Architecture, Completion and Handover Documents | Prepared |
+| Post #6 Final Certification | Pending |
+| Post #5 Maintainer Approval | Approved |
 
 Implementation and verification completion do not constitute formal maintainer approval or production certification.
 

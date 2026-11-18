@@ -110,7 +110,11 @@ class GroundedAssistantSeleniumTests(unittest.TestCase):
         ).text
 
         self.assertIn("Grounded Data Assistant", page_text)
-        self.assertIn("Mode A", page_text)
+        self.assertIn("POST #5", page_text)
+        self.assertIn(
+            "Mode B · Grounded Gemini explanation",
+            page_text
+        )
         self.assertIn(
             "Ask about the approved Track A results",
             page_text

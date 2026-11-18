@@ -1,0 +1,19 @@
+﻿POC-21 PHASE 3 POST #6 - CONTAINER VALIDATION
+Captured: 2026-11-17T22:59:56.8633006+05:30
+Compose configuration: PASS
+Backend Docker image build: PASS
+Frontend Docker image build: PASS
+Initial build attempt: FAILED temporarily due to Docker TLS record-layer error; subsequent build succeeded
+Phase 2 backend container: Preserved as downtime-backend-phase2-preserved
+Phase 2 frontend container: Preserved as downtime-frontend-phase2-preserved
+Phase 3 backend container: Running
+Phase 3 frontend container: Running
+Backend health: healthy
+Frontend root: HTTP 200
+Data Intelligence route: HTTP 200
+Intelligence metadata: POC-21; data_version 1.1.0; method_version 1.0.0; quality PASS
+Intelligence results: 11 records; all data_version 1.1.0; method_version 1.0.0; quality_status validated
+Summary: 30 incidents; 2795 downtime minutes; validation PASS
+Top findings: Mechanical 1265 minutes; MCH-02 850 minutes; Morning 1060 minutes
+Synthetic-data and descriptive-only limitations preserved
+Deployment triggered: No
