@@ -1,0 +1,32 @@
+﻿# Historical backup directories and files
+backups/**
+**/*.bak
+**/*.backup
+**/*.before-*
+
+# Historical and generated Repomix snapshots
+repomix-output.xml
+repomix-*.xml
+repomix-*.md
+
+# Dependencies and generated builds
+**/node_modules/**
+**/.next/**
+**/__pycache__/**
+**/.pytest_cache/**
+**/.mypy_cache/**
+**/dist/**
+**/build/**
+**/out/**
+
+# Virtual environments and local secrets
+**/.venv/**
+**/venv/**
+**/env/**
+**/.env
+**/.env.*
+!**/.env.example
+
+# Temporary files and logs
+**/*.log
+**/.cache/**
