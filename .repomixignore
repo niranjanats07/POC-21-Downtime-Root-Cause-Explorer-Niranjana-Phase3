@@ -30,3 +30,5 @@ repomix-*.md
 # Temporary files and logs
 **/*.log
 **/.cache/**
+
+**/*_backup.py
