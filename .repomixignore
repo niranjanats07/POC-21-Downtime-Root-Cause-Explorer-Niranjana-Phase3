@@ -34,3 +34,8 @@ repomix-*.md
 **/*_backup.py
 
 frontend/src-post4-before-restore-20261109-081350/**
+
+# Historical assistant backup and Post #5 staging notes
+backend/app/assistant/core/gemini_explainer.py.backup-*
+docs/POST5_STAGED_CHANGE_SUMMARY.txt
+docs/POST5_STAGED_FILE_LIST.txt
