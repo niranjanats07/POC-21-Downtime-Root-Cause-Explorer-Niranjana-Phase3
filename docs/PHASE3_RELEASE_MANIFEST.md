@@ -1,4 +1,4 @@
-﻿# Phase 3 Release Manifest
+# Phase 3 Release Manifest
 
 ## Project
 - Project ID: POC-21
@@ -6,6 +6,7 @@
 - Repository: https://github.com/niranjanats07/POC-21-Downtime-Root-Cause-Explorer-Niranjana-Phase3
 - Branch: main
 - Baseline Commit SHA: cab343e58762b5800ed07b12060fc6558e70dd90
+- Evidence Commit SHA: 2c52fbd49a8661a22afd6f89e359081f2660fd6a
 - Certified Commit SHA: Pending final certification
 - Release Tag: phase3-v1.0.0 (planned)
 - Application Version: 0.1.0
