@@ -37,7 +37,7 @@ The evidence pack follows the 15-folder structure prescribed by the mandatory Ph
 | `11-selenium` | Final Selenium journey report and supporting Selenium evidence |
 | `12-uat` | Final Post #6 UAT and supporting historical UAT reports |
 | `13-deployment` | Deployment and container validation reports and raw validation logs |
-| `14-screenshots` | Verified Post #6 journey/UAT screenshots and supporting Post #5 assistant screenshot |
+| `14-screenshots` | Verified Post #6 journey/UAT screenshots, supporting Post #5 assistant screenshot, and mobile screenshots in `14-screenshots/mobile/` (`operational-dashboard-mobile.png`, `data-intelligence-mobile.png`) |
 | `15-handover` | Final architecture, completion report, handover guide and project README |
 
 ### 15-handover document inventory
@@ -129,6 +129,7 @@ The final result must be one of the three outcomes prescribed by the Post #6 cer
 - `PHASE 3 CERTIFICATION BLOCKED`
 
 Final certification requires completion of all mandatory steps and reviewer signoff.
+
 
 
 
