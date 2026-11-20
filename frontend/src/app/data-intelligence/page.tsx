@@ -1,4 +1,4 @@
-﻿
+
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -44,6 +44,19 @@ type IntelligenceResult = {
   limitation: string;
 };
 
+type SupportingIncident = {
+  incident_id: string;
+  machine_id: string;
+  incident_date: string;
+  shift: string;
+  root_cause: string;
+  sub_cause: string;
+  downtime_minutes: number;
+  failure_frequency: number;
+  severity: string;
+  status: string;
+  description: string;
+};
 type IntelligenceSummary = {
   project_id?: string;
   data_version?: string;
@@ -62,6 +75,12 @@ type IntelligenceMetadata = {
   generated_at?: string;
 };
 
+function formatDisplayValue(value: string | number): string {
+  return typeof value === "number"
+    ? value.toLocaleString(undefined, { maximumFractionDigits: 2 })
+    : value;
+}
+
 export default function DataIntelligencePage() {
   const [summary, setSummary] =
     useState<IntelligenceSummary | null>(null);
@@ -74,6 +93,12 @@ export default function DataIntelligencePage() {
   const [error, setError] = useState("");
   const [selectedDimension, setSelectedDimension] =
     useState("all");
+  const [selectedResultId, setSelectedResultId] = useState("");
+  const [supportingIncidents, setSupportingIncidents] = useState<SupportingIncident[]>([]);
+  const [incidentsLoading, setIncidentsLoading] = useState(false);
+  const [incidentsError, setIncidentsError] = useState("");
+  const [incidentRetryCount, setIncidentRetryCount] = useState(0);
+  const [assistantInitialQuestion, setAssistantInitialQuestion] = useState("");
   const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
@@ -201,6 +226,80 @@ export default function DataIntelligencePage() {
         result.result_category === selectedDimension
     );
   }, [results, selectedDimension]);
+
+  const selectedResult = results.find((result) => result.result_id === selectedResultId) ?? null;
+  const evidenceResults = selectedResult ? [selectedResult] : filteredResults;
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function loadSupportingIncidents() {
+      if (!selectedResult) {
+        setSupportingIncidents([]);
+        setIncidentsError("");
+        setIncidentsLoading(false);
+        return;
+      }
+
+      const filterParameter =
+        selectedResult.result_category === "root_cause_category"
+          ? "root_cause"
+          : selectedResult.result_category === "machine"
+            ? "machine_id"
+            : selectedResult.result_category === "shift"
+              ? "shift"
+              : null;
+
+      if (!filterParameter) {
+        setSupportingIncidents([]);
+        setIncidentsError("This finding dimension is not supported by the incident filter.");
+        setIncidentsLoading(false);
+        return;
+      }
+
+      setSupportingIncidents([]);
+      setIncidentsError("");
+      setIncidentsLoading(true);
+
+      try {
+        const params = new URLSearchParams();
+        params.set(filterParameter, selectedResult.group_key);
+
+        const response = await fetch(
+          `${API}/api/incidents/filter?${params.toString()}`,
+          { signal: controller.signal }
+        );
+
+        if (!response.ok) {
+          throw new Error("Unable to load supporting incident records.");
+        }
+
+        const data: unknown = await response.json();
+
+        if (!Array.isArray(data)) {
+          throw new Error("The supporting incident response has an invalid format.");
+        }
+
+        setSupportingIncidents(data as SupportingIncident[]);
+      } catch (err) {
+        if (controller.signal.aborted) return;
+
+        setSupportingIncidents([]);
+        setIncidentsError(
+          err instanceof Error
+            ? err.message
+            : "Unable to load supporting incident records."
+        );
+      } finally {
+        if (!controller.signal.aborted) {
+          setIncidentsLoading(false);
+        }
+      }
+    }
+
+    loadSupportingIncidents();
+
+    return () => controller.abort();
+  }, [selectedResult, incidentRetryCount]);
 
   const generatedAtDate = generatedAt
     ? new Date(generatedAt)
@@ -358,7 +457,7 @@ export default function DataIntelligencePage() {
                 Approved comparative intelligence showing which observed
                 root-cause categories, machines, and shifts contribute the
                 greatest downtime and failure-frequency burden.
-              </p>
+                </p>
             </div>
 
             <nav aria-label="Main navigation">
@@ -453,9 +552,9 @@ export default function DataIntelligencePage() {
           <div className="mb-5">
             <h2 className="text-xl font-semibold">
               Key Comparative Findings
-            </h2>
+              </h2>
 
-            <p className="mt-1 text-sm text-slate-400">
+              <p className="mt-1 text-sm text-slate-400">
               Highest-priority validated intelligence from the approved
               analytical output.
             </p>
@@ -465,7 +564,7 @@ export default function DataIntelligencePage() {
             {topResults.map((result) => (
               <div
                 key={result.result_id}
-                className="rounded-xl border border-slate-800 bg-slate-950 p-5"
+                className={`rounded-xl border bg-slate-950 p-5 transition ${selectedResultId === result.result_id ? "border-cyan-500 ring-1 ring-cyan-500/50" : "border-slate-800"}`}
               >
                 <div className="flex items-center justify-between gap-3">
                   <span className="text-xs font-medium uppercase tracking-wide text-cyan-400">
@@ -491,9 +590,33 @@ export default function DataIntelligencePage() {
                   </p>
 
                   <p className="mt-1 text-xl font-semibold text-cyan-300">
-                    {result.result_value}
+                    {formatDisplayValue(result.result_value)}
                   </p>
                 </div>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedResultId(result.result_id)}
+                  aria-pressed={selectedResultId === result.result_id}
+                  className="mb-3 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm font-medium text-slate-200 hover:border-cyan-600 hover:bg-slate-800"
+                >
+                  {selectedResultId === result.result_id ? "Evidence selected" : "View evidence"}
+                </button>
+
+                <button
+                  type="button"
+                  disabled={!/^RES-\d{4}$/.test(result.result_id)}
+                  onClick={() => {
+                    setAssistantInitialQuestion(`Explain result ${result.result_id}`);
+                    document.getElementById("grounded-data-assistant")?.scrollIntoView({
+                      behavior: "smooth",
+                      block: "start",
+                    });
+                  }}
+                  className="mt-4 w-full rounded-lg border border-cyan-800 bg-cyan-950/40 px-3 py-2 text-sm font-medium text-cyan-200 transition hover:border-cyan-600 hover:bg-cyan-900/50 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Explain with Grounded Assistant
+                </button>
               </div>
             ))}
           </div>
@@ -509,7 +632,7 @@ export default function DataIntelligencePage() {
 
               <p className="mt-1 text-sm text-slate-400">
                 Results are served from the validated analytical output.
-              </p>
+                </p>
             </div>
 
             <div>
@@ -523,9 +646,10 @@ export default function DataIntelligencePage() {
               <select
                 id="result-dimension"
                 value={selectedDimension}
-                onChange={(event) =>
-                  setSelectedDimension(event.target.value)
-                }
+                onChange={(event) => {
+                  setSelectedDimension(event.target.value);
+                  setSelectedResultId("");
+                }}
                 className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white outline-none"
               >
                 <option value="all">All dimensions</option>
@@ -566,16 +690,14 @@ export default function DataIntelligencePage() {
                       {result.result_type}
                     </td>
 
-                    <td className="px-4 py-4 font-medium text-white">
-                      {result.group_key}
-                    </td>
+                    <td className="px-4 py-4 font-medium text-white"><button type="button" onClick={() => setSelectedResultId(result.result_id)} aria-pressed={selectedResultId === result.result_id} className="rounded px-1 py-1 text-left text-cyan-300 underline-offset-4 hover:text-cyan-200 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-400">{result.group_key}</button></td>
 
                     <td className="px-4 py-4 text-slate-400">
                       {result.metric_name}
                     </td>
 
                     <td className="px-4 py-4 font-semibold text-white">
-                      {result.result_value}
+                      {formatDisplayValue(result.result_value)}
                     </td>
 
                     <td className="px-4 py-4 text-slate-400">
@@ -614,7 +736,10 @@ export default function DataIntelligencePage() {
 
                       <button
                         type="button"
-                        onClick={() => setSelectedDimension("all")}
+                        onClick={() => {
+                          setSelectedDimension("all");
+                          setSelectedResultId("");
+                        }}
                         className="mt-4 rounded-lg border border-slate-700 px-4 py-2 text-sm text-cyan-300 hover:bg-slate-800"
                       >
                         Clear filters
@@ -635,18 +760,25 @@ export default function DataIntelligencePage() {
 
         {/* Supporting evidence */}
         <section>
-          <div className="mb-4">
-            <h2 className="text-xl font-semibold">
-              Supporting Evidence
-            </h2>
+          <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 className="text-xl font-semibold">
+                {selectedResult ? "Selected Finding Evidence" : "Supporting Evidence"}
+              </h2>
 
-            <p className="mt-1 text-sm text-slate-400">
-              Evidence and limitations attached to each analytical result.
-            </p>
+              <p className="mt-1 text-sm text-slate-400">
+                {selectedResult ? `Evidence and limitations for ${selectedResult.group_key} (${selectedResult.result_id}).` : "Evidence and limitations attached to each analytical result."}
+              </p>
+            </div>
+            {selectedResult && (
+              <button type="button" onClick={() => setSelectedResultId("")} className="rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-300 hover:border-cyan-600 hover:text-cyan-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-400">
+                Clear selection
+              </button>
+            )}
           </div>
 
           <div className="grid gap-4 lg:grid-cols-2">
-            {filteredResults.map((result) => (
+            {evidenceResults.map((result) => (
               <div
                 key={`${result.result_id}-evidence`}
                 className="rounded-2xl border border-slate-800 bg-slate-900 p-5"
@@ -657,6 +789,7 @@ export default function DataIntelligencePage() {
                       {result.result_type}
                     </p>
 
+                    <p className="mt-2 text-xs uppercase tracking-wide text-slate-400">Analytical entity</p>
                     <h3 className="mt-1 font-semibold">
                       {result.group_key}
                     </h3>
@@ -667,6 +800,36 @@ export default function DataIntelligencePage() {
                   </span>
                 </div>
 
+                <div className="mt-4 grid gap-3 rounded-lg border border-slate-800 bg-slate-950 p-4 sm:grid-cols-2">
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-slate-400">Result ID</p>
+                    <p className="mt-1 text-sm font-medium text-slate-200">{result.result_id}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-slate-400">Metric</p>
+                    <p className="mt-1 text-sm font-medium text-slate-200">{result.metric_name}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-slate-400">Approved result value</p>
+                    <p className="mt-1 text-sm font-semibold text-cyan-300">{formatDisplayValue(result.result_value)}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-slate-400">Quality status</p>
+                    <p className="mt-1 text-sm font-medium text-slate-200">{result.quality_status}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-slate-400">Method version</p>
+                    <p className="mt-1 text-sm text-slate-200">{result.method_version}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-slate-400">Data version</p>
+                    <p className="mt-1 text-sm text-slate-200">{result.data_version}</p>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <p className="text-xs uppercase tracking-wide text-slate-400">Generated at</p>
+                    <p className="mt-1 break-all text-sm text-slate-200">{result.generated_at}</p>
+                  </div>
+                </div>
                 <div className="mt-4 space-y-2">
                   {result.evidence.map((item, index) => (
                     <div
@@ -678,18 +841,67 @@ export default function DataIntelligencePage() {
                       </span>
 
                       <span className="font-medium text-slate-200">
-                        {item.value}
+                        {formatDisplayValue(item.value)}
                       </span>
 
-                      {item.contribution !== null && (
-                        <span className="text-cyan-300">
-                          Contribution: {item.contribution}
-                        </span>
-                      )}
                     </div>
                   ))}
                 </div>
 
+                {selectedResult && result.result_id === selectedResult.result_id && (
+                  <section className="mt-5 rounded-xl border border-cyan-900/70 bg-slate-950 p-4" aria-labelledby="supporting-incidents-title">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <h4 id="supporting-incidents-title" className="font-semibold text-cyan-200">
+                        Supporting Synthetic Incident Records
+                      </h4>
+                      <span className="text-xs text-slate-400">
+                        {supportingIncidents.length} matching records
+                      </span>
+                    </div>
+                    <p className="mt-1 text-xs leading-5 text-slate-400">
+                      Contextual source records returned by the incident filter. These records are separate from the approved Track A analytical result.
+                    </p>
+
+                    {incidentsLoading ? (
+                      <p className="mt-4 text-sm text-slate-300" role="status">Loading supporting incident records...</p>
+                    ) : incidentsError ? (
+                      <>
+                      <p className="mt-4 text-sm text-amber-300" role="alert">{incidentsError}</p>
+                      <button
+                        type="button"
+                        onClick={() => setIncidentRetryCount((count) => count + 1)}
+                        className="mt-3 rounded-lg border border-amber-800 px-3 py-2 text-sm text-amber-200 hover:border-amber-600 hover:bg-amber-950/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400"
+                      >
+                        Retry incident lookup
+                      </button>
+                      </>
+                    ) : supportingIncidents.length === 0 ? (
+                      <p className="mt-4 text-sm text-slate-400">No matching incident records were returned for this finding.</p>
+                    ) : (
+                      <div className="mt-4 space-y-3">
+                        {supportingIncidents.map((incident) => (
+                          <article key={incident.incident_id} className="rounded-lg border border-slate-800 bg-slate-900 p-3">
+                            <div className="flex flex-wrap items-center justify-between gap-2">
+                              <h5 className="font-medium text-white">{incident.incident_id}</h5>
+                              <span className="text-xs text-slate-400">{incident.incident_date}</span>
+                            </div>
+                            <div className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
+                              <p><span className="text-slate-400">Machine: </span><span className="text-slate-200">{incident.machine_id}</span></p>
+                              <p><span className="text-slate-400">Shift: </span><span className="text-slate-200">{incident.shift}</span></p>
+                              <p><span className="text-slate-400">Root cause: </span><span className="text-slate-200">{incident.root_cause}</span></p>
+                              <p><span className="text-slate-400">Sub-cause: </span><span className="text-slate-200">{incident.sub_cause}</span></p>
+                              <p><span className="text-slate-400">Downtime: </span><span className="text-cyan-200">{incident.downtime_minutes} minutes</span></p>
+                              <p><span className="text-slate-400">Severity / Status: </span><span className="text-slate-200">{incident.severity} / {incident.status}</span></p>
+                            </div>
+                            {incident.description && (
+                              <p className="mt-3 border-t border-slate-800 pt-3 text-xs leading-5 text-slate-400">{incident.description}</p>
+                            )}
+                          </article>
+                        ))}
+                      </div>
+                    )}
+                  </section>
+                )}
                 <div className="mt-4 rounded-lg border border-slate-800 bg-slate-950 p-4">
                   <p className="text-xs font-medium uppercase tracking-wide text-slate-300">
                     Limitation
@@ -729,7 +941,7 @@ export default function DataIntelligencePage() {
         </section>
 
         {/* Grounded Data Assistant - Phase 3 Post #5 */}
-        <AssistantPanel />
+        <AssistantPanel key={assistantInitialQuestion} initialQuestion={assistantInitialQuestion} />
 
         {/* Limitations */}
         <section className="rounded-2xl border border-amber-900/60 bg-amber-950/20 p-6">

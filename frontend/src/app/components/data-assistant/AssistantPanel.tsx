@@ -132,8 +132,8 @@ function GeminiExplanation({
   );
 }
 
-export default function AssistantPanel() {
-  const [question, setQuestion] = useState("");
+export default function AssistantPanel({ initialQuestion = "" }: { initialQuestion?: string }) {
+  const [question, setQuestion] = useState(initialQuestion);
   const [response, setResponse] = useState<AssistantResponse | null>(null);
   const [requestStatus, setRequestStatus] = useState<
     "idle" | "loading" | "success" | "error"
@@ -241,6 +241,7 @@ export default function AssistantPanel() {
 
   return (
     <section
+      id="grounded-data-assistant"
       aria-labelledby="data-assistant-title"
       className="space-y-5 rounded-2xl border border-cyan-900/70 bg-slate-900 p-6 shadow-xl"
     >

@@ -224,3 +224,72 @@ Formal reviewer/maintainer sign-off remains separate from these technical observ
 ---
 
 **Document status: TECHNICAL UAT RECORDED â€” REVIEW SIGN-OFF PENDING**
+
+## 15. Focused Professional UI/UX Enhancement — 2026-11-20
+
+Following maintainer acceptance of the technical Phase 3 implementation, a focused demonstration-experience enhancement was validated.
+
+### Enhancement acceptance observations
+
+| Area | Observed result | Status |
+|---|---|---|
+| Operational Dashboard | Compact filters and primary operational views retained in the desktop layout | PASS — manual check |
+| Data Intelligence | Validated findings, comparisons and visualizations presented | PASS — manual check |
+| Investigation workflow | Machine, root-cause and finding selection exposes supporting evidence and incident context | PASS — manual check |
+| Grounded explanation | Gemini explanation uses approved analytical evidence; deterministic result remains authoritative | PASS — manual check |
+| Responsive experience | Desktop and mobile layouts manually checked | PASS — manual check |
+| Technical safeguards | No new analytical model, forecasting, frontend recalculation or unsupported finding introduced | PASS — scope review |
+
+These observations are limited to the stated manual checks and do not constitute a complete accessibility or cross-device certification.
+
+### Fresh automated browser regression — 2026-11-20
+
+The final Selenium journey was rerun against the local frontend after the UI/UX enhancement.
+
+- Target: `http://localhost:3000`
+- Browser: Google Chrome 157.0.8103.79
+- ChromeDriver: 157.0.8103.78
+- Result: 1 passed, 0 failed
+- Duration: 67.15 seconds
+
+The journey verified Operational Dashboard access, Data Intelligence navigation, approved metadata visibility, Grounded Data Assistant presence and return navigation.
+
+Fresh screenshots:
+- `docs/evidence/13-final-selenium/post6-01-operational-dashboard.png`
+- `docs/evidence/13-final-selenium/post6-02-data-intelligence.png`
+- `docs/evidence/13-final-selenium/post6-03-return-operational-dashboard.png`
+
+The screenshot files were verified as non-empty and captured on 2026-11-20.
+
+Detailed execution record: `docs/PHASE3_FINAL_SELENIUM_REPORT.md`.
+
+### Scope and release boundary
+
+The approved Track A outputs, data version 1.1.0 and method version 1.0.0 remain the analytical source of truth. The stale-data warning and synthetic-data, descriptive-only limitations remain visible.
+
+This is local UI/UX regression evidence. It does not establish that these latest local changes have been deployed to the production URL, committed, pushed, or approved by the reviewer.
+
+**Focused UI/UX local regression: PASS — reviewer acceptance pending.**
+
+## 16. Verified Mobile-Viewport Browser Evidence — 2026-11-20
+
+A Selenium browser capture used Chrome DevTools viewport emulation at 390 × 844 CSS pixels against the local frontend.
+
+| Check | Result |
+|---|---|
+| Operational Dashboard route | Captured |
+| Data Intelligence route | Captured |
+| Viewport width | 390 px |
+| Viewport height | 844 px |
+| Document width | 390 px |
+| Horizontal document overflow | None |
+| Screenshot files | Both non-empty |
+| Browser capture | PASS |
+
+Evidence:
+- `docs/evidence/13-final-selenium/post6-04-operational-dashboard-mobile.png`
+- `docs/evidence/13-final-selenium/post6-05-data-intelligence-mobile.png`
+
+This is emulated mobile-viewport browser evidence, not a physical-device test or full cross-device certification. It was captured against the local frontend and does not establish production deployment.
+
+**Mobile-viewport capture: PASS — reviewer acceptance pending.**

@@ -1,4 +1,4 @@
-﻿
+
 "use client";
 
 import Link from "next/link";
@@ -438,8 +438,48 @@ export default function Home() {
           </p>
         ) : (
           <>
-            {/* Filters */}
-            <section className="mb-8 min-w-0 rounded-xl border border-slate-800 bg-slate-900 p-5">
+            {/* KPI Cards */}
+            <section className="mb-8 grid min-w-0 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {[
+                ["Total Incidents", totalIncidents, "incidents"],
+                ["Total Downtime", totalDowntime, "minutes"],
+                [
+                  "Average Downtime",
+                  averageDowntime.toFixed(1),
+                  "minutes",
+                ],
+                [
+                  "Closed Incident Average",
+                  closedAverage.toFixed(1),
+                  "minutes",
+                ],
+              ].map(([label, value, unit]) => (
+                <div
+                  key={String(label)}
+                  className="min-w-0 rounded-xl border border-slate-800 bg-slate-900 p-5"
+                >
+                  <p className="text-sm text-slate-400">{label}</p>
+
+                  <p className="mt-3 text-3xl font-bold text-cyan-300">
+                    {value}
+                  </p>
+
+                  <p className="mt-1 text-xs text-slate-500">
+                    {unit}
+                  </p>
+                </div>
+              ))}
+            </section>
+
+            {/* Compact expandable filters */}
+            <details className="mb-6 min-w-0 rounded-xl border border-slate-800 bg-slate-900">
+              <summary className="cursor-pointer px-5 py-4 text-sm font-semibold text-cyan-300 hover:text-cyan-200">
+                Incident Filters & Exports
+                <span className="ml-2 text-xs font-normal text-slate-400">
+                  ({filteredIncidents.length} of {incidents.length} incidents)
+                </span>
+              </summary>
+              <section className="border-t border-slate-800 p-5">
               <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <h2 className="text-lg font-semibold">
@@ -513,40 +553,9 @@ export default function Home() {
                   {filteredIncidents.length} of {incidents.length} incidents
                 </span>
               </div>
-            </section>
+                          </section>
+            </details>
 
-            {/* KPI Cards */}
-            <section className="mb-8 grid min-w-0 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {[
-                ["Total Incidents", totalIncidents, "incidents"],
-                ["Total Downtime", totalDowntime, "minutes"],
-                [
-                  "Average Downtime",
-                  averageDowntime.toFixed(1),
-                  "minutes",
-                ],
-                [
-                  "Closed Incident Average",
-                  closedAverage.toFixed(1),
-                  "minutes",
-                ],
-              ].map(([label, value, unit]) => (
-                <div
-                  key={String(label)}
-                  className="min-w-0 rounded-xl border border-slate-800 bg-slate-900 p-5"
-                >
-                  <p className="text-sm text-slate-400">{label}</p>
-
-                  <p className="mt-3 text-3xl font-bold text-cyan-300">
-                    {value}
-                  </p>
-
-                  <p className="mt-1 text-xs text-slate-500">
-                    {unit}
-                  </p>
-                </div>
-              ))}
-            </section>
 
             {filteredIncidents.length === 0 ? (
               <div className="mb-8 rounded-xl border border-amber-500/30 bg-amber-500/10 p-6 text-amber-200">

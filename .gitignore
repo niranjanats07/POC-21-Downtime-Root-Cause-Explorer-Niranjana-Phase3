@@ -1,4 +1,4 @@
-﻿# Node.js dependencies
+# Node.js dependencies
 node_modules/
 frontend/node_modules/
 
@@ -30,7 +30,7 @@ env/
 # Backups and temporary exports
 backend_backup/
 data_backup/
-repomix-output.xml
+repomix*
 
 # Operating system files
 .DS_Store

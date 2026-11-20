@@ -138,3 +138,76 @@ The three PNG screenshots are retained as certification evidence.
 The final Selenium journey has passed.
 
 This report certifies only the scope described above. Overall Phase 3 certification remains PENDING until all 24 mandatory certification steps are completed, reviewed, and supported by evidence.
+---
+
+## 12. Latest Local UI/UX Enhancement Regression — 2026-11-20
+
+A fresh Selenium execution was completed after the focused professional UI/UX enhancement.
+
+| Field | Value |
+|---|---|
+| Execution date | 2026-11-20 |
+| Target | Local Next.js development frontend |
+| Base URL | `http://localhost:3000` |
+| Browser | Google Chrome 157.0.8103.79 |
+| ChromeDriver | 157.0.8103.78 |
+| Execution mode | Headless Chrome |
+| Test command | `python -m pytest .\tests\test_phase3_final_journey_selenium.py -v -s` |
+| Result | PASS |
+| Duration | 67.15 seconds |
+| Tests passed | 1 |
+| Tests failed | 0 |
+
+### Actual journey result
+
+- Operational Dashboard opened successfully.
+- Data Intelligence navigation completed successfully.
+- Main navigation and approved intelligence metadata checks passed.
+- Grounded Data Assistant presence check passed.
+- Return navigation to Operational Dashboard passed.
+- Navigation availability after returning passed.
+
+**Execution output:** `FINAL JOURNEY RESULT: PASS`
+
+### Fresh screenshot evidence
+
+All three files were verified as present and non-empty.
+
+| Evidence | File | Size | Capture time |
+|---|---|---:|---|
+| Operational Dashboard | `post6-01-operational-dashboard.png` | 35,747 bytes | 06:46:10 |
+| Data Intelligence | `post6-02-data-intelligence.png` | 87,560 bytes | 06:46:23 |
+| Return to Operational Dashboard | `post6-03-return-operational-dashboard.png` | 83,343 bytes | 06:46:24 |
+
+Evidence directory: `docs/evidence/13-final-selenium/`
+
+### Interpretation
+
+The 2026-11-20 local Selenium execution provides fresh regression evidence for the Operational Dashboard and Data Intelligence navigation journey after the UI/UX enhancement.
+
+The earlier 2026-11-17 production execution remains historical evidence and is not represented as a new production deployment test.
+
+This execution does not independently certify mobile-device rendering, accessibility conformance, every interactive state, or production deployment of the latest local changes.
+
+The technical Phase 3 implementation has already received maintainer acceptance. Final acceptance of the focused professional demonstration enhancement and any subsequent release activity remain subject to reviewer confirmation.
+
+**Latest local Selenium journey: PASS**
+
+## 13. Mobile-Viewport Regression Evidence — 2026-11-20
+
+Chrome DevTools emulation was used to capture both application routes at a 390 × 844 CSS-pixel viewport against the local frontend.
+
+| Measurement | Result |
+|---|---:|
+| Viewport width | 390 px |
+| Viewport height | 844 px |
+| Document width | 390 px |
+| Horizontal document overflow | None |
+
+Screenshots:
+- `docs/evidence/13-final-selenium/post6-04-operational-dashboard-mobile.png`
+- `docs/evidence/13-final-selenium/post6-05-data-intelligence-mobile.png`
+
+Both screenshot files were verified as non-empty on 2026-11-20.
+
+**Result: PASS — mobile-viewport capture.** This is browser emulation, not a physical-device or complete cross-device certification. The run targeted the local frontend and does not establish production deployment or reviewer acceptance.
